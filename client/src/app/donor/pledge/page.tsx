@@ -34,6 +34,22 @@ export default function DonorPledgePage() {
     const [modalTarget, setModalTarget] = useState<ModalTarget | null>(null);
     const [isDeclarationChecked, setIsDeclarationChecked] = useState(false);
     const [isRevokeAllOpen, setIsRevokeAllOpen] = useState(false);
+    const [isDocked, setIsDocked] = useState(false);
+    const dockSentinelRef = React.useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const el = dockSentinelRef.current;
+        if (!el)
+            return;
+        const observer = new IntersectionObserver(([entry]) => {
+            setIsDocked(entry.isIntersecting);
+        }, {
+            root: null,
+            rootMargin: '0px 0px 0px 0px',
+            threshold: 0.1,
+        });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [loading, organTypes]);
     useEffect(() => {
         if (!authLoading && !user) {
             router.push('/auth/login');
@@ -197,7 +213,7 @@ export default function DonorPledgePage() {
             return 'Whole Blood & Cellular Units';
         return `${organ.category.replace(/_/g, ' ')}`;
     };
-    return (<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-32 sm:pb-36 w-full transition-colors duration-200">
+    return (<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-12 w-full transition-colors duration-200">
       <div className="space-y-8">
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
@@ -341,7 +357,36 @@ export default function DonorPledgePage() {
           </div>
         </div>
 
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl pointer-events-none">
+        <div ref={dockSentinelRef} className="w-full max-w-3xl mx-auto pt-6 min-h-[64px]">
+          {isDocked && (<div className="w-full animate-in fade-in duration-200">
+              <div className="px-5 sm:px-7 py-3 rounded-full backdrop-blur-2xl backdrop-saturate-150 bg-white/85 dark:bg-slate-900/85 border border-white/60 dark:border-white/10 shadow-2xl shadow-slate-900/15 dark:shadow-black/60 ring-1 ring-black/5 dark:ring-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 transition-all duration-300">
+                <div className="flex items-center gap-3">
+                  <span className="relative flex h-3 w-3 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 select-none">
+                    <strong className="text-slate-900 dark:text-white font-bold">{pledges.length}</strong> organ donation {pledges.length === 1 ? 'directive' : 'directives'} selected
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                  {pledges.length > 0 && (<button type="button" onClick={() => setIsRevokeAllOpen(true)} className="px-4 py-2 rounded-full bg-rose-50/80 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/70 border border-rose-200/80 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95">
+                      <Trash2 className="w-3.5 h-3.5"/>
+                      Revoke All Pledges
+                    </button>)}
+
+                  <button type="button" onClick={handlePledgeOrgans} disabled={saving} className="px-6 py-2.5 rounded-full bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-600 text-white font-semibold text-xs shadow-md shadow-rose-500/25 flex items-center gap-2 transition-all disabled:opacity-50 cursor-pointer active:scale-95">
+                    <Heart className="w-4 h-4 fill-white"/>
+                    {saving ? 'Recording Pledges...' : 'Pledge Organs'}
+                  </button>
+                </div>
+              </div>
+            </div>)}
+        </div>
+      </div>
+
+      {!isDocked && (<div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl pointer-events-none transition-all duration-300 animate-in fade-in">
           <div className="pointer-events-auto px-5 sm:px-7 py-3 rounded-full backdrop-blur-2xl backdrop-saturate-150 bg-white/85 dark:bg-slate-900/85 border border-white/60 dark:border-white/10 shadow-2xl shadow-slate-900/15 dark:shadow-black/60 ring-1 ring-black/5 dark:ring-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 transition-all duration-300">
             <div className="flex items-center gap-3">
               <span className="relative flex h-3 w-3 shrink-0">
@@ -365,8 +410,7 @@ export default function DonorPledgePage() {
               </button>
             </div>
           </div>
-        </div>
-      </div>
+        </div>)}
 
       {modalTarget && (<div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto transition-colors">
