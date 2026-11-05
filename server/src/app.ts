@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import { autoMigrateDatabase } from './config/database';
 import authRoutes from './routes/authRoutes';
 import citizenRoutes from './routes/citizenRoutes';
 import pledgeRoutes from './routes/pledgeRoutes';
@@ -75,6 +76,19 @@ app.get('/api/health', (req: Request, res: Response) => {
     service: 'Organova Platform API',
     timestamp: new Date().toISOString(),
   });
+});
+
+app.get('/api/health/seed', async (req: Request, res: Response) => {
+  try {
+    await autoMigrateDatabase();
+    res.status(200).json({
+      success: true,
+      service: 'Organova Platform API',
+      message: 'Database schema and seed process completed successfully.',
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // --------------------------------------------------------------------
