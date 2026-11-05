@@ -14,7 +14,9 @@
     "test:organs": "ts-node scripts/test-organ-flow.ts",
     "test:matching": "ts-node scripts/test-matching-flow.ts",
     "test:socket": "ts-node scripts/test-socket-flow.ts",
-    "seed:hospitals": "ts-node scripts/seed-extended-hospitals.ts"
+    "seed:hospitals": "ts-node scripts/seed-extended-hospitals.ts",
+    "seed:prod": "ts-node scripts/deploy-seed-db.ts",
+    "seed:export": "ts-node scripts/export-production-sql.ts"
   },
   "dependencies": {
     "@types/multer": "^2.3.0",

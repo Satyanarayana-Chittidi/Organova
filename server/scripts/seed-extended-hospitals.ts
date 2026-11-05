@@ -584,16 +584,36 @@ async function seedNeverExpiringOrgans(connection: any) {
 }
 
 async function seedNeverExpiringCamps(connection: any) {
-  console.log('\n--- Step 4: Seeding 10 Never-Expiring Medical Camps for City Trauma (Hub 27) ---');
+  console.log('\n--- Step 4: Seeding Multi-Hospital Never-Expiring Medical Camps Nationwide ---');
 
-  const hubUserId = '9a71417b-28fc-4a26-905c-1100f9265b81';
+  // Fetch hospital hubs map by name
+  const [hubs]: any = await connection.query(
+    'SELECT id, name, user_id, city, state, pincode, contact_phone, latitude, longitude FROM medical_hubs'
+  );
+  const hubMap: Record<string, any> = {};
+  for (const h of hubs) {
+    hubMap[h.name.toLowerCase()] = h;
+  }
 
-  // Clean up old camps for Hub 27
-  await connection.query('DELETE FROM blood_donation_camps WHERE organizer_hub_id = 27');
+  const findHub = (keyword: string) => {
+    const kw = keyword.toLowerCase().trim();
+    // 1. Exact match
+    const exact = Object.keys(hubMap).find((k) => k === kw);
+    if (exact) return hubMap[exact];
+    // 2. Exact word boundary or distinct inclusion
+    const match = Object.keys(hubMap).find((k) => k.startsWith(kw) || k.includes(kw));
+    if (match) return hubMap[match];
+    console.warn(`[findHub] Warning: No match found for keyword '${keyword}', falling back to hub[0]`);
+    return hubs[0]; // fallback
+  };
 
-  const campsList = [
+  // Clean up all old mock camps
+  await connection.query('DELETE FROM blood_donation_camps');
+
+  const multiHospitalCamps = [
     {
-      name: 'HITEC City Tech Park Mega Blood Drive',
+      hospitalKeyword: 'City Trauma Emergency Hospital',
+      name: 'HITEC City Cyber Towers Mega Blood Drive',
       description:
         'Flagship corporate donation drive in partnership with cyber tech corridors. Includes on-site pre-donation health vitals screening, refreshments, and certified digital donor cards.',
       venue: 'Cyber Towers Main Atrium, HITEC City',
@@ -606,6 +626,7 @@ async function seedNeverExpiringCamps(connection: any) {
       startTime: '09:00 AM',
       endTime: '06:00 PM',
       phone: '+91 98490 12345',
+      email: 'trauma.care@cityhospital.com',
       target: 300,
       status: 'UPCOMING',
       lat: 17.4504,
@@ -613,7 +634,8 @@ async function seedNeverExpiringCamps(connection: any) {
       mapUrl: 'https://maps.google.com/?q=Cyber+Towers+Hyderabad',
     },
     {
-      name: 'Gachibowli Financial District Corporate Camp',
+      hospitalKeyword: 'City Trauma Emergency Hospital',
+      name: 'Gachibowli Financial District Corporate LifeSaver Camp',
       description:
         'Multi-corporate life-saving initiative hosting over 40 financial institutions and fintech firms. Fully air-conditioned mobile phlebotomy units available.',
       venue: 'WaveRock SEZ Building 2 Concourse',
@@ -626,6 +648,7 @@ async function seedNeverExpiringCamps(connection: any) {
       startTime: '09:30 AM',
       endTime: '05:30 PM',
       phone: '+91 98490 12345',
+      email: 'trauma.care@cityhospital.com',
       target: 250,
       status: 'UPCOMING',
       lat: 17.4177,
@@ -633,168 +656,230 @@ async function seedNeverExpiringCamps(connection: any) {
       mapUrl: 'https://maps.google.com/?q=WaveRock+SEZ+Hyderabad',
     },
     {
-      name: 'Osmania University Youth LifeSaver Camp',
+      hospitalKeyword: 'AIIMS',
+      name: 'AIIMS Capital LifeDrive & Stem Cell Camp',
       description:
-        'University-wide youth donation marathon organizing undergraduate and postgraduate students. Features educational seminars on stem cell & voluntary blood donation.',
-      venue: 'University Arts College Pavilion',
-      address: 'Osmania University Campus, Amberpet',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500007',
-      date: '2027-04-05',
-      endDate: '2027-04-06',
-      startTime: '09:00 AM',
-      endTime: '05:00 PM',
-      phone: '+91 98490 12345',
-      target: 350,
-      status: 'UPCOMING',
-      lat: 17.4184,
-      lng: 78.5284,
-      mapUrl: 'https://maps.google.com/?q=Osmania+University+Arts+College',
-    },
-    {
-      name: 'Jubilee Hills Community Health & Blood Camp',
-      description:
-        'Community wellness camp open to all local residents. Comprehensive blood group testing, hemoglobin assays, and organ donor pledge registration booth on site.',
-      venue: 'Jubilee Hills International Centre (JHIC)',
-      address: 'Road No. 36, Jubilee Hills',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500033',
-      date: '2027-05-12',
-      endDate: '2027-05-13',
+        'Premier central health institute donation camp. Complete screening for voluntary blood donation, HLA typing registry, and platelet apheresis counseling.',
+      venue: 'Jawahar Lal Nehru Auditorium Foyer, AIIMS',
+      address: 'Sri Aurobindo Marg, Ansari Nagar East',
+      city: 'New Delhi',
+      state: 'Delhi',
+      pincode: '110029',
+      date: '2027-04-18',
+      endDate: '2027-04-20',
       startTime: '08:30 AM',
-      endTime: '04:30 PM',
-      phone: '+91 98490 12345',
-      target: 180,
+      endTime: '05:30 PM',
+      phone: '+91 11 2658 8500',
+      email: 'aiims.delhi@gov.in',
+      target: 450,
       status: 'UPCOMING',
-      lat: 17.4326,
-      lng: 78.4071,
-      mapUrl: 'https://maps.google.com/?q=Jubilee+Hills+Club+Hyderabad',
+      lat: 28.5672,
+      lng: 77.21,
+      mapUrl: 'https://maps.google.com/?q=AIIMS+New+Delhi',
     },
     {
-      name: 'Banjara Hills Rotary Mega Blood Drive',
+      hospitalKeyword: 'Narayana Institute',
+      name: 'Bengaluru Tech Corridor Heart & Blood Donation Festival',
       description:
-        'Rotary International community partner drive focusing on rare blood groups (O-negative, AB-negative, Bombay phenotype matching).',
-      venue: 'KBR Park Open Amphitheatre Ground',
-      address: 'Opposite LV Prasad Eye Institute, Road No. 2, Banjara Hills',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500034',
-      date: '2027-06-18',
-      endDate: '2027-06-19',
-      startTime: '07:30 AM',
-      endTime: '03:30 PM',
-      phone: '+91 98490 12345',
-      target: 200,
-      status: 'UPCOMING',
-      lat: 17.4243,
-      lng: 78.4312,
-      mapUrl: 'https://maps.google.com/?q=KBR+National+Park+Hyderabad',
-    },
-    {
-      name: 'Secunderabad Railway Central Blood Drive',
-      description:
-        'South Central Railway employee and passenger solidarity donation drive. Rapid donor screening and certificate issuance.',
-      venue: 'Rail Nilayam Community Auditorium',
-      address: 'Sarojini Devi Road, Secunderabad',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500071',
-      date: '2027-07-22',
-      endDate: '2027-07-23',
-      startTime: '09:00 AM',
-      endTime: '05:00 PM',
-      phone: '+91 98490 12345',
-      target: 220,
-      status: 'UPCOMING',
-      lat: 17.4411,
-      lng: 78.5015,
-      mapUrl: 'https://maps.google.com/?q=Rail+Nilayam+Secunderabad',
-    },
-    {
-      name: 'IIT Hyderabad Technology & Health Camp',
-      description:
-        'Technological institute camp organized by NSS IIT Hyderabad. Demonstrating smart cold-chain transit tracking and donor registration.',
-      venue: 'Academic Block A Ground Floor Foyer',
-      address: 'IIT Hyderabad Campus, Kandi, Sangareddy',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '502285',
-      date: '2027-08-14',
-      endDate: '2027-08-15',
+        'Organized in collaboration with electronic city tech giants. Dedicated to cardiac surgery patient reserves and emergency trauma stock.',
+      venue: 'Narayana Health City Central Lawn',
+      address: '258/A, Bommasandra Industrial Area, Anekal Taluk',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pincode: '560099',
+      date: '2027-05-15',
+      endDate: '2027-05-17',
       startTime: '09:00 AM',
       endTime: '06:00 PM',
-      phone: '+91 98490 12345',
-      target: 250,
+      phone: '+91 80 7122 2222',
+      email: 'transplant@narayanahealth.org',
+      target: 350,
       status: 'UPCOMING',
-      lat: 17.5947,
-      lng: 78.123,
-      mapUrl: 'https://maps.google.com/?q=IIT+Hyderabad+Kandi',
+      lat: 12.8016,
+      lng: 77.6974,
+      mapUrl: 'https://maps.google.com/?q=Narayana+Health+City+Bangalore',
     },
     {
-      name: 'Inorbit Mall Weekend Community Blood Drive',
+      hospitalKeyword: 'Tata Memorial',
+      name: 'Mumbai Oncology Support Platelet & Blood Drive',
       description:
-        'Weekend community drive at Mindspace Madhapur. High footfall awareness stall with free blood pressure and glucose checks.',
-      venue: 'Inorbit Mall Central Atrium (Ground Floor)',
-      address: 'APIIC Software Layout, Mindspace, Madhapur',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500081',
-      date: '2027-09-20',
-      endDate: '2027-09-22',
-      startTime: '10:00 AM',
-      endTime: '07:00 PM',
-      phone: '+91 98490 12345',
-      target: 280,
-      status: 'UPCOMING',
-      lat: 17.4343,
-      lng: 78.3867,
-      mapUrl: 'https://maps.google.com/?q=Inorbit+Mall+Hyderabad',
-    },
-    {
-      name: 'Kondapur Botanical Garden LifeSaver Camp',
-      description:
-        'Outdoor green health drive adjacent to Kotla Vijayabhaskara Reddy Botanical Garden. Early morning wellness walk and donor sign-up.',
-      venue: 'Botanical Garden Main Entrance Pavilion',
-      address: 'Gachibowli - Miyapur Rd, Kondapur',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500084',
-      date: '2027-10-15',
-      endDate: '2027-10-16',
-      startTime: '08:00 AM',
-      endTime: '04:00 PM',
-      phone: '+91 98490 12345',
-      target: 170,
-      status: 'UPCOMING',
-      lat: 17.4617,
-      lng: 78.3582,
-      mapUrl: 'https://maps.google.com/?q=Botanical+Garden+Kondapur',
-    },
-    {
-      name: 'Begumpet Airport Zone Emergency Blood Drive',
-      description:
-        'Aerospace and civil aviation personnel blood drive, ensuring rapid emergency stocks for trauma centers and armed forces transfusions.',
-      venue: 'Begumpet Officers Club Lawn',
-      address: 'Airport Road, Prakash Nagar, Begumpet',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500016',
-      date: '2027-11-10',
-      endDate: '2027-11-11',
+        'Critical blood and single-donor platelet (SDP) drive specifically supporting leukemia and solid tumor patients undergoing intensive chemotherapy.',
+      venue: 'R. D. Choksi Auditorium, Tata Memorial Hospital',
+      address: 'Dr. E Borges Road, Parel East',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '400012',
+      date: '2027-06-10',
+      endDate: '2027-06-12',
       startTime: '09:00 AM',
       endTime: '05:00 PM',
-      phone: '+91 98490 12345',
+      phone: '+91 22 2417 7000',
+      email: 'transplant.coord@tmc.gov.in',
+      target: 320,
+      status: 'UPCOMING',
+      lat: 19.0041,
+      lng: 72.8432,
+      mapUrl: 'https://maps.google.com/?q=Tata+Memorial+Hospital+Mumbai',
+    },
+    {
+      hospitalKeyword: 'Apollo Hospital Greams Road',
+      name: 'Chennai Coastal Metro Community Blood Drive',
+      description:
+        'Major metropolitan community blood drive supporting emergency cardiac and organ transplant surgeries across South India.',
+      venue: 'Express Avenue Mall Central Atrium, Royapettah',
+      address: '21 Greams Lane, Off Greams Road, Thousand Lights',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      pincode: '600006',
+      date: '2027-07-08',
+      endDate: '2027-07-10',
+      startTime: '10:00 AM',
+      endTime: '07:00 PM',
+      phone: '+91 44 2829 0200',
+      email: 'transplant.greams@apollohospitals.com',
+      target: 280,
+      status: 'UPCOMING',
+      lat: 13.0556,
+      lng: 80.252,
+      mapUrl: 'https://maps.google.com/?q=Apollo+Hospital+Greams+Road+Chennai',
+    },
+    {
+      hospitalKeyword: 'Ruby Hall',
+      name: 'Pune Silicon City Rotary Blood Camp',
+      description:
+        'Annual industrial and IT park blood donation camp organized with Rotary Club of Pune. Free comprehensive hemoglobin and vital screening.',
+      venue: 'Magarpatta Cybercity Amphitheatre',
+      address: 'Magarpatta, Hadapsar',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pincode: '411028',
+      date: '2027-08-12',
+      endDate: '2027-08-14',
+      startTime: '09:00 AM',
+      endTime: '05:00 PM',
+      phone: '+91 20 6681 9999',
+      email: 'ruby.pune@hospital.org',
+      target: 260,
+      status: 'UPCOMING',
+      lat: 18.5167,
+      lng: 73.9298,
+      mapUrl: 'https://maps.google.com/?q=Magarpatta+Cybercity+Pune',
+    },
+    {
+      hospitalKeyword: 'Medica Superspecialty Hospital',
+      name: 'Kolkata Metro East LifeSaver Blood Drive',
+      description:
+        'Eastern India emergency blood drive bolstering reserves for pediatric surgery, accident trauma, and thalassemia transfusion recipients.',
+      venue: 'Science City Main Exhibition Pavilion',
+      address: '127, Mukundapur, E.M. Bypass',
+      city: 'Kolkata',
+      state: 'West Bengal',
+      pincode: '700099',
+      date: '2027-09-05',
+      endDate: '2027-09-07',
+      startTime: '09:30 AM',
+      endTime: '05:30 PM',
+      phone: '+91 33 6652 0000',
+      email: 'transplant.desk@medicahospitals.in',
+      target: 275,
+      status: 'UPCOMING',
+      lat: 22.4988,
+      lng: 88.3976,
+      mapUrl: 'https://maps.google.com/?q=Medica+Hospital+Kolkata',
+    },
+    {
+      hospitalKeyword: 'PGIMER',
+      name: 'North India University Youth Blood Mission',
+      description:
+        'Youth and student blood drive organizing tri-city university students. Equipped with state-of-the-art cold chain mobile storage vans.',
+      venue: 'Panjab University Student Centre Ground, Sector 14',
+      address: 'Sector 12, Madhya Marg',
+      city: 'Chandigarh',
+      state: 'Chandigarh',
+      pincode: '160012',
+      date: '2027-10-02',
+      endDate: '2027-10-04',
+      startTime: '09:00 AM',
+      endTime: '05:00 PM',
+      phone: '+91 172 274 7585',
+      email: 'transplant@pgimer.edu.in',
+      target: 350,
+      status: 'UPCOMING',
+      lat: 30.7651,
+      lng: 76.7766,
+      mapUrl: 'https://maps.google.com/?q=PGIMER+Chandigarh',
+    },
+    {
+      hospitalKeyword: 'Amrita',
+      name: 'Kerala Coastal Emergency Care Blood Drive',
+      description:
+        'Coastal healthcare resilience drive dedicated to monsoon season emergency reserves and state-wide surgical readiness.',
+      venue: 'Lulu International Mall Grand Atrium, Edappally',
+      address: 'AIMS Ponekkara P.O., Edappally',
+      city: 'Kochi',
+      state: 'Kerala',
+      pincode: '682041',
+      date: '2027-11-14',
+      endDate: '2027-11-16',
+      startTime: '10:00 AM',
+      endTime: '07:00 PM',
+      phone: '+91 484 285 1234',
+      email: 'organ.transplant@aims.amrita.edu',
+      target: 230,
+      status: 'UPCOMING',
+      lat: 10.0326,
+      lng: 76.2999,
+      mapUrl: 'https://maps.google.com/?q=Amrita+Hospital+Kochi',
+    },
+    {
+      hospitalKeyword: 'Yashoda',
+      name: 'Somajiguda Twin Cities Health & Blood Camp',
+      description:
+        'Community wellness camp open to all local residents. Comprehensive blood group testing, hemoglobin assays, and organ donor pledge registration booth on site.',
+      venue: 'Nizam College Grounds, Basheerbagh',
+      address: 'Raj Bhavan Road, Matha Nagar, Somajiguda',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500082',
+      date: '2027-12-05',
+      endDate: '2027-12-07',
+      startTime: '08:30 AM',
+      endTime: '04:30 PM',
+      phone: '+91 40 4567 4567',
+      email: 'transplant.somajiguda@yashodahospitals.com',
       target: 200,
       status: 'UPCOMING',
-      lat: 17.4475,
-      lng: 78.4682,
-      mapUrl: 'https://maps.google.com/?q=Begumpet+Airport+Hyderabad',
+      lat: 17.4265,
+      lng: 78.4578,
+      mapUrl: 'https://maps.google.com/?q=Yashoda+Hospital+Somajiguda',
+    },
+    {
+      hospitalKeyword: 'Zydus',
+      name: 'Gujarat Industrial Corridor Lifeline Camp',
+      description:
+        'Collaborative drive across Gujarat industrial corridors ensuring sufficient whole blood and plasma availability.',
+      venue: 'Ahmedabad Management Association (AMA) Complex',
+      address: 'Zydus Hospital Road, SG Highway, Thaltej',
+      city: 'Ahmedabad',
+      state: 'Gujarat',
+      pincode: '380054',
+      date: '2028-01-18',
+      endDate: '2028-01-20',
+      startTime: '09:00 AM',
+      endTime: '05:00 PM',
+      phone: '+91 79 6619 0201',
+      email: 'transplant.care@zydushospitals.com',
+      target: 260,
+      status: 'UPCOMING',
+      lat: 23.0722,
+      lng: 72.5255,
+      mapUrl: 'https://maps.google.com/?q=Zydus+Hospital+Ahmedabad',
     },
   ];
 
-  for (const c of campsList) {
+  for (const c of multiHospitalCamps) {
+    const hub = findHub(c.hospitalKeyword);
+
     await connection.query(
       `INSERT INTO blood_donation_camps (
          organizer_hub_id, created_by_user_id, camp_name, description,
@@ -804,8 +889,8 @@ async function seedNeverExpiringCamps(connection: any) {
          latitude, longitude, map_url
        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        27,
-        hubUserId,
+        hub.id,
+        hub.user_id,
         c.name,
         c.description,
         c.venue,
@@ -818,7 +903,7 @@ async function seedNeverExpiringCamps(connection: any) {
         c.startTime,
         c.endTime,
         c.phone,
-        'trauma.care@cityhospital.com',
+        c.email,
         c.target,
         c.status,
         c.lat,
@@ -826,13 +911,13 @@ async function seedNeverExpiringCamps(connection: any) {
         c.mapUrl,
       ]
     );
-    console.log(`  + Seeded Camp: ${c.name} (${c.date} to ${c.endDate})`);
+    console.log(`  + Seeded Camp: [Hub ${hub.id} - ${hub.name}] ${c.name} in ${c.city}`);
   }
 
   const [countRows]: any = await connection.query(
-    'SELECT COUNT(*) as cnt FROM blood_donation_camps WHERE organizer_hub_id = 27 AND status = "UPCOMING"'
+    'SELECT COUNT(*) as cnt FROM blood_donation_camps WHERE status = "UPCOMING"'
   );
-  console.log(`  ✓ Total Active/Upcoming Camps for Hub 27: ${countRows[0].cnt}`);
+  console.log(`  ✓ Total Active/Upcoming Multi-Hospital Camps: ${countRows[0].cnt}`);
 }
 
 async function main() {
