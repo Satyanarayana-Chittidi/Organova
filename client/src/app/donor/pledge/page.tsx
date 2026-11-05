@@ -197,7 +197,7 @@ export default function DonorPledgePage() {
             return 'Whole Blood & Cellular Units';
         return `${organ.category.replace(/_/g, ' ')}`;
     };
-    return (<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200">
+    return (<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-32 sm:pb-36 w-full transition-colors duration-200">
       <div className="space-y-8">
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
@@ -341,8 +341,8 @@ export default function DonorPledgePage() {
           </div>
         </div>
 
-        <div className="sticky bottom-6 z-30 w-full max-w-3xl mx-auto px-2 sm:px-0">
-          <div className="px-5 sm:px-7 py-3 rounded-full backdrop-blur-2xl backdrop-saturate-150 bg-white/75 dark:bg-slate-900/75 border border-white/60 dark:border-white/10 shadow-2xl shadow-slate-900/10 dark:shadow-black/60 ring-1 ring-black/5 dark:ring-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 transition-all duration-300">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl pointer-events-none">
+          <div className="pointer-events-auto px-5 sm:px-7 py-3 rounded-full backdrop-blur-2xl backdrop-saturate-150 bg-white/85 dark:bg-slate-900/85 border border-white/60 dark:border-white/10 shadow-2xl shadow-slate-900/15 dark:shadow-black/60 ring-1 ring-black/5 dark:ring-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 transition-all duration-300">
             <div className="flex items-center gap-3">
               <span className="relative flex h-3 w-3 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
