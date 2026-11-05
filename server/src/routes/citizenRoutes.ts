@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import { saveMyProfile, getMyProfile, uploadMyAvatar, removeMyAvatar, getMyDonationHistory, } from '../controllers/citizenController';
+import { authenticate, authorizeRoles } from '../middlewares/authMiddleware';
+import { uploadAvatarMiddleware } from '../middlewares/uploadMiddleware';
+const router = Router();
+router.use(authenticate);
+router.use(authorizeRoles('USER'));
+router.get('/profile', getMyProfile);
+router.post('/profile', saveMyProfile);
+router.put('/profile', saveMyProfile);
+router.get('/history', getMyDonationHistory);
+router.post('/avatar', uploadAvatarMiddleware.single('avatar'), uploadMyAvatar);
+router.delete('/avatar', removeMyAvatar);
+export default router;

@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { getPendingHubsHandler, verifyHubStatusHandler, getPlatformMetricsHandler, getAllHubsHandler, searchEntitiesHandler, getActivityLogsHandler, } from '../controllers/adminController';
+import { authenticate, authorizeRoles } from '../middlewares/authMiddleware';
+const router = Router();
+router.use(authenticate, authorizeRoles('ADMIN'));
+router.get('/metrics', getPlatformMetricsHandler);
+router.get('/hubs/pending', getPendingHubsHandler);
+router.get('/hubs', getAllHubsHandler);
+router.patch('/hubs/:id/verify', verifyHubStatusHandler);
+router.get('/entities/search', searchEntitiesHandler);
+router.get('/logs', getActivityLogsHandler);
+export default router;

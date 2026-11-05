@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { getOrganTypesHandler, harvestOrganHandler, getOrganByIdHandler, listOrgansHandler, updateOrganStatusHandler, sweepExpiredOrgansHandler, } from '../controllers/organController';
+import { authenticate, authorizeRoles } from '../middlewares/authMiddleware';
+const router = Router();
+router.get('/types', getOrganTypesHandler);
+router.post('/harvest', authenticate, authorizeRoles('HOSPITAL'), harvestOrganHandler);
+router.get('/', authenticate, authorizeRoles('HOSPITAL', 'ADMIN'), listOrgansHandler);
+router.get('/:id', authenticate, getOrganByIdHandler);
+router.patch('/:id/status', authenticate, authorizeRoles('HOSPITAL', 'ADMIN'), updateOrganStatusHandler);
+router.post('/sweep-expired', authenticate, authorizeRoles('ADMIN'), sweepExpiredOrgansHandler);
+export default router;

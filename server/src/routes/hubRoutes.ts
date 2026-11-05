@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import { registerHubHandler, getMyHubProfileHandler, getMyHubHistoryHandler, updateMyHubProfileHandler, getPublicDirectoryHandler, getHubCitiesHandler, getHubByIdHandler, searchCitizensHandler, masterRegisterCitizenHandler, } from '../controllers/hubController';
+import { authenticate, authorizeRoles } from '../middlewares/authMiddleware';
+const router = Router();
+router.post('/register', registerHubHandler);
+router.get('/directory', getPublicDirectoryHandler);
+router.get('/cities', getHubCitiesHandler);
+router.get('/me', authenticate, authorizeRoles('HOSPITAL'), getMyHubProfileHandler);
+router.get('/me/history', authenticate, authorizeRoles('HOSPITAL'), getMyHubHistoryHandler);
+router.put('/me', authenticate, authorizeRoles('HOSPITAL'), updateMyHubProfileHandler);
+router.get('/citizens/search', authenticate, authorizeRoles('HOSPITAL', 'ADMIN'), searchCitizensHandler);
+router.post('/citizens/master-register', authenticate, authorizeRoles('HOSPITAL', 'ADMIN'), masterRegisterCitizenHandler);
+router.get('/:id', getHubByIdHandler);
+export default router;

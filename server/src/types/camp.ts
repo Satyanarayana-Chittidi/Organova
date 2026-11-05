@@ -1,0 +1,70 @@
+export type CampStatus = 'DRAFT' | 'UPCOMING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+export interface BloodDonationCamp {
+    id: number;
+    organizer_hub_id: number;
+    created_by_user_id: string;
+    camp_name: string;
+    description?: string | null;
+    venue_name: string;
+    address_line: string;
+    city: string;
+    state?: string | null;
+    pincode?: string | null;
+    camp_date: string;
+    end_date?: string | null;
+    start_time: string;
+    end_time: string;
+    contact_phone?: string | null;
+    contact_email?: string | null;
+    target_units?: number | null;
+    status: CampStatus;
+    latitude?: number | null;
+    longitude?: number | null;
+    map_url?: string | null;
+    created_at: string | Date;
+    updated_at?: string | Date;
+    organizer_hub_name?: string;
+    organizer_hub_type?: string;
+    organizer_hub_city?: string;
+    organizer_hub_phone?: string;
+}
+export interface CreateCampDTO {
+    camp_name: string;
+    description?: string;
+    venue_name: string;
+    address_line: string;
+    city: string;
+    state?: string;
+    pincode?: string;
+    camp_date: string;
+    end_date?: string;
+    start_time: string;
+    end_time: string;
+    contact_phone?: string;
+    contact_email?: string;
+    target_units?: number;
+    latitude?: number;
+    longitude?: number;
+    map_url?: string;
+    status?: CampStatus;
+}
+export interface UpdateCampDTO {
+    camp_name?: string;
+    description?: string;
+    venue_name?: string;
+    address_line?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    camp_date?: string;
+    end_date?: string;
+    start_time?: string;
+    end_time?: string;
+    contact_phone?: string;
+    contact_email?: string;
+    target_units?: number;
+    latitude?: number;
+    longitude?: number;
+    map_url?: string;
+    status?: CampStatus;
+}
