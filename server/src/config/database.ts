@@ -66,6 +66,21 @@ export async function autoMigrateDatabase(force = false): Promise<{ executed: nu
             .filter((s) => s.length > 0);
 
           await connection.query('SET FOREIGN_KEY_CHECKS = 0');
+
+          // Ensure modern schema columns exist if tables already existed without them
+          const schemaPatches = [
+            'ALTER TABLE users ADD COLUMN avatar_url VARCHAR(255) NULL AFTER google_id',
+            'ALTER TABLE citizen_profiles ADD COLUMN avatar_url VARCHAR(255) NULL AFTER pincode',
+            'ALTER TABLE blood_donation_camps ADD COLUMN map_url TEXT NULL AFTER longitude',
+          ];
+          for (const patch of schemaPatches) {
+            try {
+              await connection.query(patch);
+            } catch (err: any) {
+              // Ignore if already present (ER_DUP_FIELDNAME 1060) or table not created yet (ER_NO_SUCH_TABLE 1146)
+            }
+          }
+
           for (const stmt of statements) {
             if (stmt.toLowerCase().startsWith('use ') || stmt.toLowerCase().startsWith('create database')) {
               continue;

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     role ENUM('USER', 'HOSPITAL', 'ADMIN') NOT NULL,
     auth_provider ENUM('LOCAL', 'GOOGLE') NOT NULL DEFAULT 'LOCAL',
     google_id VARCHAR(255) NULL UNIQUE,
+    avatar_url VARCHAR(255) NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS citizen_profiles (
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     pincode VARCHAR(10) NOT NULL,
+    avatar_url VARCHAR(255) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -237,6 +239,7 @@ CREATE TABLE IF NOT EXISTS blood_donation_camps (
     status ENUM('UPCOMING', 'ACTIVE', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'UPCOMING',
     latitude DECIMAL(10, 8) NULL,
     longitude DECIMAL(11, 8) NULL,
+    map_url TEXT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (organizer_hub_id) REFERENCES medical_hubs(id) ON DELETE CASCADE,
@@ -254,82 +257,82 @@ CREATE TABLE IF NOT EXISTS blood_donation_camps (
 -- --------------------------------------------------------------------
 INSERT INTO `users` (`id`, `email`, `password_hash`, `role`, `auth_provider`, `google_id`, `is_active`, `is_verified`, `avatar_url`, `created_at`, `updated_at`) VALUES
   ('003740d6-8857-40b3-b3af-0fd43f125a4b', 'gaurav.bhatt@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('04406dfa-6c7d-4ec8-b5ff-b0ee45a51bf2', 'organ.desk@lilavatihospital.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('04406dfa-6c7d-4ec8-b5ff-b0ee45a51bf2', 'organ.desk@lilavatihospital.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('14126dfb-5d7f-4e49-a52d-4b5412c5ba41', 'chittidisatyanarayana2@gmail.com', '$2b$10$yv6hGpPG6Dvkpy8CBYWIJu7/.Vl.Q9Wmj1EX6M/06P9abnzs6ZMtW', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 05:27:38', '2026-10-25 05:27:54'),
-  ('19f4335b-a006-42c5-b0e8-1a14aea06014', 'transplant@kokilabenhospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('1d1e9c71-22ce-4539-8d99-b95098a6667e', 'transplant.coord@tmc.gov.in', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('19f4335b-a006-42c5-b0e8-1a14aea06014', 'transplant@kokilabenhospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('1d1e9c71-22ce-4539-8d99-b95098a6667e', 'transplant.coord@tmc.gov.in', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('1d8e07d7-6420-49ed-a07e-d14db4dc9081', 'vikram.malhotra@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
   ('207063e9-795a-400a-b359-d35368699540', 'harish.pillai@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('2132ce28-ce0c-44c4-9489-279d29b1da67', 'nims.transplant@nims.edu.in', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('2132ce28-ce0c-44c4-9489-279d29b1da67', 'nims.transplant@nims.edu.in', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('25099de0-538e-4920-ad88-aa76c83aac75', 'meera.deshmukh@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('26de60b9-1d77-4666-86dc-09169c5abacd', 'transplant.services@cmcvellore.ac.in', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('26de60b9-1d77-4666-86dc-09169c5abacd', 'transplant.services@cmcvellore.ac.in', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('2e969834-dbfa-42c8-b83a-763d27ed758c', 'sunita.roy@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('2f58b970-401f-4573-ac2a-8b3c00b7c7dd', 'transplant@narayanahealth.org', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('2f58b970-401f-4573-ac2a-8b3c00b7c7dd', 'transplant@narayanahealth.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('32d3e06c-4d0d-4390-919a-ea596bac1aab', '2@g', '$2b$10$JJrbw2pqSYcrLkF0F3uYBuSyw5UIMjroTWmbqsf1aReIbijMR9ciG', 'USER', 'LOCAL', NULL, 1, 1, '/uploads/avatars/avatar-32d3e06c-4d0d-4390-919a-ea596bac1aab-1792911729163.jpg', '2026-10-25 05:50:06', '2026-10-25 07:02:09'),
-  ('36ab4c5f-38d6-43af-a278-057ed4f931e2', 'transplant.coord@manipalhospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('3f079d05-fcc8-411a-ba6e-9004526a2f21', 'rahul.verma@gmail.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
-  ('4228dbae-b4b7-4eb4-a494-7c75b2ccf52e', 'organ.transplant@aims.amrita.edu', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('442ec46a-0f73-40b9-8966-88d118e8ae7a', 'p1@citizen.org', '$2b$10$RtVbgNUXD5UAl5KJRE36zeXpx9vJLacgTa3lJnETdePRLqRD1mJke', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
-  ('44e8f9f0-bd62-49aa-a8b2-9a6f67429fc0', 'transplant.desk@medicahospitals.in', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('36ab4c5f-38d6-43af-a278-057ed4f931e2', 'transplant.coord@manipalhospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('3f079d05-fcc8-411a-ba6e-9004526a2f21', 'rahul.verma@gmail.com', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
+  ('4228dbae-b4b7-4eb4-a494-7c75b2ccf52e', 'organ.transplant@aims.amrita.edu', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('442ec46a-0f73-40b9-8966-88d118e8ae7a', 'p1@citizen.org', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
+  ('44e8f9f0-bd62-49aa-a8b2-9a6f67429fc0', 'transplant.desk@medicahospitals.in', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('4674df15-aa24-44ca-90e1-951f22c3a115', 'ananya.iyer@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
   ('49f624a2-a48a-443a-b926-18412ff77e46', '1@gmail.com', '$2b$10$.J2m/Dj.ZzhVHEGADXSw0.9ObWePucEM3GJHmfSShE.0bcXGHf5di', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 05:39:56', '2026-10-25 05:40:12'),
   ('4b09173c-0b33-4f08-a21f-49a7e5f86192', 'no_pledge_test_1792947078669@example.com', '$2b$10$c38r5bkGDIIszvp7Xs9yPe2bbtkWRF6eUVnRZeCfiY5xKHbr1TA0G', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 16:51:18', '2026-10-25 16:51:18'),
-  ('4cb889ce-5e5f-4548-a9ec-03431ff2d0bf', 'transplant.saket@maxhealthcare.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('4e2e028b-2909-4e2a-8049-7ea5e0cdafdb', 'transplant.cmi@asterhospital.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('4cb889ce-5e5f-4548-a9ec-03431ff2d0bf', 'transplant.saket@maxhealthcare.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('4e2e028b-2909-4e2a-8049-7ea5e0cdafdb', 'transplant.cmi@asterhospital.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('53a41ccb-aea7-407a-8f83-0a38e8d70885', 'kavita.reddy@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('56305174-4bd5-4ffe-838a-ff64d26d31e1', 'kavita.reddy@outlook.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
-  ('56c4338a-a957-4b0c-9255-4d51276862ed', 'phantomcapacitor@gmail.com', '$2b$10$VwtdKPBk39XTXUtXwvcL7eYT7wWRULV0pFO0ub5mQLQ/uBSBObhae', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-24 11:18:23', '2026-10-24 11:18:50'),
+  ('56305174-4bd5-4ffe-838a-ff64d26d31e1', 'kavita.reddy@outlook.com', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
+  ('56c4338a-a957-4b0c-9255-4d51276862ed', 'phantomcapacitor@gmail.com', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-24 11:18:23', '2026-10-24 11:18:50'),
   ('598ff7e2-9b50-4fc3-949a-e4d2d76cc66d', 'bhaaaaai@gmail.com', '$2b$10$roZUF5931uAuxO3hgWjEO.zidX3HCEyOCBfAlF4CY4EmRkt5LbB3S', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-26 14:05:46', '2026-10-26 14:05:46'),
   ('5bf3c5d0-6259-4c65-b36c-c4a3bf2afbcf', 'amitabh.sen@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('5c43676b-babf-47fd-94eb-f09e795ff14f', 'transplant@pgimer.edu.in', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('5ff051d2-7a55-490e-9997-b370be9bdd0b', 'ruby.pune@hospital.org', '$2b$10$qcHa7NesXr6KQI9/Iv419./QmS8PUaufE80ENhL3jPtK67gh4ohAC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
+  ('5c43676b-babf-47fd-94eb-f09e795ff14f', 'transplant@pgimer.edu.in', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('5ff051d2-7a55-490e-9997-b370be9bdd0b', 'ruby.pune@hospital.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
   ('7645ee5b-8add-4ec7-b87b-2cc77d0d8ee5', 'pledge_revamp_1792946785364@example.com', '$2b$10$IK7BioxqJWSNyjrFNiG4j.j5EBZY/ABZ17aq2PjM9Ue/Zpo8UXINO', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 16:46:25', '2026-10-25 16:46:25'),
   ('810c59cf-da16-495c-afdb-c6e154d6777c', '3@g', '$2b$10$/l1ADvX8h7wUgqskevKwq.K/KSRPDWt3WJhhigYv9sHycFI4eYxYS', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 08:40:42', '2026-10-25 08:41:44'),
-  ('83c98cb2-e082-4420-8e79-e2d1d7f94da0', 'transplant.somajiguda@yashodahospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('83c98cb2-e082-4420-8e79-e2d1d7f94da0', 'transplant.somajiguda@yashodahospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('8406c313-d12d-4552-a1c8-9a36ff4cf8f4', 'rohan.patel@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('84f0b314-c0a0-46fc-9760-70c8c3cfb39e', 'socket.hosp@hospital.org', '$2b$10$pYxk3LeKebA5YyRKdapfTeYhGDsqPBiAAzkycDHqhvTkZq20kYRC6', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-24 11:01:20', '2026-10-24 11:01:20'),
+  ('84f0b314-c0a0-46fc-9760-70c8c3cfb39e', 'socket.hosp@hospital.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-24 11:01:20', '2026-10-24 11:01:20'),
   ('859e14af-d954-4f08-b9d0-5abc9625be26', 'nisha.gupta@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('8c79bce4-11fb-4f74-b7bd-fa0fb18b8000', 'transplant.blr@fortishealthcare.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('8c79bce4-11fb-4f74-b7bd-fa0fb18b8000', 'transplant.blr@fortishealthcare.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('8de4586b-7736-4b47-871b-5008aaac41c1', 'user1@example.com', '$2b$10$8VaMX7zYfzRstzhczlYuA.e6sp.AnkLsiy2c.4ULpQDpnx49S3U3W', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-23 17:05:58', '2026-10-23 17:06:33'),
   ('9363da13-b82c-4205-ba3e-06ff5993784a', 'manoj.joshi@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
   ('93d75861-57ed-4780-9197-f852625a37e5', 'rajesh.kumar@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
   ('952c2dad-dcdc-4440-9fe4-5415222e98b2', 'lakshmi.narayanan@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('97f1f2f5-ee3d-4f6f-8ea5-82f8bf5abf5d', 'organova@fortishealthcare.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('98a7039f-5871-48fe-8f9d-7dee856b11e8', 'transplant.chennai@gleneagles.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('97f1f2f5-ee3d-4f6f-8ea5-82f8bf5abf5d', 'organova@fortishealthcare.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('98a7039f-5871-48fe-8f9d-7dee856b11e8', 'transplant.chennai@gleneagles.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('99882cf2-0b05-4953-ae07-68c2ee10aa40', 'deepak.verma@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('99fef86d-d4b8-4803-b174-b6292e231ab3', 'admin@mastercontrol.local', '$2b$10$mjH1/hCVH7bZDrFEfAnBfeNY0Sho2lx/hzXrv.FzO2OFKarbegDyK', 'ADMIN', 'LOCAL', NULL, 1, 1, NULL, '2026-10-23 19:22:32', '2026-10-29 20:15:09'),
-  ('9a71417b-28fc-4a26-905c-1100f9265b81', 'trauma.care@cityhospital.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:55:57', '2026-10-25 06:55:57'),
-  ('9bf823ff-2498-4965-97d0-1733b7d002fb', 'transplant.kolkata@apollohospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('99fef86d-d4b8-4803-b174-b6292e231ab3', 'admin@mastercontrol.local', '$2b$10$TbJDHQENmdorf2.29dSMi.3cwHrE5kYbvTw7aA4wSLPjeOPbBIC8S', 'ADMIN', 'LOCAL', NULL, 1, 1, NULL, '2026-10-23 19:22:32', '2026-10-29 20:15:09'),
+  ('9a71417b-28fc-4a26-905c-1100f9265b81', 'trauma.care@cityhospital.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:55:57', '2026-10-25 06:55:57'),
+  ('9bf823ff-2498-4965-97d0-1733b7d002fb', 'transplant.kolkata@apollohospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('9c91d959-3900-4575-8fba-1ff550132993', 'socket.patient@citizen.org', '$2b$10$IQ/mdIE8f84SpyFfYApkmOQy6H/iia/TUlexZP6R6Dke599dNrqUK', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-24 11:01:20', '2026-10-24 11:01:20'),
-  ('a1f586d0-2989-4d41-a00e-7370a49e0f93', 'kem.mumbai@hospital.org', '$2b$10$y3mxpmPvs/SKzQSHChdPW.JTOq0gjkaGhacwgRTkJn/r8Ez60IqXK', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:02', '2026-10-25 06:56:02'),
-  ('b10b79af-d32e-495e-bd3a-4c563a348db0', 'p2@citizen.org', '$2b$10$oNta4DncQ08lEpuBH0/FYONspFVuxyrVfSVZH46dhYP1pD/z1R3hC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+  ('a1f586d0-2989-4d41-a00e-7370a49e0f93', 'kem.mumbai@hospital.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:02', '2026-10-25 06:56:02'),
+  ('b10b79af-d32e-495e-bd3a-4c563a348db0', 'p2@citizen.org', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03')
+ON DUPLICATE KEY UPDATE `password_hash` = VALUES(`password_hash`), `role` = VALUES(`role`), `is_active` = VALUES(`is_active`), `is_verified` = VALUES(`is_verified`), `avatar_url` = VALUES(`avatar_url`);
 
 INSERT INTO `users` (`id`, `email`, `password_hash`, `role`, `auth_provider`, `google_id`, `is_active`, `is_verified`, `avatar_url`, `created_at`, `updated_at`) VALUES
   ('b3e9d07a-47be-4b4d-9c18-1a350789f3a5', 'aarav.sharma@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('b4702c0d-384d-47d6-95ad-80a5cc373dd2', 'transplant.care@continentalhospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('c195dca0-ca6b-419a-8e9d-786170c15589', 'transplant@miotinternational.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('c1b03fc3-00cf-46ce-827c-66ebf1b97075', 'transplant.greams@apollohospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('c75dca18-aa36-4e82-9dab-4ccee8d2ea81', 'transplant@carehospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('b4702c0d-384d-47d6-95ad-80a5cc373dd2', 'transplant.care@continentalhospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('c195dca0-ca6b-419a-8e9d-786170c15589', 'transplant@miotinternational.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('c1b03fc3-00cf-46ce-827c-66ebf1b97075', 'transplant.greams@apollohospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('c75dca18-aa36-4e82-9dab-4ccee8d2ea81', 'transplant@carehospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('c7a1794e-ee67-4883-829b-182a2e4e42bd', 'sanjay.singhania@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
   ('ca60b6b4-67f7-4451-a3de-2d8da520e28b', 'pledge_revamp_1792946774033@example.com', '$2b$10$hoc/SlSyRfgTIG.Yz66C1OorrB34kpv6dZdiBKjHy8M1wVibLRgA6', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 16:46:14', '2026-10-25 16:46:14'),
-  ('cac346ad-e858-4ad7-befe-85122e532b53', 'organ.transplant@sgrh.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('ce0adc0b-290a-4e13-b118-7f24e7a5bd93', 'amit.deshmukh@gmail.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
-  ('d228f870-721f-4430-ad10-b71298ba9d57', 'transplant.division@medanta.org', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('d34f2924-4cb8-4671-af54-70cf03f6c351', 'p3@citizen.org', '$2b$10$/uMzr7TSj5JP/E8aYpnnB.JCAYHiy1MW7Qhv5oFjXRjXXO8wMQ.Ym', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
+  ('cac346ad-e858-4ad7-befe-85122e532b53', 'organ.transplant@sgrh.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('ce0adc0b-290a-4e13-b118-7f24e7a5bd93', 'amit.deshmukh@gmail.com', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
+  ('d228f870-721f-4430-ad10-b71298ba9d57', 'transplant.division@medanta.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('d34f2924-4cb8-4671-af54-70cf03f6c351', 'p3@citizen.org', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
   ('d4a76df4-d8c5-441a-8a97-0cfa2f899230', 'ramesh.test.1793182043288@organdonation.local', '$2b$10$P2aI2AuX9iDcvsgVo5vi/uSwY9wo/6rDvll1FTcrXNH1tE94nbS3m', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 10:07:23', '2026-10-28 10:07:23'),
-  ('dd680639-26d0-42c2-a810-c94655f0dd01', 'priya.sharma92@gmail.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
-  ('e098f76d-5bab-4a8b-b055-657bda4b081d', 'transplant@jehangirhospital.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('dd680639-26d0-42c2-a810-c94655f0dd01', 'priya.sharma92@gmail.com', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
+  ('e098f76d-5bab-4a8b-b055-657bda4b081d', 'transplant@jehangirhospital.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('e51d13db-31ab-4778-8c97-d07b951e811e', 'priya.nair@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('e94a5470-4197-4a38-b1cb-80dc09e75d7f', 'aiims.delhi@gov.in', '$2b$10$OtJQ8YCv98utHq.JSPA6gOzqHbW4H2bY7AFoSvCYlnr3j57YE7sj6', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:13:30', '2026-10-25 06:13:30'),
-  ('e9b68148-f104-4a24-87f0-72b0e33a7869', 'vikram.rao@gmail.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
-  ('ed0d0cbc-d1ce-48d2-93cf-11c962a207f3', 'transplant.desk@hindujahospital.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('eecdb724-5679-43d3-9cc6-4a7ca50822da', 'redcross.hyd@bloodbank.org', '$2b$10$X7LphGAVVfiQLRhKLkB7mO.zKQ2kOl2oTqrRBS2zIyvxVAxR6fl8a', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:55:57', '2026-11-01 18:32:12'),
+  ('e94a5470-4197-4a38-b1cb-80dc09e75d7f', 'aiims.delhi@gov.in', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:13:30', '2026-10-25 06:13:30'),
+  ('e9b68148-f104-4a24-87f0-72b0e33a7869', 'vikram.rao@gmail.com', '$2b$10$wDsb7SwlpuzBBtDdvUf56u.8YuJBGt1.uwv7aSfCEuU1m.iY14GVC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
+  ('ed0d0cbc-d1ce-48d2-93cf-11c962a207f3', 'transplant.desk@hindujahospital.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('eecdb724-5679-43d3-9cc6-4a7ca50822da', 'redcross.hyd@bloodbank.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:55:57', '2026-11-01 18:32:12'),
   ('f653a6ee-2ec6-4ff8-9801-91722965452a', 'satya@example.com', '$2b$10$S7sx3EzaxY9.r88uvBjGS.XixFVzFbnbFF9WIP/litzHFEunsVWWq', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-23 17:00:44', '2026-10-23 17:01:13'),
-  ('fc4d1a0b-035d-4d27-9447-72d69914777f', 'transplant.care@zydushospitals.com', '$2b$10$EyqfPCi3xl7WNft4ejOFGOkCpLkfCbi98Ywea4d6H.TyWWu0l1IDG', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
-  ('ff3ce11f-e9b5-4daf-b519-75dd8de8ad01', 'apollo.delhi@hospital.org', '$2b$10$pCamrse2mShG1IC9yyiO8OF9U3DR/bA76Vab6dvuMdrwgJC2v23me', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:00', '2026-10-25 06:56:00'),
-  ('ff58ca04-5a92-4fc0-95ac-f739b6a3e3d7', 'pending.test1793305135647@hospital.org', '$2b$10$Ge7s67waRRQzHL08vDKwcO4A7wI83eReXh/62eoFOIlCeNYSxKZrq', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-29 20:18:55', '2026-10-29 20:18:55')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+  ('fc4d1a0b-035d-4d27-9447-72d69914777f', 'transplant.care@zydushospitals.com', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('ff3ce11f-e9b5-4daf-b519-75dd8de8ad01', 'apollo.delhi@hospital.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:00', '2026-10-25 06:56:00'),
+  ('ff58ca04-5a92-4fc0-95ac-f739b6a3e3d7', 'pending.test1793305135647@hospital.org', '$2b$10$S0brBaOB6PE85nzZns/HPui1KawwaipCqq/OHq8kOkgbX0iVcvYqC', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-29 20:18:55', '2026-10-29 20:18:55')
+ON DUPLICATE KEY UPDATE `password_hash` = VALUES(`password_hash`), `role` = VALUES(`role`), `is_active` = VALUES(`is_active`), `is_verified` = VALUES(`is_verified`), `avatar_url` = VALUES(`avatar_url`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: citizen_profiles (34 rows)
@@ -369,7 +372,7 @@ INSERT INTO `citizen_profiles` (`id`, `user_id`, `full_name`, `date_of_birth`, `
   (132, '3f079d05-fcc8-411a-ba6e-9004526a2f21', 'Rahul Verma', '1987-08-18 18:30:00', 'MALE', 'A+', '+91 91234 56789', 'Emergency Contact', '+91 9988776655', 'House 12-4-88, Banjara Hills Road No. 10', 'Hyderabad', 'Telangana', '500034', NULL, '2026-11-05 17:17:23'),
   (133, 'e9b68148-f104-4a24-87f0-72b0e33a7869', 'Dr. Vikram Rao', '1980-02-14 18:30:00', 'MALE', 'B+', '+91 99887 76655', 'Emergency Contact', '+91 9988776655', 'Villa 54, Jubilee Hills', 'Hyderabad', 'Telangana', '500033', NULL, '2026-11-05 17:17:23'),
   (134, 'ce0adc0b-290a-4e13-b118-7f24e7a5bd93', 'Amit Deshmukh', '1995-06-29 18:30:00', 'MALE', 'A+', '+91 94401 23456', 'Emergency Contact', '+91 9988776655', 'Apartment 304, Green Meadows, Kondapur', 'Hyderabad', 'Telangana', '500084', NULL, '2026-11-05 17:17:23')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`), `date_of_birth` = VALUES(`date_of_birth`), `gender` = VALUES(`gender`), `blood_group` = VALUES(`blood_group`), `phone_number` = VALUES(`phone_number`), `emergency_contact_name` = VALUES(`emergency_contact_name`), `emergency_contact_phone` = VALUES(`emergency_contact_phone`), `address_line` = VALUES(`address_line`), `city` = VALUES(`city`), `state` = VALUES(`state`), `pincode` = VALUES(`pincode`), `avatar_url` = VALUES(`avatar_url`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: medical_hubs (34 rows)
@@ -409,7 +412,7 @@ INSERT INTO `medical_hubs` (`id`, `user_id`, `hub_type`, `name`, `license_number
   (55, 'fc4d1a0b-035d-4d27-9447-72d69914777f', 'HOSPITAL', 'Zydus Hospital SG Highway', 'MHUB-GJ-AHM-001', '+91 79 6619 0201', 'Zydus Hospital Road, SG Highway, Thaltej', 'Ahmedabad', 'Gujarat', '380054', '23.07220000', '72.52550000', 'ACTIVE', NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   (56, '5c43676b-babf-47fd-94eb-f09e795ff14f', 'HOSPITAL', 'Post Graduate Institute of Medical Education & Research (PGIMER)', 'MHUB-CH-CHD-001', '+91 172 274 7585', 'Sector 12, Madhya Marg', 'Chandigarh', 'Chandigarh', '160012', '30.76510000', '76.77660000', 'ACTIVE', NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   (57, '4228dbae-b4b7-4eb4-a494-7c75b2ccf52e', 'HOSPITAL', 'Amrita Institute of Medical Sciences (AIMS)', 'MHUB-KL-COK-001', '+91 484 285 1234', 'AIMS Ponekkara P.O., Edappally', 'Kochi', 'Kerala', '682041', '10.03260000', '76.29990000', 'ACTIVE', NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `license_number` = VALUES(`license_number`), `contact_phone` = VALUES(`contact_phone`), `address_line` = VALUES(`address_line`), `city` = VALUES(`city`), `state` = VALUES(`state`), `pincode` = VALUES(`pincode`), `latitude` = VALUES(`latitude`), `longitude` = VALUES(`longitude`), `verification_status` = VALUES(`verification_status`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: donor_pledges (45 rows)
@@ -460,7 +463,7 @@ INSERT INTO `donor_pledges` (`id`, `user_id`, `organ_type_id`, `consent_type`, `
   (229, '810c59cf-da16-495c-afdb-c6e154d6777c', 5, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
   (230, '810c59cf-da16-495c-afdb-c6e154d6777c', 6, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
   (232, '810c59cf-da16-495c-afdb-c6e154d6777c', 8, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `consent_type` = VALUES(`consent_type`), `status` = VALUES(`status`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: blood_inventory (131 rows)
@@ -516,7 +519,7 @@ INSERT INTO `blood_inventory` (`id`, `hub_id`, `blood_group`, `component`, `unit
   (87, 20, 'B+', 'PLASMA', 21, '2026-11-05 17:10:05'),
   (88, 20, 'AB+', 'WHOLE_BLOOD', 14, '2026-11-05 17:10:05'),
   (89, 20, 'AB+', 'PACKED_RBC', 17, '2026-11-05 17:10:05')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `units_available` = VALUES(`units_available`), `last_updated` = VALUES(`last_updated`);
 
 INSERT INTO `blood_inventory` (`id`, `hub_id`, `blood_group`, `component`, `units_available`, `last_updated`) VALUES
   (90, 20, 'AB+', 'PLATELETS', 11, '2026-11-05 17:10:05'),
@@ -569,7 +572,7 @@ INSERT INTO `blood_inventory` (`id`, `hub_id`, `blood_group`, `component`, `unit
   (138, 28, 'AB-', 'PLATELETS', 4, '2026-11-05 17:10:05'),
   (139, 28, 'AB-', 'PLASMA', 5, '2026-11-05 17:10:05'),
   (140, 29, 'O+', 'WHOLE_BLOOD', 32, '2026-11-05 17:10:05')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `units_available` = VALUES(`units_available`), `last_updated` = VALUES(`last_updated`);
 
 INSERT INTO `blood_inventory` (`id`, `hub_id`, `blood_group`, `component`, `units_available`, `last_updated`) VALUES
   (141, 29, 'O+', 'PACKED_RBC', 36, '2026-11-05 17:10:05'),
@@ -603,7 +606,7 @@ INSERT INTO `blood_inventory` (`id`, `hub_id`, `blood_group`, `component`, `unit
   (169, 29, 'AB-', 'PACKED_RBC', 6, '2026-11-05 17:10:05'),
   (170, 29, 'AB-', 'PLATELETS', 4, '2026-11-05 17:10:05'),
   (171, 29, 'AB-', 'PLASMA', 5, '2026-11-05 17:10:05')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `units_available` = VALUES(`units_available`), `last_updated` = VALUES(`last_updated`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: available_organs (33 rows)
@@ -646,7 +649,7 @@ INSERT INTO `available_organs` (`id`, `organ_type_id`, `donor_user_id`, `harvest
   (116, 6, NULL, 27, 27, 'B+', '2026-11-05 15:10:05', '2099-12-31 18:29:59', 'AVAILABLE', 'Donor Age 35. Optical-grade corneal graft preserved in Optisol-GS medium at 4°C. Endothelial cell density (ECD) 3,100 cells/mm². Crystal clear stroma. [NEVER EXPIRES]', '2026-11-05 17:10:05'),
   (117, 6, NULL, 27, 27, 'O+', '2026-11-05 15:10:05', '2099-12-31 18:29:59', 'AVAILABLE', 'Donor Age 27. Penetrating keratoplasty tissue in corneal storage medium. ECD 3,250 cells/mm², epithelial integrity 100%. Negative for infectious markers. [NEVER EXPIRES]', '2026-11-05 17:10:05'),
   (118, 4, '56c4338a-a957-4b0c-9255-4d51276862ed', 27, 27, 'A+', '2026-06-20 02:30:00', '2026-06-21 14:30:00', 'TRANSPLANTED', 'Living humanitarian renal allograft donation by Satyanarayana Chittidi. Zero warm ischemia time. Successfully transplanted into recipient with immediate diuresis.', '2026-11-05 17:17:23')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`), `expires_at` = VALUES(`expires_at`), `clinical_notes` = VALUES(`clinical_notes`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: transplant_requests (26 rows)
@@ -678,7 +681,7 @@ INSERT INTO `transplant_requests` (`id`, `recipient_user_id`, `attending_hub_id`
   (87, '003740d6-8857-40b3-b3af-0fd43f125a4b', 30, 5, 'O+', 'TIER_2_URGENT', 'Type 1 diabetes mellitus with severe hypoglycemic unawareness and frequent life-threatening neuroglycopenic seizures.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-08-09 12:13:38'),
   (88, '810c59cf-da16-495c-afdb-c6e154d6777c', 27, 6, 'B+', 'TIER_1_EMERGENCY', '12345', 'WAITING_LIST', '2026-10-29 16:49:21', '2026-10-29 16:49:21'),
   (89, '56c4338a-a957-4b0c-9255-4d51276862ed', 27, 6, 'A+', 'TIER_3_ROUTINE', 'Optical penetrating keratoplasty for traumatic corneal opacity. Successful corneal transplant performed with 6/9 post-op visual acuity.', 'FULFILLED', '2026-03-10 05:30:00', '2026-02-15 04:00:00')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`), `medical_summary` = VALUES(`medical_summary`), `urgency_tier` = VALUES(`urgency_tier`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: blood_requests (23 rows)
@@ -707,7 +710,7 @@ INSERT INTO `blood_requests` (`id`, `requester_user_id`, `destination_hub_id`, `
   (25, 'e9b68148-f104-4a24-87f0-72b0e33a7869', 33, NULL, NULL, NULL, 'B+', 'PACKED_RBC', 2, 'CRITICAL', 'REQUESTED', 'Yashoda Hospitals Somajiguda, Raj Bhavan Rd', '2026-11-05 16:17:23', NULL, 'BROTHER', 'Suresh Rao', 'Cardio-Ward-09'),
   (26, 'ce0adc0b-290a-4e13-b118-7f24e7a5bd93', 27, NULL, 27, '56c4338a-a957-4b0c-9255-4d51276862ed', 'A+', 'WHOLE_BLOOD', 1, 'URGENT', 'COMPLETED', 'City Trauma Emergency Hospital, Gachibowli', '2026-08-15 04:00:00', '2026-08-15 06:15:00', 'SELF', 'Amit Deshmukh', 'Ward-3B-Bed-21'),
   (27, '56c4338a-a957-4b0c-9255-4d51276862ed', 27, NULL, 27, '3f079d05-fcc8-411a-ba6e-9004526a2f21', 'A+', 'PACKED_RBC', 1, 'ROUTINE', 'COMPLETED', 'City Trauma Emergency Hospital, Gachibowli', '2026-05-12 08:30:00', '2026-05-12 11:00:00', 'SELF', 'Satyanarayana Chittidi', 'DayCare-Bed-02')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`), `units_requested` = VALUES(`units_requested`), `urgency` = VALUES(`urgency`), `delivery_address` = VALUES(`delivery_address`);
 
 -- --------------------------------------------------------------------
 -- DATA FOR TABLE: blood_donation_camps (12 rows)
@@ -725,5 +728,5 @@ INSERT INTO `blood_donation_camps` (`id`, `organizer_hub_id`, `created_by_user_i
   (39, 57, '4228dbae-b4b7-4eb4-a494-7c75b2ccf52e', 'Kerala Coastal Emergency Care Blood Drive', 'Coastal healthcare resilience drive dedicated to monsoon season emergency reserves and state-wide surgical readiness.', 'Lulu International Mall Grand Atrium, Edappally', 'AIMS Ponekkara P.O., Edappally', 'Kochi', 'Kerala', '682041', '2027-11-13 18:30:00', '2027-11-15 18:30:00', '10:00 AM', '07:00 PM', '+91 484 285 1234', 'organ.transplant@aims.amrita.edu', 230, 'UPCOMING', '10.03260000', '76.29990000', 'https://maps.google.com/?q=Amrita+Hospital+Kochi', '2026-11-05 17:10:05', '2026-11-05 17:10:05'),
   (40, 33, '83c98cb2-e082-4420-8e79-e2d1d7f94da0', 'Somajiguda Twin Cities Health & Blood Camp', 'Community wellness camp open to all local residents. Comprehensive blood group testing, hemoglobin assays, and organ donor pledge registration booth on site.', 'Nizam College Grounds, Basheerbagh', 'Raj Bhavan Road, Matha Nagar, Somajiguda', 'Hyderabad', 'Telangana', '500082', '2027-12-04 18:30:00', '2027-12-06 18:30:00', '08:30 AM', '04:30 PM', '+91 40 4567 4567', 'transplant.somajiguda@yashodahospitals.com', 200, 'UPCOMING', '17.42650000', '78.45780000', 'https://maps.google.com/?q=Yashoda+Hospital+Somajiguda', '2026-11-05 17:10:05', '2026-11-05 17:10:05'),
   (41, 55, 'fc4d1a0b-035d-4d27-9447-72d69914777f', 'Gujarat Industrial Corridor Lifeline Camp', 'Collaborative drive across Gujarat industrial corridors ensuring sufficient whole blood and plasma availability.', 'Ahmedabad Management Association (AMA) Complex', 'Zydus Hospital Road, SG Highway, Thaltej', 'Ahmedabad', 'Gujarat', '380054', '2028-01-17 18:30:00', '2028-01-19 18:30:00', '09:00 AM', '05:00 PM', '+91 79 6619 0201', 'transplant.care@zydushospitals.com', 260, 'UPCOMING', '23.07220000', '72.52550000', 'https://maps.google.com/?q=Zydus+Hospital+Ahmedabad', '2026-11-05 17:10:05', '2026-11-05 17:10:05')
-ON DUPLICATE KEY UPDATE `id` = `id`;
+ON DUPLICATE KEY UPDATE `camp_name` = VALUES(`camp_name`), `description` = VALUES(`description`), `venue_name` = VALUES(`venue_name`), `address_line` = VALUES(`address_line`), `city` = VALUES(`city`), `state` = VALUES(`state`), `pincode` = VALUES(`pincode`), `camp_date` = VALUES(`camp_date`), `end_date` = VALUES(`end_date`), `start_time` = VALUES(`start_time`), `end_time` = VALUES(`end_time`), `contact_phone` = VALUES(`contact_phone`), `contact_email` = VALUES(`contact_email`), `target_units` = VALUES(`target_units`), `status` = VALUES(`status`), `latitude` = VALUES(`latitude`), `longitude` = VALUES(`longitude`), `map_url` = VALUES(`map_url`);
 
