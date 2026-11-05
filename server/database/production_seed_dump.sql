@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS blood_donation_camps (
 -- ====================================================================
 
 -- --------------------------------------------------------------------
--- DATA FOR TABLE: users (68 rows)
+-- DATA FOR TABLE: users (73 rows)
 -- --------------------------------------------------------------------
 INSERT INTO `users` (`id`, `email`, `password_hash`, `role`, `auth_provider`, `google_id`, `is_active`, `is_verified`, `avatar_url`, `created_at`, `updated_at`) VALUES
   ('003740d6-8857-40b3-b3af-0fd43f125a4b', 'gaurav.bhatt@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
@@ -267,6 +267,7 @@ INSERT INTO `users` (`id`, `email`, `password_hash`, `role`, `auth_provider`, `g
   ('2f58b970-401f-4573-ac2a-8b3c00b7c7dd', 'transplant@narayanahealth.org', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('32d3e06c-4d0d-4390-919a-ea596bac1aab', '2@g', '$2b$10$JJrbw2pqSYcrLkF0F3uYBuSyw5UIMjroTWmbqsf1aReIbijMR9ciG', 'USER', 'LOCAL', NULL, 1, 1, '/uploads/avatars/avatar-32d3e06c-4d0d-4390-919a-ea596bac1aab-1792911729163.jpg', '2026-10-25 05:50:06', '2026-10-25 07:02:09'),
   ('36ab4c5f-38d6-43af-a278-057ed4f931e2', 'transplant.coord@manipalhospitals.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('3f079d05-fcc8-411a-ba6e-9004526a2f21', 'rahul.verma@gmail.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
   ('4228dbae-b4b7-4eb4-a494-7c75b2ccf52e', 'organ.transplant@aims.amrita.edu', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('442ec46a-0f73-40b9-8966-88d118e8ae7a', 'p1@citizen.org', '$2b$10$RtVbgNUXD5UAl5KJRE36zeXpx9vJLacgTa3lJnETdePRLqRD1mJke', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
   ('44e8f9f0-bd62-49aa-a8b2-9a6f67429fc0', 'transplant.desk@medicahospitals.in', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
@@ -276,6 +277,7 @@ INSERT INTO `users` (`id`, `email`, `password_hash`, `role`, `auth_provider`, `g
   ('4cb889ce-5e5f-4548-a9ec-03431ff2d0bf', 'transplant.saket@maxhealthcare.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('4e2e028b-2909-4e2a-8049-7ea5e0cdafdb', 'transplant.cmi@asterhospital.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('53a41ccb-aea7-407a-8f83-0a38e8d70885', 'kavita.reddy@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
+  ('56305174-4bd5-4ffe-838a-ff64d26d31e1', 'kavita.reddy@outlook.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
   ('56c4338a-a957-4b0c-9255-4d51276862ed', 'phantomcapacitor@gmail.com', '$2b$10$FOn0Dq1tsWU37MUtaETEZusGSWc5vG...G19jl8tV46tuQge.6HnG', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-24 11:18:23', '2026-10-24 11:18:50'),
   ('598ff7e2-9b50-4fc3-949a-e4d2d76cc66d', 'bhaaaaai@gmail.com', '$2b$10$roZUF5931uAuxO3hgWjEO.zidX3HCEyOCBfAlF4CY4EmRkt5LbB3S', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-26 14:05:46', '2026-10-26 14:05:46'),
   ('5bf3c5d0-6259-4c65-b36c-c4a3bf2afbcf', 'amitabh.sen@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
@@ -300,30 +302,73 @@ INSERT INTO `users` (`id`, `email`, `password_hash`, `role`, `auth_provider`, `g
   ('9bf823ff-2498-4965-97d0-1733b7d002fb', 'transplant.kolkata@apollohospitals.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('9c91d959-3900-4575-8fba-1ff550132993', 'socket.patient@citizen.org', '$2b$10$IQ/mdIE8f84SpyFfYApkmOQy6H/iia/TUlexZP6R6Dke599dNrqUK', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-24 11:01:20', '2026-10-24 11:01:20'),
   ('a1f586d0-2989-4d41-a00e-7370a49e0f93', 'kem.mumbai@hospital.org', '$2b$10$y3mxpmPvs/SKzQSHChdPW.JTOq0gjkaGhacwgRTkJn/r8Ez60IqXK', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:02', '2026-10-25 06:56:02'),
-  ('b10b79af-d32e-495e-bd3a-4c563a348db0', 'p2@citizen.org', '$2b$10$oNta4DncQ08lEpuBH0/FYONspFVuxyrVfSVZH46dhYP1pD/z1R3hC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
-  ('b3e9d07a-47be-4b4d-9c18-1a350789f3a5', 'aarav.sharma@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
-  ('b4702c0d-384d-47d6-95ad-80a5cc373dd2', 'transplant.care@continentalhospitals.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19')
+  ('b10b79af-d32e-495e-bd3a-4c563a348db0', 'p2@citizen.org', '$2b$10$oNta4DncQ08lEpuBH0/FYONspFVuxyrVfSVZH46dhYP1pD/z1R3hC', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03')
 ON DUPLICATE KEY UPDATE `id` = `id`;
 
 INSERT INTO `users` (`id`, `email`, `password_hash`, `role`, `auth_provider`, `google_id`, `is_active`, `is_verified`, `avatar_url`, `created_at`, `updated_at`) VALUES
+  ('b3e9d07a-47be-4b4d-9c18-1a350789f3a5', 'aarav.sharma@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
+  ('b4702c0d-384d-47d6-95ad-80a5cc373dd2', 'transplant.care@continentalhospitals.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('c195dca0-ca6b-419a-8e9d-786170c15589', 'transplant@miotinternational.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('c1b03fc3-00cf-46ce-827c-66ebf1b97075', 'transplant.greams@apollohospitals.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('c75dca18-aa36-4e82-9dab-4ccee8d2ea81', 'transplant@carehospitals.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('c7a1794e-ee67-4883-829b-182a2e4e42bd', 'sanjay.singhania@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
   ('ca60b6b4-67f7-4451-a3de-2d8da520e28b', 'pledge_revamp_1792946774033@example.com', '$2b$10$hoc/SlSyRfgTIG.Yz66C1OorrB34kpv6dZdiBKjHy8M1wVibLRgA6', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 16:46:14', '2026-10-25 16:46:14'),
   ('cac346ad-e858-4ad7-befe-85122e532b53', 'organ.transplant@sgrh.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
+  ('ce0adc0b-290a-4e13-b118-7f24e7a5bd93', 'amit.deshmukh@gmail.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
   ('d228f870-721f-4430-ad10-b71298ba9d57', 'transplant.division@medanta.org', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('d34f2924-4cb8-4671-af54-70cf03f6c351', 'p3@citizen.org', '$2b$10$/uMzr7TSj5JP/E8aYpnnB.JCAYHiy1MW7Qhv5oFjXRjXXO8wMQ.Ym', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
   ('d4a76df4-d8c5-441a-8a97-0cfa2f899230', 'ramesh.test.1793182043288@organdonation.local', '$2b$10$P2aI2AuX9iDcvsgVo5vi/uSwY9wo/6rDvll1FTcrXNH1tE94nbS3m', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 10:07:23', '2026-10-28 10:07:23'),
+  ('dd680639-26d0-42c2-a810-c94655f0dd01', 'priya.sharma92@gmail.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
   ('e098f76d-5bab-4a8b-b055-657bda4b081d', 'transplant@jehangirhospital.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('e51d13db-31ab-4778-8c97-d07b951e811e', 'priya.nair@patient.organdonation.in', NULL, 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-28 08:43:38', '2026-10-28 17:22:29'),
   ('e94a5470-4197-4a38-b1cb-80dc09e75d7f', 'aiims.delhi@gov.in', '$2b$10$OtJQ8YCv98utHq.JSPA6gOzqHbW4H2bY7AFoSvCYlnr3j57YE7sj6', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:13:30', '2026-10-25 06:13:30'),
+  ('e9b68148-f104-4a24-87f0-72b0e33a7869', 'vikram.rao@gmail.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:17:23', '2026-11-05 17:17:23'),
   ('ed0d0cbc-d1ce-48d2-93cf-11c962a207f3', 'transplant.desk@hindujahospital.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('eecdb724-5679-43d3-9cc6-4a7ca50822da', 'redcross.hyd@bloodbank.org', '$2b$10$X7LphGAVVfiQLRhKLkB7mO.zKQ2kOl2oTqrRBS2zIyvxVAxR6fl8a', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:55:57', '2026-11-01 18:32:12'),
   ('f653a6ee-2ec6-4ff8-9801-91722965452a', 'satya@example.com', '$2b$10$S7sx3EzaxY9.r88uvBjGS.XixFVzFbnbFF9WIP/litzHFEunsVWWq', 'USER', 'LOCAL', NULL, 1, 1, NULL, '2026-10-23 17:00:44', '2026-10-23 17:01:13'),
   ('fc4d1a0b-035d-4d27-9447-72d69914777f', 'transplant.care@zydushospitals.com', '$2b$10$3MNZiHttVx9SHIxL0l6n1.XCRF..aFHTk3Vpz1KmVdLsLNgN/IqD2', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   ('ff3ce11f-e9b5-4daf-b519-75dd8de8ad01', 'apollo.delhi@hospital.org', '$2b$10$pCamrse2mShG1IC9yyiO8OF9U3DR/bA76Vab6dvuMdrwgJC2v23me', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-25 06:56:00', '2026-10-25 06:56:00'),
   ('ff58ca04-5a92-4fc0-95ac-f739b6a3e3d7', 'pending.test1793305135647@hospital.org', '$2b$10$Ge7s67waRRQzHL08vDKwcO4A7wI83eReXh/62eoFOIlCeNYSxKZrq', 'HOSPITAL', 'LOCAL', NULL, 1, 1, NULL, '2026-10-29 20:18:55', '2026-10-29 20:18:55')
+ON DUPLICATE KEY UPDATE `id` = `id`;
+
+-- --------------------------------------------------------------------
+-- DATA FOR TABLE: citizen_profiles (34 rows)
+-- --------------------------------------------------------------------
+INSERT INTO `citizen_profiles` (`id`, `user_id`, `full_name`, `date_of_birth`, `gender`, `blood_group`, `phone_number`, `emergency_contact_name`, `emergency_contact_phone`, `address_line`, `city`, `state`, `pincode`, `avatar_url`, `created_at`) VALUES
+  (1, '8de4586b-7736-4b47-871b-5008aaac41c1', 'Chittidi Satyanarayana', '2004-05-14 18:30:00', 'MALE', 'O+', '+91 94914 83994', 'S V V Satyanarayana', '+91 94914 83995', 'IIT ISM Campus', 'Dhanbad', 'Jharkhand', '826004', NULL, '2026-10-23 17:42:44'),
+  (5, '9c91d959-3900-4575-8fba-1ff550132993', 'Rohan Kumar', '1995-05-14 18:30:00', 'MALE', 'O-', '+91-9876543210', 'Kin', '+91-9876543211', 'Address', 'Hyderabad', 'TS', '500081', NULL, '2026-10-24 11:01:20'),
+  (9, '56c4338a-a957-4b0c-9255-4d51276862ed', 'Satyanarayana Chittidi', '2005-03-07 18:30:00', 'MALE', 'A+', '9491483994', 'Emergency Contact', '1234567890', '4-80, Near Chinna Vantena', 'Hyderabad', 'Telangana', '534302', NULL, '2026-10-24 11:44:06'),
+  (35, '32d3e06c-4d0d-4390-919a-ea596bac1aab', '1', '0999-12-30 18:06:32', 'MALE', 'A+', '1', '1', '1', '4-80, Near Chinna Vantena', 'Madduru', 'Andhra Pradesh', '534302', '/uploads/avatars/avatar-32d3e06c-4d0d-4390-919a-ea596bac1aab-1792911729163.jpg', '2026-10-25 06:27:30'),
+  (41, '442ec46a-0f73-40b9-8966-88d118e8ae7a', 'Rajesh Sharma (Pune ICU)', '1989-12-31 18:30:00', 'MALE', 'A+', '+91-9876543210', 'Kin', '+91-9876543211', 'Address', 'Pune', 'MH', '411001', NULL, '2026-10-25 06:56:03'),
+  (42, 'b10b79af-d32e-495e-bd3a-4c563a348db0', 'Anita Verma (Delhi Emergency)', '1989-12-31 18:30:00', 'MALE', 'A+', '+91-9876543210', 'Kin', '+91-9876543211', 'Address', 'Pune', 'MH', '411001', NULL, '2026-10-25 06:56:03'),
+  (43, 'd34f2924-4cb8-4671-af54-70cf03f6c351', 'Vikram Patel (Pune Routine)', '1989-12-31 18:30:00', 'MALE', 'A+', '+91-9876543210', 'Kin', '+91-9876543211', 'Address', 'Pune', 'MH', '411001', NULL, '2026-10-25 06:56:03'),
+  (48, '810c59cf-da16-495c-afdb-c6e154d6777c', 'Jonh Doe', '2005-04-06 18:30:00', 'MALE', 'B+', '1234567890', 'Jaatu', '1234567890', 'My House, My Streer', 'My City', 'My Stata', 'PINCOD', NULL, '2026-10-25 08:44:28'),
+  (57, '7645ee5b-8add-4ec7-b87b-2cc77d0d8ee5', 'Pledge Test User', '1995-05-14 18:30:00', 'MALE', 'O+', '+91-9876543210', 'Emergency Contact', '+91-9876543211', '123 Test St', 'Hyderabad', 'Telangana', '500001', NULL, '2026-10-25 16:46:25'),
+  (59, '4b09173c-0b33-4f08-a21f-49a7e5f86192', 'No Pledge User', '1989-12-31 18:30:00', 'FEMALE', 'B+', '+91-9988776655', 'Contact Name', '+91-9988776654', 'Test Road', 'Delhi', 'Delhi', '110001', NULL, '2026-10-25 16:51:18'),
+  (60, '598ff7e2-9b50-4fc3-949a-e4d2d76cc66d', 'bhaaai', '2026-10-25 18:30:00', 'MALE', 'B+', '9898989899', 'satyaaaaa', '9779797999', 'dhanabd', 'dhanbad', 'jharkhand', '111111', NULL, '2026-10-26 14:07:19'),
+  (61, 'b3e9d07a-47be-4b4d-9c18-1a350789f3a5', 'Aarav Sharma', '1984-06-14 18:30:00', 'MALE', 'O+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (62, 'e51d13db-31ab-4778-8c97-d07b951e811e', 'Priya Nair', '1991-03-21 18:30:00', 'FEMALE', 'O+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (63, '8406c313-d12d-4552-a1c8-9a36ff4cf8f4', 'Rohan Patel', '1979-11-07 18:30:00', 'MALE', 'A+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (64, '25099de0-538e-4920-ad88-aa76c83aac75', 'Meera Deshmukh', '1986-09-13 18:30:00', 'FEMALE', 'B+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (65, '1d8e07d7-6420-49ed-a07e-d14db4dc9081', 'Vikram Malhotra', '1975-01-29 18:30:00', 'MALE', 'AB+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (66, '4674df15-aa24-44ca-90e1-951f22c3a115', 'Ananya Iyer', '1995-12-03 18:30:00', 'FEMALE', 'O-', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (67, '93d75861-57ed-4780-9197-f852625a37e5', 'Rajesh Kumar', '1970-07-18 18:30:00', 'MALE', 'O+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (68, '2e969834-dbfa-42c8-b83a-763d27ed758c', 'Sunita Roy', '1982-04-10 18:30:00', 'FEMALE', 'B+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (69, '5bf3c5d0-6259-4c65-b36c-c4a3bf2afbcf', 'Amitabh Sen', '1968-08-24 18:30:00', 'MALE', 'A+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (70, '99882cf2-0b05-4953-ae07-68c2ee10aa40', 'Deepak Verma', '1988-10-01 18:30:00', 'MALE', 'O+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (71, '53a41ccb-aea7-407a-8f83-0a38e8d70885', 'Kavita Reddy', '1992-05-17 18:30:00', 'FEMALE', 'A-', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (72, '207063e9-795a-400a-b359-d35368699540', 'Harish Pillai', '1974-12-11 18:30:00', 'MALE', 'O+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (73, '859e14af-d954-4f08-b9d0-5abc9625be26', 'Nisha Gupta', '1980-02-13 18:30:00', 'FEMALE', 'A+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (74, '9363da13-b82c-4205-ba3e-06ff5993784a', 'Manoj Joshi', '1998-07-06 18:30:00', 'MALE', 'O-', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (75, '952c2dad-dcdc-4440-9fe4-5415222e98b2', 'Lakshmi Narayanan', '1965-03-08 18:30:00', 'FEMALE', 'B+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (76, 'c7a1794e-ee67-4883-829b-182a2e4e42bd', 'Sanjay Singhania', '1960-11-19 18:30:00', 'MALE', 'O+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (77, '003740d6-8857-40b3-b3af-0fd43f125a4b', 'Gaurav Bhatt', '1989-09-02 18:30:00', 'MALE', 'O+', '9876543210', 'Primary Guardian', '9876543211', 'Transplant Inpatient Ward', 'Regional Center', 'State', '500001', NULL, '2026-10-28 08:43:38'),
+  (78, 'd4a76df4-d8c5-441a-8a97-0cfa2f899230', 'Ramesh Patel', '1985-04-11 18:30:00', 'MALE', 'B+', '9876543210', 'Hospital Attendant', '9876543210', 'Registered via Hospital Master Control', 'Hyderabad', 'Telangana', '500081', NULL, '2026-10-28 10:07:23'),
+  (130, 'dd680639-26d0-42c2-a810-c94655f0dd01', 'Priya Sharma', '1992-04-11 18:30:00', 'FEMALE', 'A+', '+91 98480 22334', 'Emergency Contact', '+91 9988776655', 'Flat 402, Sai Vihar, Madhapur', 'Hyderabad', 'Telangana', '500081', NULL, '2026-11-05 17:17:23'),
+  (131, '56305174-4bd5-4ffe-838a-ff64d26d31e1', 'Kavita Reddy', '1989-11-22 18:30:00', 'FEMALE', 'AB+', '+91 98765 43211', 'Emergency Contact', '+91 9988776655', 'Plot 88, Financial District, Nanakramguda', 'Hyderabad', 'Telangana', '500032', NULL, '2026-11-05 17:17:23'),
+  (132, '3f079d05-fcc8-411a-ba6e-9004526a2f21', 'Rahul Verma', '1987-08-18 18:30:00', 'MALE', 'A+', '+91 91234 56789', 'Emergency Contact', '+91 9988776655', 'House 12-4-88, Banjara Hills Road No. 10', 'Hyderabad', 'Telangana', '500034', NULL, '2026-11-05 17:17:23'),
+  (133, 'e9b68148-f104-4a24-87f0-72b0e33a7869', 'Dr. Vikram Rao', '1980-02-14 18:30:00', 'MALE', 'B+', '+91 99887 76655', 'Emergency Contact', '+91 9988776655', 'Villa 54, Jubilee Hills', 'Hyderabad', 'Telangana', '500033', NULL, '2026-11-05 17:17:23'),
+  (134, 'ce0adc0b-290a-4e13-b118-7f24e7a5bd93', 'Amit Deshmukh', '1995-06-29 18:30:00', 'MALE', 'A+', '+91 94401 23456', 'Emergency Contact', '+91 9988776655', 'Apartment 304, Green Meadows, Kondapur', 'Hyderabad', 'Telangana', '500084', NULL, '2026-11-05 17:17:23')
 ON DUPLICATE KEY UPDATE `id` = `id`;
 
 -- --------------------------------------------------------------------
@@ -364,6 +409,57 @@ INSERT INTO `medical_hubs` (`id`, `user_id`, `hub_type`, `name`, `license_number
   (55, 'fc4d1a0b-035d-4d27-9447-72d69914777f', 'HOSPITAL', 'Zydus Hospital SG Highway', 'MHUB-GJ-AHM-001', '+91 79 6619 0201', 'Zydus Hospital Road, SG Highway, Thaltej', 'Ahmedabad', 'Gujarat', '380054', '23.07220000', '72.52550000', 'ACTIVE', NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   (56, '5c43676b-babf-47fd-94eb-f09e795ff14f', 'HOSPITAL', 'Post Graduate Institute of Medical Education & Research (PGIMER)', 'MHUB-CH-CHD-001', '+91 172 274 7585', 'Sector 12, Madhya Marg', 'Chandigarh', 'Chandigarh', '160012', '30.76510000', '76.77660000', 'ACTIVE', NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19'),
   (57, '4228dbae-b4b7-4eb4-a494-7c75b2ccf52e', 'HOSPITAL', 'Amrita Institute of Medical Sciences (AIMS)', 'MHUB-KL-COK-001', '+91 484 285 1234', 'AIMS Ponekkara P.O., Edappally', 'Kochi', 'Kerala', '682041', '10.03260000', '76.29990000', 'ACTIVE', NULL, '2026-11-05 17:02:19', '2026-11-05 17:02:19')
+ON DUPLICATE KEY UPDATE `id` = `id`;
+
+-- --------------------------------------------------------------------
+-- DATA FOR TABLE: donor_pledges (45 rows)
+-- --------------------------------------------------------------------
+INSERT INTO `donor_pledges` (`id`, `user_id`, `organ_type_id`, `consent_type`, `pledge_date`, `status`) VALUES
+  (1, '8de4586b-7736-4b47-871b-5008aaac41c1', 1, 'DECEASED_ONLY', '2026-10-23 18:21:04', 'REVOKED'),
+  (2, '8de4586b-7736-4b47-871b-5008aaac41c1', 4, 'LIVING_ALLOWED', '2026-10-23 18:45:40', 'ACTIVE'),
+  (3, '8de4586b-7736-4b47-871b-5008aaac41c1', 6, 'DECEASED_ONLY', '2026-10-28 17:32:28', 'ACTIVE'),
+  (4, '8de4586b-7736-4b47-871b-5008aaac41c1', 8, 'LIVING_ALLOWED', '2026-10-23 18:21:04', 'REVOKED'),
+  (6, '8de4586b-7736-4b47-871b-5008aaac41c1', 4, 'DECEASED_ONLY', '2026-10-28 17:32:28', 'ACTIVE'),
+  (8, '56c4338a-a957-4b0c-9255-4d51276862ed', 3, 'LIVING_ALLOWED', '2026-10-24 11:47:22', 'ACTIVE'),
+  (9, '56c4338a-a957-4b0c-9255-4d51276862ed', 4, 'LIVING_ALLOWED', '2026-10-24 11:47:22', 'ACTIVE'),
+  (10, '56c4338a-a957-4b0c-9255-4d51276862ed', 8, 'LIVING_ALLOWED', '2026-11-05 17:09:18', 'ACTIVE'),
+  (11, '56c4338a-a957-4b0c-9255-4d51276862ed', 1, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (12, '56c4338a-a957-4b0c-9255-4d51276862ed', 2, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (13, '56c4338a-a957-4b0c-9255-4d51276862ed', 3, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (14, '56c4338a-a957-4b0c-9255-4d51276862ed', 4, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (15, '56c4338a-a957-4b0c-9255-4d51276862ed', 8, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (16, '56c4338a-a957-4b0c-9255-4d51276862ed', 7, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (17, '56c4338a-a957-4b0c-9255-4d51276862ed', 5, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (18, '56c4338a-a957-4b0c-9255-4d51276862ed', 6, 'DECEASED_ONLY', '2026-11-05 17:09:18', 'ACTIVE'),
+  (39, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 4, 'LIVING_ALLOWED', '2026-10-25 06:37:02', 'ACTIVE'),
+  (40, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 3, 'LIVING_ALLOWED', '2026-10-25 18:10:50', 'ACTIVE'),
+  (53, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 4, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (54, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 3, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (63, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 7, 'LIVING_ALLOWED', '2026-10-25 18:10:50', 'ACTIVE'),
+  (64, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 8, 'LIVING_ALLOWED', '2026-10-25 18:10:50', 'ACTIVE'),
+  (65, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 1, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (66, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 2, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (67, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 5, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (68, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 6, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (69, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 7, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (70, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 8, 'DECEASED_ONLY', '2026-10-25 18:10:50', 'ACTIVE'),
+  (83, '810c59cf-da16-495c-afdb-c6e154d6777c', 3, 'LIVING_ALLOWED', '2026-11-01 12:27:51', 'ACTIVE'),
+  (84, '810c59cf-da16-495c-afdb-c6e154d6777c', 4, 'LIVING_ALLOWED', '2026-11-01 12:27:51', 'ACTIVE'),
+  (97, '810c59cf-da16-495c-afdb-c6e154d6777c', 2, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
+  (98, '810c59cf-da16-495c-afdb-c6e154d6777c', 3, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
+  (182, '7645ee5b-8add-4ec7-b87b-2cc77d0d8ee5', 4, 'LIVING_ALLOWED', '2026-10-25 16:46:25', 'REVOKED'),
+  (183, '7645ee5b-8add-4ec7-b87b-2cc77d0d8ee5', 1, 'DECEASED_ONLY', '2026-10-25 16:46:25', 'REVOKED'),
+  (185, '7645ee5b-8add-4ec7-b87b-2cc77d0d8ee5', 6, 'DECEASED_ONLY', '2026-10-25 16:46:25', 'ACTIVE'),
+  (188, '810c59cf-da16-495c-afdb-c6e154d6777c', 1, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
+  (190, '810c59cf-da16-495c-afdb-c6e154d6777c', 7, 'LIVING_ALLOWED', '2026-11-01 12:27:51', 'ACTIVE'),
+  (207, '810c59cf-da16-495c-afdb-c6e154d6777c', 7, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
+  (212, '598ff7e2-9b50-4fc3-949a-e4d2d76cc66d', 3, 'LIVING_ALLOWED', '2026-10-26 14:07:43', 'ACTIVE'),
+  (213, '598ff7e2-9b50-4fc3-949a-e4d2d76cc66d', 6, 'DECEASED_ONLY', '2026-10-26 14:07:43', 'ACTIVE'),
+  (225, '810c59cf-da16-495c-afdb-c6e154d6777c', 8, 'LIVING_ALLOWED', '2026-11-01 12:27:51', 'ACTIVE'),
+  (227, '810c59cf-da16-495c-afdb-c6e154d6777c', 4, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
+  (229, '810c59cf-da16-495c-afdb-c6e154d6777c', 5, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
+  (230, '810c59cf-da16-495c-afdb-c6e154d6777c', 6, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE'),
+  (232, '810c59cf-da16-495c-afdb-c6e154d6777c', 8, 'DECEASED_ONLY', '2026-11-01 12:27:51', 'ACTIVE')
 ON DUPLICATE KEY UPDATE `id` = `id`;
 
 -- --------------------------------------------------------------------
@@ -510,7 +606,7 @@ INSERT INTO `blood_inventory` (`id`, `hub_id`, `blood_group`, `component`, `unit
 ON DUPLICATE KEY UPDATE `id` = `id`;
 
 -- --------------------------------------------------------------------
--- DATA FOR TABLE: available_organs (32 rows)
+-- DATA FOR TABLE: available_organs (33 rows)
 -- --------------------------------------------------------------------
 INSERT INTO `available_organs` (`id`, `organ_type_id`, `donor_user_id`, `harvesting_hub_id`, `current_hub_id`, `blood_group`, `harvested_at`, `expires_at`, `status`, `clinical_notes`, `created_at`) VALUES
   (5, 4, NULL, 9, 9, 'O-', '2026-10-24 10:31:21', '2026-10-25 22:31:21', 'MATCHING', 'Deceased Donor Kidney', '2026-10-24 11:01:20'),
@@ -548,7 +644,69 @@ INSERT INTO `available_organs` (`id`, `organ_type_id`, `donor_user_id`, `harvest
   (114, 2, NULL, 27, 27, 'A+', '2026-11-05 15:10:05', '2099-12-31 18:29:59', 'AVAILABLE', 'Donor Age 29. Single left lung allograft. Clear bronchoscopy negative for aspiration, PaO2/FiO2 > 430 mmHg on 100% FiO2. EVLP stabilized. [NEVER EXPIRES]', '2026-11-05 17:10:05'),
   (115, 5, NULL, 27, 27, 'O+', '2026-11-05 15:10:05', '2099-12-31 18:29:59', 'AVAILABLE', 'Donor Age 21. Whole pancreas allograft with intact duodenal C-loop and mesenteric vascular reconstruction. Cold ischemia preserved in UW solution. [NEVER EXPIRES]', '2026-11-05 17:10:05'),
   (116, 6, NULL, 27, 27, 'B+', '2026-11-05 15:10:05', '2099-12-31 18:29:59', 'AVAILABLE', 'Donor Age 35. Optical-grade corneal graft preserved in Optisol-GS medium at 4°C. Endothelial cell density (ECD) 3,100 cells/mm². Crystal clear stroma. [NEVER EXPIRES]', '2026-11-05 17:10:05'),
-  (117, 6, NULL, 27, 27, 'O+', '2026-11-05 15:10:05', '2099-12-31 18:29:59', 'AVAILABLE', 'Donor Age 27. Penetrating keratoplasty tissue in corneal storage medium. ECD 3,250 cells/mm², epithelial integrity 100%. Negative for infectious markers. [NEVER EXPIRES]', '2026-11-05 17:10:05')
+  (117, 6, NULL, 27, 27, 'O+', '2026-11-05 15:10:05', '2099-12-31 18:29:59', 'AVAILABLE', 'Donor Age 27. Penetrating keratoplasty tissue in corneal storage medium. ECD 3,250 cells/mm², epithelial integrity 100%. Negative for infectious markers. [NEVER EXPIRES]', '2026-11-05 17:10:05'),
+  (118, 4, '56c4338a-a957-4b0c-9255-4d51276862ed', 27, 27, 'A+', '2026-06-20 02:30:00', '2026-06-21 14:30:00', 'TRANSPLANTED', 'Living humanitarian renal allograft donation by Satyanarayana Chittidi. Zero warm ischemia time. Successfully transplanted into recipient with immediate diuresis.', '2026-11-05 17:17:23')
+ON DUPLICATE KEY UPDATE `id` = `id`;
+
+-- --------------------------------------------------------------------
+-- DATA FOR TABLE: transplant_requests (26 rows)
+-- --------------------------------------------------------------------
+INSERT INTO `transplant_requests` (`id`, `recipient_user_id`, `attending_hub_id`, `organ_type_id`, `blood_group`, `urgency_tier`, `medical_summary`, `status`, `verified_at`, `created_at`) VALUES
+  (4, '9c91d959-3900-4575-8fba-1ff550132993', 9, 4, 'O-', 'TIER_1_EMERGENCY', 'Chronic kidney disease stage 5 on maintenance hemodialysis.', 'WAITING_LIST', '2026-10-24 11:01:20', '2026-10-24 11:01:20'),
+  (14, '442ec46a-0f73-40b9-8966-88d118e8ae7a', 30, 3, 'A+', 'TIER_1_EMERGENCY', 'Acute hepatic failure on mechanical ventilation.', 'WAITING_LIST', '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
+  (15, 'b10b79af-d32e-495e-bd3a-4c563a348db0', 30, 3, 'A+', 'TIER_2_URGENT', 'Decompensated cirrhosis with recurrent ascites.', 'ACCEPTED', '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
+  (16, 'd34f2924-4cb8-4671-af54-70cf03f6c351', 30, 3, 'A+', 'TIER_3_ROUTINE', 'Stable NASH cirrhosis.', 'WAITING_LIST', '2026-10-25 06:56:03', '2026-10-25 06:56:03'),
+  (34, '810c59cf-da16-495c-afdb-c6e154d6777c', 27, 4, 'B+', 'TIER_2_URGENT', 'abcd', 'WAITING_LIST', '2026-10-28 10:14:10', '2026-10-28 10:14:10'),
+  (35, '810c59cf-da16-495c-afdb-c6e154d6777c', 27, 4, 'B+', 'TIER_2_URGENT', '112345', 'WAITING_LIST', '2026-10-28 10:28:30', '2026-10-28 10:28:30'),
+  (36, '810c59cf-da16-495c-afdb-c6e154d6777c', 27, 3, 'B+', 'TIER_2_URGENT', '12345678', 'ACCEPTED', '2026-10-28 10:29:45', '2026-10-28 10:29:45'),
+  (71, 'b3e9d07a-47be-4b4d-9c18-1a350789f3a5', 9, 4, 'O+', 'TIER_1_EMERGENCY', 'End-stage renal disease (ESRD) with failed vascular access for hemodialysis. Recurrent refractory hyperkalemia. UNOS Tier 1 Emergency indication.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-04-01 12:13:38'),
+  (72, 'e51d13db-31ab-4778-8c97-d07b951e811e', 9, 4, 'O+', 'TIER_2_URGENT', 'Chronic glomerulonephritis on continuous ambulatory peritoneal dialysis (CAPD) with recurrent peritonitis episodes.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-07-30 12:13:38'),
+  (73, '8406c313-d12d-4552-a1c8-9a36ff4cf8f4', 20, 4, 'A+', 'TIER_1_EMERGENCY', 'Rapidly progressive crescentic glomerulonephritis with acute uremic encephalopathy requiring urgent deceased donor renal transplant.', 'ACCEPTED', '2026-10-28 12:13:38', '2026-10-13 12:13:38'),
+  (74, '25099de0-538e-4920-ad88-aa76c83aac75', 29, 4, 'B+', 'TIER_2_URGENT', 'Autosomal dominant polycystic kidney disease (ADPKD) with nephromegaly and refractory severe renal anemia.', 'ACCEPTED', '2026-10-28 12:13:38', '2025-12-12 12:13:38'),
+  (75, '1d8e07d7-6420-49ed-a07e-d14db4dc9081', 30, 4, 'AB+', 'TIER_3_ROUTINE', 'Diabetic nephropathy secondary to long-standing T2D. Stable on maintenance hemodialysis 3x/week. Universal recipient (AB+).', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-09-13 12:13:38'),
+  (76, '4674df15-aa24-44ca-90e1-951f22c3a115', 20, 4, 'O-', 'TIER_3_ROUTINE', 'Reflux nephropathy with bilateral small contracted kidneys. Patient maintains stable dry weight on nocturnal home dialysis.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-05-01 12:13:38'),
+  (77, '93d75861-57ed-4780-9197-f852625a37e5', 9, 3, 'O+', 'TIER_1_EMERGENCY', 'Fulminant acute hepatic failure secondary to drug-induced liver injury (DILI). Grade 3 hepatic encephalopathy. MELD score: 39.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-10-18 12:13:38'),
+  (78, '2e969834-dbfa-42c8-b83a-763d27ed758c', 20, 3, 'B+', 'TIER_1_EMERGENCY', 'Decompensated cirrhosis with type 1 hepatorenal syndrome and recurrent variceal bleeds. MELD score: 34.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-08-29 12:13:38'),
+  (79, '5bf3c5d0-6259-4c65-b36c-c4a3bf2afbcf', 29, 3, 'A+', 'TIER_2_URGENT', 'Cryptogenic cirrhosis with refractory diuretic-resistant ascites and spontaneous bacterial peritonitis. MELD score: 26.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-07-10 12:13:38'),
+  (80, '99882cf2-0b05-4953-ae07-68c2ee10aa40', 9, 1, 'O+', 'TIER_1_EMERGENCY', 'Ischemic cardiomyopathy NYHA Class IV on dual inotrope support (milrinone + noradrenaline) in cardiac ICU. Status 1A candidate.', 'ACCEPTED', '2026-10-28 12:13:38', '2026-10-03 12:13:38'),
+  (81, '53a41ccb-aea7-407a-8f83-0a38e8d70885', 29, 1, 'A-', 'TIER_1_EMERGENCY', 'Dilated cardiomyopathy with LVAD driveline bacteremia and severe right ventricular failure. UNOS Status 1A.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-09-18 12:13:38'),
+  (82, '207063e9-795a-400a-b359-d35368699540', 20, 1, 'O+', 'TIER_2_URGENT', 'Post-viral myocarditis with LVEF 18%, recurrent non-sustained ventricular tachycardias on automatic implantable cardioverter-defibrillator.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-07-25 12:13:38'),
+  (83, '859e14af-d954-4f08-b9d0-5abc9625be26', 20, 2, 'A+', 'TIER_1_EMERGENCY', 'Idiopathic pulmonary fibrosis (IPF) with acute exacerbation on veno-venous ECMO bridge. High urgent bilateral lung priority.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-09-28 12:13:38'),
+  (84, '9363da13-b82c-4205-ba3e-06ff5993784a', 9, 2, 'O-', 'TIER_2_URGENT', 'Cystic fibrosis with end-stage bronchiectasis, recurrent Pseudomonas respiratory failure, FEV1 22% of predicted.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-06-10 12:13:38'),
+  (85, '952c2dad-dcdc-4440-9fe4-5415222e98b2', 9, 6, 'B+', 'TIER_2_URGENT', 'Severe bilateral corneal stromal dystrophy with central optical scarring. Visual acuity reduced to hand motion.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-08-14 12:13:38'),
+  (86, 'c7a1794e-ee67-4883-829b-182a2e4e42bd', 29, 6, 'O+', 'TIER_3_ROUTINE', 'Pseudophakic bullous keratopathy with corneal decompensation following complicated cataract extraction.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-04-11 12:13:38'),
+  (87, '003740d6-8857-40b3-b3af-0fd43f125a4b', 30, 5, 'O+', 'TIER_2_URGENT', 'Type 1 diabetes mellitus with severe hypoglycemic unawareness and frequent life-threatening neuroglycopenic seizures.', 'WAITING_LIST', '2026-10-28 12:13:38', '2026-08-09 12:13:38'),
+  (88, '810c59cf-da16-495c-afdb-c6e154d6777c', 27, 6, 'B+', 'TIER_1_EMERGENCY', '12345', 'WAITING_LIST', '2026-10-29 16:49:21', '2026-10-29 16:49:21'),
+  (89, '56c4338a-a957-4b0c-9255-4d51276862ed', 27, 6, 'A+', 'TIER_3_ROUTINE', 'Optical penetrating keratoplasty for traumatic corneal opacity. Successful corneal transplant performed with 6/9 post-op visual acuity.', 'FULFILLED', '2026-03-10 05:30:00', '2026-02-15 04:00:00')
+ON DUPLICATE KEY UPDATE `id` = `id`;
+
+-- --------------------------------------------------------------------
+-- DATA FOR TABLE: blood_requests (23 rows)
+-- --------------------------------------------------------------------
+INSERT INTO `blood_requests` (`id`, `requester_user_id`, `destination_hub_id`, `target_hub_id`, `fulfilling_hub_id`, `donor_user_id`, `blood_group`, `component`, `units_requested`, `urgency`, `status`, `delivery_address`, `created_at`, `fulfilled_at`, `patient_relationship`, `patient_name`, `hospital_bed_no`) VALUES
+  (1, '810c59cf-da16-495c-afdb-c6e154d6777c', 20, NULL, NULL, NULL, 'O-', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 06:21:33', NULL, 'SELF', NULL, NULL),
+  (2, '810c59cf-da16-495c-afdb-c6e154d6777c', 20, NULL, NULL, NULL, 'O-', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 06:28:43', NULL, 'SELF', NULL, NULL),
+  (3, '810c59cf-da16-495c-afdb-c6e154d6777c', 20, NULL, NULL, NULL, 'A+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 06:29:10', NULL, 'SELF', NULL, NULL),
+  (4, '810c59cf-da16-495c-afdb-c6e154d6777c', 20, NULL, NULL, NULL, 'B+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 06:29:19', NULL, 'SELF', NULL, NULL),
+  (5, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 20, NULL, NULL, NULL, 'B+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 06:30:01', NULL, 'SELF', NULL, NULL),
+  (6, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 27, NULL, NULL, NULL, 'A+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'City Trauma Emergency Hospital', '2026-10-26 06:30:10', NULL, 'SELF', NULL, NULL),
+  (7, '810c59cf-da16-495c-afdb-c6e154d6777c', 28, NULL, NULL, NULL, 'A+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'Apollo Multi-Specialty Transplant Center', '2026-10-26 06:39:12', NULL, 'SELF', NULL, NULL),
+  (8, '810c59cf-da16-495c-afdb-c6e154d6777c', 20, NULL, NULL, NULL, 'A+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 06:51:06', NULL, 'SELF', NULL, NULL),
+  (13, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 20, NULL, NULL, NULL, 'B+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 07:20:23', NULL, 'SELF', NULL, NULL),
+  (14, '32d3e06c-4d0d-4390-919a-ea596bac1aab', 20, NULL, NULL, NULL, 'B+', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'All India Institute of Medical Sciences (AIIMS)', '2026-10-26 08:10:31', NULL, 'SELF', NULL, NULL),
+  (15, '810c59cf-da16-495c-afdb-c6e154d6777c', 28, NULL, NULL, NULL, 'O-', 'PACKED_RBC', 2, 'CRITICAL', 'CANCELLED', 'Apollo Multi-Specialty Transplant Center', '2026-10-26 08:31:45', NULL, 'OTHER', 'Budda Gadu', NULL),
+  (16, '598ff7e2-9b50-4fc3-949a-e4d2d76cc66d', 26, NULL, NULL, NULL, 'AB+', 'WHOLE_BLOOD', 5, 'CRITICAL', 'CANCELLED', 'Red Cross Central Blood Bank', '2026-10-26 14:09:03', NULL, 'SELF', 'bhaaaaai', NULL),
+  (17, '810c59cf-da16-495c-afdb-c6e154d6777c', 29, NULL, NULL, NULL, 'AB+', 'WHOLE_BLOOD', 5, 'CRITICAL', 'CANCELLED', 'KEM Hospital Mumbai', '2026-10-26 14:16:08', NULL, 'OTHER', 'Budda Jaatu', NULL),
+  (18, '84f0b314-c0a0-46fc-9760-70c8c3cfb39e', 9, 9, 9, '8de4586b-7736-4b47-871b-5008aaac41c1', 'O+', 'PACKED_RBC', 2, 'ROUTINE', 'COMPLETED', NULL, '2026-10-28 18:01:29', '2026-10-28 18:01:29', 'VOLUNTARY_DONATION', 'Chittidi Satyanarayana', NULL),
+  (19, '9c91d959-3900-4575-8fba-1ff550132993', 9, 9, 9, NULL, 'O+', 'PACKED_RBC', 1, 'URGENT', 'COMPLETED', NULL, '2026-10-28 18:01:29', '2026-10-28 18:01:29', 'HOSPITAL_DISPENSE', 'Rohan Kumar', 'ICU-Bed 02'),
+  (20, '56c4338a-a957-4b0c-9255-4d51276862ed', 27, NULL, NULL, NULL, 'A+', 'PACKED_RBC', 2, 'URGENT', 'REQUESTED', 'City Trauma Emergency Hospital, 2nd Floor ICU', '2026-11-05 16:32:23', NULL, 'MOTHER', 'Lakshmi Chittidi', 'ICU-Bed-04'),
+  (21, '56c4338a-a957-4b0c-9255-4d51276862ed', 34, NULL, NULL, 'dd680639-26d0-42c2-a810-c94655f0dd01', 'A+', 'PLATELETS', 1, 'CRITICAL', 'DONOR_COMMITTED', 'Continental Hospitals, Financial District, Nanakramguda', '2026-11-05 15:17:23', NULL, 'FATHER', 'Srinivas Chittidi', 'CCU-Bed-12'),
+  (22, 'dd680639-26d0-42c2-a810-c94655f0dd01', 27, NULL, NULL, NULL, 'A+', 'PACKED_RBC', 2, 'CRITICAL', 'REQUESTED', 'City Trauma Emergency Hospital, Emergency Trauma Ward', '2026-11-05 16:47:23', NULL, 'FATHER', 'Ramesh Sharma', 'Trauma-Bed-07'),
+  (23, '56305174-4bd5-4ffe-838a-ff64d26d31e1', 34, NULL, NULL, NULL, 'AB+', 'WHOLE_BLOOD', 3, 'URGENT', 'REQUESTED', 'Continental Hospitals, Nanakramguda, Hyderabad', '2026-11-05 15:47:23', NULL, 'SELF', 'Kavita Reddy', 'Oncology-DayCare-14'),
+  (24, '3f079d05-fcc8-411a-ba6e-9004526a2f21', 32, NULL, NULL, NULL, 'A+', 'PLATELETS', 2, 'CRITICAL', 'REQUESTED', 'Nizam\'s Institute of Medical Sciences (NIMS), Punjagutta', '2026-11-05 14:17:23', NULL, 'SON', 'Aarav Verma', 'Pediatric-ICU-03'),
+  (25, 'e9b68148-f104-4a24-87f0-72b0e33a7869', 33, NULL, NULL, NULL, 'B+', 'PACKED_RBC', 2, 'CRITICAL', 'REQUESTED', 'Yashoda Hospitals Somajiguda, Raj Bhavan Rd', '2026-11-05 16:17:23', NULL, 'BROTHER', 'Suresh Rao', 'Cardio-Ward-09'),
+  (26, 'ce0adc0b-290a-4e13-b118-7f24e7a5bd93', 27, NULL, 27, '56c4338a-a957-4b0c-9255-4d51276862ed', 'A+', 'WHOLE_BLOOD', 1, 'URGENT', 'COMPLETED', 'City Trauma Emergency Hospital, Gachibowli', '2026-08-15 04:00:00', '2026-08-15 06:15:00', 'SELF', 'Amit Deshmukh', 'Ward-3B-Bed-21'),
+  (27, '56c4338a-a957-4b0c-9255-4d51276862ed', 27, NULL, 27, '3f079d05-fcc8-411a-ba6e-9004526a2f21', 'A+', 'PACKED_RBC', 1, 'ROUTINE', 'COMPLETED', 'City Trauma Emergency Hospital, Gachibowli', '2026-05-12 08:30:00', '2026-05-12 11:00:00', 'SELF', 'Satyanarayana Chittidi', 'DayCare-Bed-02')
 ON DUPLICATE KEY UPDATE `id` = `id`;
 
 -- --------------------------------------------------------------------

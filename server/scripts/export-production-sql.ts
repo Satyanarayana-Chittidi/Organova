@@ -32,9 +32,13 @@ async function exportSql() {
 
   const tablesToExport = [
     'users',
+    'citizen_profiles',
     'medical_hubs',
+    'donor_pledges',
     'blood_inventory',
     'available_organs',
+    'transplant_requests',
+    'blood_requests',
     'blood_donation_camps',
   ];
 
