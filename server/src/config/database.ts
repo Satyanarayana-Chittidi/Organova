@@ -37,15 +37,16 @@ export async function testDatabaseConnection(): Promise<void> {
 }
 
 // Automatically seeds the database on startup if fresh/empty tables are detected
-export async function autoMigrateDatabase(): Promise<void> {
+export async function autoMigrateDatabase(force = false): Promise<{ executed: number; errors: string[] }> {
+  const result = { executed: 0, errors: [] as string[] };
   try {
     const connection = await pool.getConnection();
     try {
       const [rows]: any = await connection.query(
-        "SELECT COUNT(*) as cnt FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'medical_hubs'"
+        "SELECT COUNT(*) as cnt FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'blood_donation_camps'"
       );
-      if (rows[0]?.cnt === 0) {
-        console.log('[AUTO-MIGRATE] Fresh database detected. Automatically running schema & seed dump...');
+      if (force || rows[0]?.cnt === 0) {
+        console.log('[AUTO-MIGRATE] Running schema & seed dump (force=' + force + ')...');
         const candidatePaths = [
           path.resolve(__dirname, '../../database/production_seed_dump.sql'),
           path.resolve(__dirname, '../database/production_seed_dump.sql'),
@@ -65,20 +66,20 @@ export async function autoMigrateDatabase(): Promise<void> {
             .filter((s) => s.length > 0);
 
           await connection.query('SET FOREIGN_KEY_CHECKS = 0');
-          let executed = 0;
           for (const stmt of statements) {
             if (stmt.toLowerCase().startsWith('use ') || stmt.toLowerCase().startsWith('create database')) {
               continue;
             }
             try {
               await connection.query(stmt);
-              executed++;
+              result.executed++;
             } catch (err: any) {
-              // Ignore duplicate or non-fatal warnings
+              result.errors.push(err.message);
+              console.warn('[AUTO-MIGRATE] Statement warning:', err.message?.slice(0, 120));
             }
           }
           await connection.query('SET FOREIGN_KEY_CHECKS = 1');
-          console.log(`[AUTO-MIGRATE] ✓ Successfully initialized ${executed} database operations, 34 hospitals, blood stock, organs, and mock data!`);
+          console.log(`[AUTO-MIGRATE] ✓ Successfully executed ${result.executed} operations (${result.errors.length} warnings)`);
         } else {
           console.warn('[AUTO-MIGRATE] Notice: production_seed_dump.sql not found at expected paths.');
         }
@@ -90,7 +91,9 @@ export async function autoMigrateDatabase(): Promise<void> {
     }
   } catch (err: any) {
     console.warn('[AUTO-MIGRATE] Non-fatal notice during database check:', err.message);
+    result.errors.push(err.message);
   }
+  return result;
 }
 
 export default pool;
