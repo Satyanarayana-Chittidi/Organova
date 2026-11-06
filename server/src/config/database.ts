@@ -28,7 +28,10 @@ function createDatabasePool() {
           connectionLimit: 10,
           queueLimit: 0,
           enableKeepAlive: true,
-          keepAliveInitialDelay: 0,
+          keepAliveInitialDelay: 10000,
+          idleTimeout: 60000,
+          connectTimeout: 20000,
+          maxIdle: 5,
         });
       }
     } catch (e) {
@@ -47,11 +50,23 @@ function createDatabasePool() {
     connectionLimit: 10,
     queueLimit: 0,
     enableKeepAlive: true,
-    keepAliveInitialDelay: 0,
+    keepAliveInitialDelay: 10000,
+    idleTimeout: 60000,
+    connectTimeout: 20000,
+    maxIdle: 5,
   });
 }
 
 const pool = createDatabasePool();
+
+// Handle disconnects on idle sockets from cloud providers gracefully
+pool.on('connection', (connection: any) => {
+  connection.on('error', (err: any) => {
+    if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+      console.warn('[DATABASE] Stale connection closed by database server, recycling socket.');
+    }
+  });
+});
 
 // Helper to ensure target database exists on fresh cloud MySQL / TiDB clusters
 async function ensureDatabaseExists(): Promise<void> {

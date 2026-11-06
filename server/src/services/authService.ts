@@ -89,8 +89,12 @@ export async function registerUser(dto: RegisterDTO): Promise<{
   }
   devPendingRegistrations.set(normalizedEmail, pendingData);
 
-  // 5. Send OTP email via configured SMTP (or log fallback)
-  await sendOtpEmail(normalizedEmail, otp);
+  // 5. Send OTP email via configured SMTP/API (with non-blocking error resilience)
+  try {
+    await sendOtpEmail(normalizedEmail, otp);
+  } catch (emailErr: any) {
+    console.warn('[EMAIL] Non-fatal email dispatch notice:', emailErr.message);
+  }
 
   return {
     message: 'Registration initiated. Please verify the 6-digit OTP sent to your email.',
