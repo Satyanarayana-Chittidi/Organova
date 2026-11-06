@@ -488,79 +488,50 @@ export default function HomePage() {
                           </div>
                         </div>
 
-                        <h4 className="font-bold text-slate-900 dark:text-white text-sm">
+                        <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate">
                           {req.destination_hub_name}
                         </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1 truncate">
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           {req.destination_hub_address || req.destination_hub_city || 'Destination Facility'}
                         </p>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 font-medium">
-                          Quantity Requested: <strong>{req.units_requested} Unit(s)</strong>
-                        </p>
 
-                        {(req.patient_relationship || req.patient_name) && (
-                          <div className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 flex-wrap">
-                            <span className="flex items-center gap-1">
-                              <User className="w-3 h-3 text-rose-500" />
-                              For: <strong className="text-slate-700 dark:text-slate-300 capitalize">{req.patient_relationship?.toLowerCase() === 'self' ? 'Myself' : (req.patient_relationship || 'Patient')}</strong>
-                              {req.patient_name ? ` (${req.patient_name})` : ''}
-                            </span>
-                          </div>
-                        )}
+                        <div className="mt-2.5 flex items-center justify-between flex-wrap gap-2 text-xs">
+                          <p className="text-slate-600 dark:text-slate-300 font-medium">
+                            Need: <strong>{req.units_requested} Unit(s)</strong>
+                            {(req.patient_relationship || req.patient_name) && (
+                              <span className="text-slate-500 dark:text-slate-400">
+                                {' '}• For {req.patient_relationship?.toLowerCase() === 'self' ? 'Myself' : (req.patient_relationship || req.patient_name)}
+                              </span>
+                            )}
+                          </p>
 
-                        <div className="mt-3.5">
                           {req.status === 'REQUESTED' && (
-                            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-xs">
-                              <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-300 mb-0.5">
-                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                                Awaiting Volunteer Donor / Hospital Claim
-                              </div>
-                              <p className="text-amber-900/90 dark:text-amber-200/90 leading-snug">
-                                Active broadcast in progress to all matching {req.blood_group} donors across the network.
-                              </p>
-                            </div>
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                              Awaiting Donor
+                            </span>
                           )}
 
                           {req.status === 'DONOR_COMMITTED' && (
-                            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-xs">
-                              <div className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-300 mb-0.5">
-                                <HeartHandshake className="w-4 h-4 text-emerald-600" />
-                                Volunteer Donor Committed & En Route!
-                              </div>
-                              <p className="text-emerald-900/90 dark:text-emerald-200/90 leading-snug">
-                                A volunteer donor has locked in and is heading to {req.destination_hub_name}.
-                              </p>
-                              {req.donor_name && (
-                                <p className="mt-1 text-emerald-950 dark:text-emerald-100 font-semibold">
-                                  Donor: {req.donor_name} {req.donor_phone ? `(${req.donor_phone})` : ''}
-                                </p>
-                              )}
-                            </div>
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-900/40">
+                              <HeartHandshake className="w-3 h-3 text-emerald-600 shrink-0" />
+                              Donor En Route{req.donor_name ? ` (${req.donor_name.split(' ')[0]})` : ''}
+                            </span>
                           )}
 
                           {req.status === 'APPROVED' && (
-                            <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 text-xs">
-                              <div className="flex items-center gap-1.5 font-bold text-blue-800 dark:text-blue-300 mb-0.5">
-                                <Building2 className="w-4 h-4 text-blue-600" />
-                                Claimed & Reserved in Hospital Stock
-                              </div>
-                              <p className="text-blue-900/90 dark:text-blue-200/90 leading-snug">
-                                Reserved by {req.fulfilling_hub_name || 'Medical Hub'}. Stock allocated for dispatch.
-                              </p>
-                            </div>
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-blue-900/40">
+                              <Building2 className="w-3 h-3 text-blue-600 shrink-0" />
+                              Reserved in Stock
+                            </span>
                           )}
 
                           {req.status === 'DISPATCHED' && (
-                            <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/50 text-xs">
-                              <div className="flex items-center gap-1.5 font-bold text-purple-800 dark:text-purple-300 mb-0.5">
-                                <Truck className="w-4 h-4 text-purple-600" />
-                                Units Dispatched — In Transit
-                              </div>
-                              <p className="text-purple-900/90 dark:text-purple-200/90 leading-snug">
-                                Blood units are in temperature-controlled transit to {req.destination_hub_name}.
-                              </p>
-                            </div>
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-0.5 rounded-full border border-purple-200 dark:border-purple-900/40">
+                              <Truck className="w-3 h-3 text-purple-600 shrink-0" />
+                              In Transit
+                            </span>
                           )}
                         </div>
                       </div>
@@ -578,7 +549,7 @@ export default function HomePage() {
                               disabled={cancellingId === req.id}
                               className="text-xs font-semibold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors cursor-pointer"
                             >
-                              {cancellingId === req.id ? 'Cancelling...' : 'Cancel Request'}
+                              {cancellingId === req.id ? 'Cancelling...' : 'Cancel'}
                             </button>
                           )}
                           <Link
