@@ -1,14 +1,19 @@
+# Dependencies
 node_modules/
+
+# Compiled production output
 dist/
 
+# Environment secrets (NEVER commit to Git!)
 .env
 .env.local
 .env.*.local
-!.env.example
 
-logs/
+# Logs
+logs
 *.log
 npm-debug.log*
 
+# OS specific files
 .DS_Store
 Thumbs.db

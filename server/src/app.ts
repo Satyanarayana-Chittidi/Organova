@@ -80,11 +80,11 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 app.get('/api/health/seed', async (req: Request, res: Response) => {
   try {
-    const outcome = await autoMigrateDatabase(true);
+    const outcome = await autoMigrateDatabase();
     res.status(200).json({
       success: true,
       service: 'Organova Platform API',
-      message: 'Database schema and seed process completed successfully.',
+      message: 'Database schema verified and active.',
       details: outcome,
     });
   } catch (err: any) {

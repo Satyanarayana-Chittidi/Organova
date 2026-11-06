@@ -1,116 +1,201 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import pool from '../config/database';
-import { MedicalHub, HubType, VerificationStatus, HubQueryFilters, RegisterHubDTO, HubTransactionHistory, UpdateHubProfileDTO, } from '../types/hub';
-interface MedicalHubRow extends MedicalHub, RowDataPacket {
-}
+import {
+  MedicalHub,
+  HubType,
+  VerificationStatus,
+  HubQueryFilters,
+  RegisterHubDTO,
+  HubTransactionHistory,
+  UpdateHubProfileDTO,
+} from '../types/hub';
+
+interface MedicalHubRow extends MedicalHub, RowDataPacket {}
+
+/**
+ * Finds a medical hub by its linked user_id foreign key.
+ */
 export async function findHubByUserId(userId: string): Promise<MedicalHub | null> {
-    const [rows] = await pool.query<MedicalHubRow[]>('SELECT * FROM medical_hubs WHERE user_id = ? LIMIT 1', [userId]);
-    return rows.length > 0 ? rows[0] : null;
+  const [rows] = await pool.query<MedicalHubRow[]>(
+    'SELECT * FROM medical_hubs WHERE user_id = ? LIMIT 1',
+    [userId]
+  );
+  return rows.length > 0 ? rows[0] : null;
 }
+
+/**
+ * Finds a medical hub by its primary key ID.
+ */
 export async function findHubById(id: number): Promise<MedicalHub | null> {
-    const [rows] = await pool.query<MedicalHubRow[]>('SELECT * FROM medical_hubs WHERE id = ? LIMIT 1', [id]);
-    return rows.length > 0 ? rows[0] : null;
+  const [rows] = await pool.query<MedicalHubRow[]>(
+    'SELECT * FROM medical_hubs WHERE id = ? LIMIT 1',
+    [id]
+  );
+  return rows.length > 0 ? rows[0] : null;
 }
+
+/**
+ * Checks if a facility with the given facility license number is already registered.
+ */
 export async function findHubByLicense(licenseNumber: string): Promise<MedicalHub | null> {
-    const [rows] = await pool.query<MedicalHubRow[]>('SELECT * FROM medical_hubs WHERE license_number = ? LIMIT 1', [licenseNumber.trim().toUpperCase()]);
-    return rows.length > 0 ? rows[0] : null;
+  const [rows] = await pool.query<MedicalHubRow[]>(
+    'SELECT * FROM medical_hubs WHERE license_number = ? LIMIT 1',
+    [licenseNumber.trim().toUpperCase()]
+  );
+  return rows.length > 0 ? rows[0] : null;
 }
-export async function createHubWithUser(userId: string, dto: RegisterHubDTO, passwordHash: string): Promise<MedicalHub> {
-    const connection = await pool.getConnection();
-    try {
-        await connection.beginTransaction();
-        await connection.query<ResultSetHeader>(`INSERT INTO users (id, email, password_hash, role, auth_provider, is_active, is_verified)
-       VALUES (?, ?, ?, ?, 'LOCAL', TRUE, TRUE)`, [userId, dto.email.toLowerCase().trim(), passwordHash, dto.hub_type]);
-        const [hubResult] = await connection.query<ResultSetHeader>(`INSERT INTO medical_hubs (
+
+/**
+ * Registers an institution using an ACID Transaction:
+ * 1. Inserts authentication record into 'users' (role = HOSPITAL).
+ * 2. Inserts institutional profile into 'medical_hubs' (status = 'PENDING_APPROVAL').
+ * If either step fails, the entire transaction rolls back automatically.
+ */
+export async function createHubWithUser(
+  userId: string,
+  dto: RegisterHubDTO,
+  passwordHash: string
+): Promise<MedicalHub> {
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    // 1. Create auth user row
+    await connection.query<ResultSetHeader>(
+      `INSERT INTO users (id, email, password_hash, role, auth_provider, is_active, is_verified)
+       VALUES (?, ?, ?, ?, 'LOCAL', TRUE, TRUE)`,
+      [userId, dto.email.toLowerCase().trim(), passwordHash, dto.hub_type]
+    );
+
+    // 2. Create medical hub row in PENDING_APPROVAL state
+    const [hubResult] = await connection.query<ResultSetHeader>(
+      `INSERT INTO medical_hubs (
          user_id, hub_type, name, license_number, contact_phone,
          address_line, city, state, pincode, latitude, longitude,
          verification_status
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING_APPROVAL')`, [
-            userId,
-            dto.hub_type,
-            dto.name.trim(),
-            dto.license_number.trim().toUpperCase(),
-            dto.contact_phone.trim(),
-            dto.address_line.trim(),
-            dto.city.trim(),
-            dto.state.trim(),
-            dto.pincode.trim(),
-            dto.latitude,
-            dto.longitude,
-        ]);
-        await connection.commit();
-        const hubId = hubResult.insertId;
-        const createdHub = await findHubById(hubId);
-        if (!createdHub)
-            throw new Error('Failed to retrieve medical hub after transaction.');
-        return createdHub;
-    }
-    catch (error) {
-        await connection.rollback();
-        throw error;
-    }
-    finally {
-        connection.release();
-    }
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING_APPROVAL')`,
+      [
+        userId,
+        dto.hub_type,
+        dto.name.trim(),
+        dto.license_number.trim().toUpperCase(),
+        dto.contact_phone.trim(),
+        dto.address_line.trim(),
+        dto.city.trim(),
+        dto.state.trim(),
+        dto.pincode.trim(),
+        dto.latitude,
+        dto.longitude,
+      ]
+    );
+
+    await connection.commit();
+
+    const hubId = hubResult.insertId;
+    const createdHub = await findHubById(hubId);
+    if (!createdHub) throw new Error('Failed to retrieve medical hub after transaction.');
+    return createdHub;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 }
-export async function updateHubVerificationStatus(hubId: number, status: VerificationStatus, adminId: string): Promise<boolean> {
-    const [result] = await pool.query<ResultSetHeader>(`UPDATE medical_hubs
+
+/**
+ * Updates a facility's verification status by an Admin (e.g. ACTIVE, REJECTED, SUSPENDED).
+ */
+export async function updateHubVerificationStatus(
+  hubId: number,
+  status: VerificationStatus,
+  adminId: string
+): Promise<boolean> {
+  const [result] = await pool.query<ResultSetHeader>(
+    `UPDATE medical_hubs 
      SET verification_status = ?, verified_by_admin_id = ?, verified_at = NOW()
-     WHERE id = ?`, [status, adminId, hubId]);
-    return result.affectedRows > 0;
+     WHERE id = ?`,
+    [status, adminId, hubId]
+  );
+  return result.affectedRows > 0;
 }
+
+/**
+ * Public directory search: Returns only ACTIVE (verified) medical hubs.
+ * Supports filtering by hub_type, city, and name search.
+ */
 export async function listActiveHubs(filters: HubQueryFilters): Promise<MedicalHub[]> {
-    let query = "SELECT * FROM medical_hubs WHERE verification_status = 'ACTIVE'";
-    const params: any[] = [];
-    if (filters.hub_type) {
-        query += ' AND hub_type = ?';
-        params.push(filters.hub_type);
-    }
-    if (filters.city) {
-        query += ' AND LOWER(city) = LOWER(?)';
-        params.push(filters.city.trim());
-    }
-    if (filters.search) {
-        query += ' AND (LOWER(name) LIKE ? OR LOWER(city) LIKE ?)';
-        const searchPattern = `%${filters.search.toLowerCase().trim()}%`;
-        params.push(searchPattern, searchPattern);
-    }
-    query += ' ORDER BY name ASC';
-    const [rows] = await pool.query<MedicalHubRow[]>(query, params);
-    return rows;
+  let query = "SELECT * FROM medical_hubs WHERE verification_status = 'ACTIVE'";
+  const params: any[] = [];
+
+  if (filters.hub_type) {
+    query += ' AND hub_type = ?';
+    params.push(filters.hub_type);
+  }
+
+  if (filters.city) {
+    query += ' AND LOWER(city) = LOWER(?)';
+    params.push(filters.city.trim());
+  }
+
+  if (filters.search) {
+    query += ' AND (LOWER(name) LIKE ? OR LOWER(city) LIKE ?)';
+    const searchPattern = `%${filters.search.toLowerCase().trim()}%`;
+    params.push(searchPattern, searchPattern);
+  }
+
+  query += ' ORDER BY name ASC';
+
+  const [rows] = await pool.query<MedicalHubRow[]>(query, params);
+  return rows;
 }
+
+/**
+ * Admin view: Lists all facilities awaiting approval.
+ */
 export async function listPendingHubs(): Promise<MedicalHub[]> {
-    const query = `
-    SELECT mh.*, u.email
+  const query = `
+    SELECT mh.*, u.email 
     FROM medical_hubs mh
     JOIN users u ON u.id = mh.user_id
     WHERE mh.verification_status = 'PENDING_APPROVAL'
     ORDER BY mh.created_at ASC
   `;
-    const [rows] = await pool.query<MedicalHubRow[]>(query);
-    return rows;
+  const [rows] = await pool.query<MedicalHubRow[]>(query);
+  return rows;
 }
+
+/**
+ * Returns all distinct cities where active hospitals are registered.
+ */
 export async function getDistinctHubCities(): Promise<string[]> {
-    const query = `
-    SELECT DISTINCT city
-    FROM medical_hubs
-    WHERE verification_status = 'ACTIVE'
-      AND city IS NOT NULL
+  const query = `
+    SELECT DISTINCT city 
+    FROM medical_hubs 
+    WHERE verification_status = 'ACTIVE' 
+      AND city IS NOT NULL 
       AND TRIM(city) != ''
     ORDER BY city ASC
   `;
-    const [rows] = await pool.query<RowDataPacket[]>(query);
-    return rows.map((r: any) => r.city);
+  const [rows] = await pool.query<RowDataPacket[]>(query);
+  return rows.map((r: any) => r.city);
 }
+
+/**
+ * Retrieves the full operational and clinical transaction history for a medical facility.
+ */
 export async function getHubTransactionHistory(hubId: number): Promise<HubTransactionHistory> {
-    const hub = await findHubById(hubId);
-    if (!hub) {
-        const error: any = new Error('Medical facility not found.');
-        error.statusCode = 404;
-        throw error;
-    }
-    const [harvests] = await pool.query<RowDataPacket[]>(`
-    SELECT
+  const hub = await findHubById(hubId);
+  if (!hub) {
+    const error: any = new Error('Medical facility not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // 1. Organs harvested by this hub
+  const [harvests] = await pool.query<RowDataPacket[]>(`
+    SELECT 
       ao.id,
       ao.organ_type_id,
       ot.name AS organ_name,
@@ -124,17 +209,17 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
       IFNULL(cp.full_name, 'Deceased Donor') AS donor_name,
       cp.phone_number AS donor_phone,
       (
-        SELECT mh.name
-        FROM matches tm
-        JOIN transplant_requests tr ON tr.id = tm.request_id
-        JOIN medical_hubs mh ON mh.id = tr.attending_hub_id
-        WHERE tm.organ_id = ao.id
+        SELECT mh.name 
+        FROM matches tm 
+        JOIN transplant_requests tr ON tr.id = tm.request_id 
+        JOIN medical_hubs mh ON mh.id = tr.attending_hub_id 
+        WHERE tm.organ_id = ao.id 
         ORDER BY tm.id DESC LIMIT 1
       ) AS recipient_hospital_name,
       (
-        SELECT tm.status
-        FROM matches tm
-        WHERE tm.organ_id = ao.id
+        SELECT tm.status 
+        FROM matches tm 
+        WHERE tm.organ_id = ao.id 
         ORDER BY tm.id DESC LIMIT 1
       ) AS match_status
     FROM available_organs ao
@@ -143,8 +228,10 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     WHERE ao.harvesting_hub_id = ?
     ORDER BY ao.harvested_at DESC
   `, [hubId]);
-    const [transplants] = await pool.query<RowDataPacket[]>(`
-    SELECT
+
+  // 2. Transplants / Matches performed or received by this hub
+  const [transplants] = await pool.query<RowDataPacket[]>(`
+    SELECT 
       tm.id AS match_id,
       tm.organ_id,
       tm.request_id,
@@ -175,8 +262,10 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     WHERE tr.attending_hub_id = ? OR ao.harvesting_hub_id = ?
     ORDER BY tm.offered_at DESC
   `, [hubId, hubId]);
-    const [waitlist] = await pool.query<RowDataPacket[]>(`
-    SELECT
+
+  // 3. Waitlist patients registered by this facility
+  const [waitlist] = await pool.query<RowDataPacket[]>(`
+    SELECT 
       tr.id,
       tr.recipient_user_id,
       IFNULL(cp.full_name, u.email) AS recipient_name,
@@ -195,8 +284,10 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     WHERE tr.attending_hub_id = ?
     ORDER BY tr.created_at DESC
   `, [hubId]);
-    const [blood] = await pool.query<RowDataPacket[]>(`
-    SELECT
+
+  // 4. Blood transactions
+  const [blood] = await pool.query<RowDataPacket[]>(`
+    SELECT 
       br.id,
       br.donor_user_id,
       br.requester_user_id,
@@ -224,64 +315,48 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     WHERE br.destination_hub_id = ? OR br.fulfilling_hub_id = ?
     ORDER BY COALESCE(br.fulfilled_at, br.created_at) DESC
   `, [hubId, hubId]);
-    const activeHarvests = harvests.filter(h => h.status === 'AVAILABLE' || h.status === 'MATCHING').length;
-    const confirmedTransplants = transplants.filter(t => t.match_status === 'ACCEPTED' || t.match_status === 'COMPLETED').length;
-    return {
-        facility: hub,
-        stats: {
-            totalHarvests: harvests.length,
-            activeHarvests,
-            totalTransplants: confirmedTransplants,
-            waitlistPatients: waitlist.length,
-            bloodTransactions: blood.length,
-        },
-        harvests: harvests as any[],
-        transplants: transplants as any[],
-        waitlist: waitlist as any[],
-        bloodTransactions: blood as any[],
-    };
+
+  const activeHarvests = harvests.filter(h => h.status === 'AVAILABLE' || h.status === 'MATCHING').length;
+  const confirmedTransplants = transplants.filter(t => t.match_status === 'ACCEPTED' || t.match_status === 'COMPLETED').length;
+
+  return {
+    facility: hub,
+    stats: {
+      totalHarvests: harvests.length,
+      activeHarvests,
+      totalTransplants: confirmedTransplants,
+      waitlistPatients: waitlist.length,
+      bloodTransactions: blood.length,
+    },
+    harvests: harvests as any[],
+    transplants: transplants as any[],
+    waitlist: waitlist as any[],
+    bloodTransactions: blood as any[],
+  };
 }
+
+/**
+ * Updates a facility's contact and location details.
+ */
 export async function updateHubProfile(hubId: number, dto: UpdateHubProfileDTO): Promise<MedicalHub> {
-    const fields: string[] = [];
-    const values: any[] = [];
-    if (dto.name) {
-        fields.push('name = ?');
-        values.push(dto.name.trim());
-    }
-    if (dto.contact_phone) {
-        fields.push('contact_phone = ?');
-        values.push(dto.contact_phone.trim());
-    }
-    if (dto.address_line) {
-        fields.push('address_line = ?');
-        values.push(dto.address_line.trim());
-    }
-    if (dto.city) {
-        fields.push('city = ?');
-        values.push(dto.city.trim());
-    }
-    if (dto.state) {
-        fields.push('state = ?');
-        values.push(dto.state.trim());
-    }
-    if (dto.pincode) {
-        fields.push('pincode = ?');
-        values.push(dto.pincode.trim());
-    }
-    if (dto.latitude !== undefined) {
-        fields.push('latitude = ?');
-        values.push(dto.latitude);
-    }
-    if (dto.longitude !== undefined) {
-        fields.push('longitude = ?');
-        values.push(dto.longitude);
-    }
-    if (fields.length > 0) {
-        values.push(hubId);
-        await pool.query(`UPDATE medical_hubs SET ${fields.join(', ')} WHERE id = ?`, values);
-    }
-    const updated = await findHubById(hubId);
-    if (!updated)
-        throw new Error('Facility not found after update.');
-    return updated;
+  const fields: string[] = [];
+  const values: any[] = [];
+
+  if (dto.name) { fields.push('name = ?'); values.push(dto.name.trim()); }
+  if (dto.contact_phone) { fields.push('contact_phone = ?'); values.push(dto.contact_phone.trim()); }
+  if (dto.address_line) { fields.push('address_line = ?'); values.push(dto.address_line.trim()); }
+  if (dto.city) { fields.push('city = ?'); values.push(dto.city.trim()); }
+  if (dto.state) { fields.push('state = ?'); values.push(dto.state.trim()); }
+  if (dto.pincode) { fields.push('pincode = ?'); values.push(dto.pincode.trim()); }
+  if (dto.latitude !== undefined) { fields.push('latitude = ?'); values.push(dto.latitude); }
+  if (dto.longitude !== undefined) { fields.push('longitude = ?'); values.push(dto.longitude); }
+
+  if (fields.length > 0) {
+    values.push(hubId);
+    await pool.query(`UPDATE medical_hubs SET ${fields.join(', ')} WHERE id = ?`, values);
+  }
+
+  const updated = await findHubById(hubId);
+  if (!updated) throw new Error('Facility not found after update.');
+  return updated;
 }
