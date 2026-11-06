@@ -59,12 +59,33 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
     refreshAlerts();
 
-    const SOCKET_URL =
-      process.env.NEXT_PUBLIC_SOCKET_URL ||
-      (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5000');
+    const getSocketUrl = () => {
+      if (process.env.NEXT_PUBLIC_SOCKET_URL) {
+        return process.env.NEXT_PUBLIC_SOCKET_URL;
+      }
+      if (typeof window !== 'undefined') {
+        const host = window.location.hostname;
+        if (host === 'localhost' || host === '127.0.0.1') {
+          return 'http://localhost:5000';
+        }
+        return 'https://organova.onrender.com';
+      }
+      return process.env.NODE_ENV === 'production' ? 'https://organova.onrender.com' : 'http://localhost:5000';
+    };
+
+    const SOCKET_URL = getSocketUrl();
+    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('organ_auth_token') : null;
+
     const s = io(SOCKET_URL, {
+      auth: storedToken ? { token: storedToken } : undefined,
       withCredentials: true,
       transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 3000,
+    });
+
+    s.on('connect_error', (err) => {
+      console.warn('[WEBSOCKET] Notice:', err.message);
     });
 
     s.on('connect', () => {

@@ -45,7 +45,10 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await authApi.verifyOtp({ email, otp });
+      const res = await authApi.verifyOtp({ email, otp });
+      if (res.data?.token) {
+        localStorage.setItem('organ_auth_token', res.data.token);
+      }
       setOtpSuccess(true);
       await refreshUser();
       setTimeout(() => {

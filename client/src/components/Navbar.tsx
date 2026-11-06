@@ -42,7 +42,7 @@ export default function Navbar() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { alerts, dismissAlert, connected } = useSocket();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
@@ -327,7 +327,7 @@ export default function Navbar() {
               className="p-1.5 sm:p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
-              {theme === 'dark' ? (
+              {mounted && theme === 'dark' ? (
                 <Moon className="w-4 h-4 text-indigo-400" />
               ) : (
                 <Sun className="w-4 h-4 text-amber-500" />
@@ -676,16 +676,16 @@ export default function Navbar() {
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
           >
             <span className="flex items-center gap-2">
-              {theme === 'dark' ? (
+              {mounted && theme === 'dark' ? (
                 <Moon className="w-4 h-4 text-indigo-400" />
               ) : (
                 <Sun className="w-4 h-4 text-amber-500" />
               )}
-              {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+              {mounted && theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
             </span>
             <div
               className={`w-8 h-4.5 rounded-full p-0.5 flex items-center ${
-                theme === 'dark' ? 'bg-rose-600 justify-end' : 'bg-slate-300 dark:bg-slate-700 justify-start'
+                mounted && theme === 'dark' ? 'bg-rose-600 justify-end' : 'bg-slate-300 dark:bg-slate-700 justify-start'
               }`}
             >
               <div className="w-3.5 h-3.5 rounded-full bg-white shadow-xs" />

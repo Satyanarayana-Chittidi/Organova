@@ -49,6 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string): Promise<AuthUser> => {
     const res = await authApi.login({ email, password });
     const loggedUser = res.data.user;
+    if (res.data?.token) {
+      localStorage.setItem('organ_auth_token', res.data.token);
+    }
     setUser(loggedUser);
     return loggedUser;
   };
@@ -57,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authApi.logout();
     } catch (err) {}
+    localStorage.removeItem('organ_auth_token');
     setUser(null);
     window.location.href = '/';
   };

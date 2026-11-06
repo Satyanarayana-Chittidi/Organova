@@ -19,7 +19,21 @@ export interface AuthenticatedSocket extends Socket {
 export function initSocketServer(httpServer: HttpServer): SocketIOServer {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:3000',
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const clientUrl = process.env.CLIENT_URL;
+        if (
+          !clientUrl ||
+          origin === clientUrl ||
+          origin === 'http://localhost:3000' ||
+          origin.endsWith('.railway.app') ||
+          origin.endsWith('.onrender.com') ||
+          origin.endsWith('.vercel.app')
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, true);
+      },
       credentials: true,
       methods: ['GET', 'POST'],
     },
@@ -43,7 +57,7 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
       }
 
       if (!token) {
-        return next(new Error('Authentication error: No session token provided in handshake.'));
+        return next();
       }
 
       const decoded = verifyToken(token);
@@ -67,26 +81,28 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
 
       next();
     } catch (error: any) {
-      next(new Error('Authentication error: Invalid or expired session token.'));
+      next();
     }
   });
 
   io.on('connection', (socket: AuthenticatedSocket) => {
-    const user = socket.data.user!;
-    console.log(`[WEBSOCKET] Client connected: Socket ID ${socket.id} (User: ${user.email}, Role: ${user.role})`);
+    const user = socket.data.user;
+    if (user) {
+      console.log(`[WEBSOCKET] Client connected: Socket ID ${socket.id} (User: ${user.email}, Role: ${user.role})`);
+      socket.join(`user:${user.userId}`);
+      socket.join(`role:${user.role}`);
 
-    socket.join(`user:${user.userId}`);
+      if (socket.data.hubId) {
+        socket.join(`hub:${socket.data.hubId}`);
+        console.log(`[WEBSOCKET] Socket joined facility room: hub:${socket.data.hubId}`);
+      }
 
-    socket.join(`role:${user.role}`);
-
-    if (socket.data.hubId) {
-      socket.join(`hub:${socket.data.hubId}`);
-      console.log(`[WEBSOCKET] Socket joined facility room: hub:${socket.data.hubId}`);
-    }
-
-    if (socket.data.bloodGroup) {
-      socket.join(`blood:${socket.data.bloodGroup}`);
-      console.log(`[WEBSOCKET] Citizen joined blood donor room: blood:${socket.data.bloodGroup}`);
+      if (socket.data.bloodGroup) {
+        socket.join(`blood:${socket.data.bloodGroup}`);
+        console.log(`[WEBSOCKET] Citizen joined blood donor room: blood:${socket.data.bloodGroup}`);
+      }
+    } else {
+      console.log(`[WEBSOCKET] Guest connected: Socket ID ${socket.id}`);
     }
 
     socket.on('disconnect', (reason) => {
