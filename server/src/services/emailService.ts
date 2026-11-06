@@ -5,6 +5,7 @@ dotenv.config();
 
 interface SendOtpResult {
   success: boolean;
+  delivered: boolean;
   messageId?: string;
   previewUrl?: string | false;
   error?: string;
@@ -114,13 +115,13 @@ async function sendViaResend(
     const data: any = await res.json();
     if (res.ok) {
       console.log(`[RESEND-API] ✓ Email dispatched via HTTPS to ${toEmail} (ID: ${data.id})`);
-      return { success: true, messageId: data.id };
+      return { success: true, delivered: true, messageId: data.id };
     } else {
       throw new Error(data.message || 'Resend API returned error');
     }
   } catch (err: any) {
     console.error(`[RESEND-API] Failed to dispatch email to ${toEmail}:`, err.message);
-    return { success: false, error: err.message };
+    return { success: false, delivered: false, error: err.message };
   }
 }
 
@@ -153,13 +154,13 @@ async function sendViaBrevo(
     const data: any = await res.json();
     if (res.ok) {
       console.log(`[BREVO-API] ✓ Email dispatched via HTTPS to ${toEmail} (MessageId: ${data.messageId})`);
-      return { success: true, messageId: data.messageId };
+      return { success: true, delivered: true, messageId: data.messageId };
     } else {
       throw new Error(data.message || 'Brevo API returned error');
     }
   } catch (err: any) {
     console.error(`[BREVO-API] Failed to dispatch email to ${toEmail}:`, err.message);
-    return { success: false, error: err.message };
+    return { success: false, delivered: false, error: err.message };
   }
 }
 
@@ -284,7 +285,7 @@ export async function sendOtpEmail(toEmail: string, otp: string): Promise<SendOt
       });
 
       console.log(`[SMTP] ✓ OTP verification email dispatched to ${toEmail} (Message ID: ${info.messageId})`);
-      return { success: true, messageId: info.messageId };
+      return { success: true, delivered: true, messageId: info.messageId };
     } catch (error: any) {
       console.warn(`[SMTP] Notice: Email delivery failed via SMTP (${error.message}).`);
     }
@@ -297,6 +298,7 @@ export async function sendOtpEmail(toEmail: string, otp: string): Promise<SendOt
 
   return {
     success: true,
+    delivered: false,
     messageId: 'console-otp-fallback',
   };
 }

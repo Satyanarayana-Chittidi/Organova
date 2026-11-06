@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState('');
+  const [devOtp, setDevOtp] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [otpSuccess, setOtpSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +28,10 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await authApi.register({ email, password });
+      const res: any = await authApi.register({ email, password });
+      if (res?.data?.devOtp) {
+        setDevOtp(res.data.devOtp);
+      }
       setStep(2);
     } catch (err: any) {
       setError(err.message || 'Registration failed. Email might already be taken.');
@@ -144,6 +148,22 @@ export default function RegisterPage() {
           </form>
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
+            {devOtp && (
+              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-200 text-xs flex items-center justify-between gap-2 shadow-xs">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">⚡</span>
+                  <span>Demo Access Code: <strong className="font-mono text-sm tracking-wider font-bold text-amber-950 dark:text-amber-100">{devOtp}</strong></span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOtp(devOtp)}
+                  className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[11px] font-semibold transition cursor-pointer shadow-xs"
+                >
+                  Auto-Fill
+                </button>
+              </div>
+            )}
+
             <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 text-blue-700 dark:text-blue-300 text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0 text-blue-500 dark:text-blue-400" />
               <span>A 6-digit verification code was sent to <strong className="font-semibold text-slate-900 dark:text-white">{email}</strong>. Check your inbox and spam folder.</span>

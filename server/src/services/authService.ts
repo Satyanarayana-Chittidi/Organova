@@ -90,14 +90,18 @@ export async function registerUser(dto: RegisterDTO): Promise<{
   devPendingRegistrations.set(normalizedEmail, pendingData);
 
   // 5. Send OTP email via configured SMTP/API (with non-blocking error resilience)
+  let emailDelivered = false;
   try {
-    await sendOtpEmail(normalizedEmail, otp);
+    const mailResult = await sendOtpEmail(normalizedEmail, otp);
+    emailDelivered = !!mailResult.delivered;
   } catch (emailErr: any) {
     console.warn('[EMAIL] Non-fatal email dispatch notice:', emailErr.message);
   }
 
   return {
-    message: 'Registration initiated. Please verify the 6-digit OTP sent to your email.',
+    message: emailDelivered
+      ? 'Registration initiated. Please verify the 6-digit OTP sent to your email.'
+      : 'Registration initiated. Verification code sent (or use demo code shown below).',
     user: {
       id: userId,
       email: normalizedEmail,
@@ -106,7 +110,7 @@ export async function registerUser(dto: RegisterDTO): Promise<{
       is_verified: false,
       avatar_url: null,
     },
-    devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
+    devOtp: (!emailDelivered || process.env.NODE_ENV !== 'production') ? otp : undefined,
   };
 }
 
