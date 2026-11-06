@@ -109,7 +109,7 @@ export default function DirectoryPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-slate-800">
           <span>{hubs.length} verified center(s) registered</span>
-          <Link href="/hubs/register" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
+          <Link href="/hospital/register" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
             Onboard new facility →
           </Link>
         </div>

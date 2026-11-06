@@ -20,7 +20,7 @@ import {
   FileText,
 } from 'lucide-react';
 
-export default function RecipientPassportPage() {
+export default function RecipientWaitlistStatusPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { alerts } = useSocket();

@@ -221,7 +221,7 @@ function LoginContent() {
             <p className="text-xs text-slate-600 dark:text-slate-400">
               Don&apos;t have an account yet?{' '}
               <Link
-                href="/hubs/register"
+                href="/hospital/register"
                 className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Register a Medical Facility

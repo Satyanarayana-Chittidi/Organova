@@ -263,11 +263,11 @@ export default function MasterControlPage() {
           </button>
 
           <Link
-            href="/master-control/hubs"
+            href="/master-control/hospitals"
             className="px-3.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-semibold flex items-center gap-1.5 hover:bg-blue-100 transition-colors"
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>Medical Hubs</span>
+            <span>Hospitals</span>
           </Link>
 
           <Link
@@ -753,7 +753,7 @@ export default function MasterControlPage() {
                 </div>
 
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Active Medical Hubs
+                  Active Hospitals
                 </p>
                 <div className="text-3xl font-black text-slate-900 dark:text-white mt-1">
                   {dataLoading ? '...' : metrics?.activeHubsCount || 0}
@@ -765,10 +765,10 @@ export default function MasterControlPage() {
 
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                 <Link
-                  href="/master-control/hubs"
+                  href="/master-control/hospitals"
                   className="inline-flex items-center justify-between w-full text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 group"
                 >
-                  <span>Explore Medical Hubs</span>
+                  <span>Explore Hospitals</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>

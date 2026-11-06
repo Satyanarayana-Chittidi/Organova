@@ -131,9 +131,9 @@ export default function Navbar() {
                 </Link>
 
                 <Link
-                  href="/master-control/hubs"
+                  href="/master-control/hospitals"
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                    isActive('/master-control/hubs')
+                    isActive('/master-control/hospitals')
                       ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40'
                       : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
@@ -257,9 +257,9 @@ export default function Navbar() {
                     </Link>
 
                     <Link
-                      href="/transplant/passport"
+                      href="/transplant/waitlist-status"
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                        isActive('/transplant/passport')
+                        isActive('/transplant/waitlist-status')
                           ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'
                           : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                       }`}
@@ -413,7 +413,7 @@ export default function Navbar() {
 
                               {alert.type.includes('MATCH') && (
                                 <Link
-                                  href="/transplant/passport"
+                                  href="/transplant/waitlist-status"
                                   onClick={() => setAlertsOpen(false)}
                                   className="inline-flex items-center gap-1 mt-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
                                 >
@@ -624,7 +624,7 @@ export default function Navbar() {
                 <span>Admin Console</span>
               </Link>
               <Link
-                href="/master-control/hubs"
+                href="/master-control/hospitals"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
               >
@@ -736,7 +736,7 @@ export default function Navbar() {
                 <span>Request Blood</span>
               </Link>
               <Link
-                href="/transplant/passport"
+                href="/transplant/waitlist-status"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2.5"
               >

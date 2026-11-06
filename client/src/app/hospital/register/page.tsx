@@ -20,7 +20,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 
-export default function HubRegisterPage() {
+export default function HospitalRegisterPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState('');

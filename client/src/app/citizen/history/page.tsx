@@ -862,7 +862,7 @@ function DonationHistoryContent() {
                     Pledge Organs & Tissues
                   </Link>
                   <Link
-                    href="/transplant/passport"
+                    href="/transplant/waitlist-status"
                     className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
                   >
                     <Clock className="w-3.5 h-3.5 text-emerald-500" />

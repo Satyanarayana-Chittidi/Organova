@@ -44,7 +44,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/hubs/register" className="hover:text-white transition-colors">
+                <Link href="/hospital/register" className="hover:text-white transition-colors">
                   Hospital Registration
                 </Link>
               </li>

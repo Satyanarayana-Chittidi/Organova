@@ -1059,7 +1059,7 @@ export default function CitizenProfilePage() {
                   Pledge Your Organs
                 </Link>
                 <Link
-                  href="/transplant/passport"
+                  href="/transplant/waitlist-status"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors"
                 >
                   <Clock className="w-3.5 h-3.5 text-emerald-500" />

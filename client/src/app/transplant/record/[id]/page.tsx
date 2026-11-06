@@ -306,7 +306,7 @@ function TransplantRecordContent() {
           </p>
           <div className="pt-2 flex justify-center gap-2">
             <Link
-              href={fromHistory ? '/citizen/history?type=organ' : fromProfile ? '/citizen/profile' : '/transplant/passport'}
+              href={fromHistory ? '/citizen/history?type=organ' : fromProfile ? '/citizen/profile' : '/transplant/waitlist-status'}
               className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-semibold hover:bg-slate-800 transition-colors"
             >
               Return to Previous Page
@@ -326,7 +326,7 @@ function TransplantRecordContent() {
         {/* Top Navigation & Print Bar */}
         <div className="flex items-center justify-between print:hidden">
           <Link
-            href={fromHistory ? '/citizen/history?type=organ' : fromProfile ? '/citizen/profile' : '/transplant/passport'}
+            href={fromHistory ? '/citizen/history?type=organ' : fromProfile ? '/citizen/profile' : '/transplant/waitlist-status'}
             className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />

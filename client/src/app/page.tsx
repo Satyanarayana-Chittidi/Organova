@@ -364,7 +364,7 @@ export default function HomePage() {
 
                     {/* 4. Hospital Registration */}
                     <Link
-                      href="/hubs/register"
+                      href="/hospital/register"
                       className="group p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 border border-slate-200/80 dark:border-slate-700/60 hover:border-emerald-300 dark:hover:border-emerald-800 transition-all flex items-center justify-between"
                     >
                       <div className="flex items-center gap-3">
@@ -1428,7 +1428,7 @@ export default function HomePage() {
 
                   {/* Card 5: Patient Waitlist */}
                   <Link
-                    href="/transplant/passport"
+                    href="/transplant/waitlist-status"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
                   >
                     <div>
