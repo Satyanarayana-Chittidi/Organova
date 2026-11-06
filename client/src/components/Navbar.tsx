@@ -25,7 +25,6 @@ import {
   Users,
   FileText,
   Search,
-  Lock,
   Home,
   Clock,
   BookOpen,
@@ -364,24 +363,6 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-            )}
-
-            {pathname.startsWith('/master-control') && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (user) {
-                    logout();
-                  } else {
-                    window.location.reload();
-                  }
-                }}
-                className="px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                title={user?.role === 'ADMIN' ? 'Lock Master Control Console' : 'Admin Login'}
-              >
-                <Lock className="w-3.5 h-3.5 text-rose-500" />
-                <span className="hidden sm:inline">{user?.role === 'ADMIN' ? 'Lock Console' : 'Login'}</span>
-              </button>
             )}
 
             {!pathname.startsWith('/master-control') && user && (
