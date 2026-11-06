@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import redis from '../config/redis';
 import { hashPassword, comparePassword } from '../utils/hash';
 import { signToken } from '../utils/jwt';
+import { sendOtpEmail } from './emailService';
 import {
   findUserByEmail,
   findUserById,
@@ -88,10 +89,8 @@ export async function registerUser(dto: RegisterDTO): Promise<{
   }
   devPendingRegistrations.set(normalizedEmail, pendingData);
 
-  // Log to terminal for easy local testing
-  console.log('----------------------------------------------------');
-  console.log(`[AUTH-OTP] Verification code for ${normalizedEmail}: ${otp}`);
-  console.log('----------------------------------------------------');
+  // 5. Send OTP email via configured SMTP (or log fallback)
+  await sendOtpEmail(normalizedEmail, otp);
 
   return {
     message: 'Registration initiated. Please verify the 6-digit OTP sent to your email.',

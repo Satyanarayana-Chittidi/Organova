@@ -2,6 +2,7 @@ import http from 'http';
 import app from './app';
 import { testDatabaseConnection, autoMigrateDatabase } from './config/database';
 import { testRedisConnection } from './config/redis';
+import { testSmtpConnection } from './services/emailService';
 import { initSocketServer } from './config/socket';
 import { sweepTimedOutMatches } from './services/matchingService';
 import dotenv from 'dotenv';
@@ -22,10 +23,11 @@ async function startServer(): Promise<void> {
   console.log('  ORGANOVA PLATFORM: BACKEND SERVER');
   console.log('====================================================');
 
-  // 1. Verify database and cache connectivity
+  // 1. Verify database, cache, and email connectivity
   await testDatabaseConnection();
   await autoMigrateDatabase();
   await testRedisConnection();
+  await testSmtpConnection();
 
   // 2. Start HTTP listener
   server.listen(PORT, () => {

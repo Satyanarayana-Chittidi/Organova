@@ -146,7 +146,7 @@ export default function RegisterPage() {
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 text-blue-700 dark:text-blue-300 text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0 text-blue-500 dark:text-blue-400" />
-              <span>In local dev, the 6-digit OTP code is logged directly to your server terminal.</span>
+              <span>A 6-digit verification code was sent to <strong className="font-semibold text-slate-900 dark:text-white">{email}</strong>. Check your inbox and spam folder.</span>
             </div>
 
             <div>
