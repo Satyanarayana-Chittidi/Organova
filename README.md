@@ -5,9 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://organova.vercel.app"><strong>Live Application</strong></a> &bull;
-  <a href="https://organova.onrender.com/api/health"><strong>API Service</strong></a> &bull;
-  <a href="https://github.com/Satyanarayana-Chittidi/Organova"><strong>GitHub Repository</strong></a>
+  <a href="https://organova.vercel.app"><strong>Live Application</strong></a>
 </p>
 
 <p align="center">
