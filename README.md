@@ -1,7 +1,7 @@
 # Organova
 
 <p align="center">
-  <strong>National Digital Healthcare Platform for Real-Time Organ Viability Tracking, Algorithmic Matching, and Emergency Blood Logistics</strong>
+  <strong>A Full-Stack Platform for Real-Time Organ Viability Tracking, Algorithmic Matching, and Emergency Blood Logistics</strong>
 </p>
 
 <p align="center">
@@ -33,19 +33,19 @@
 
 ## Platform Overview
 
-Organova is a digital healthcare platform engineered to streamline organ donation pledges, track organ viability in real time, run automated compatibility matching, and coordinate emergency blood logistics across accredited hospitals and citizens.
+Organova is a full-stack web application designed to demonstrate real-time organ viability tracking, automated recipient matching, and emergency blood requisition logistics between hospitals and donors.
 
-In organ transplantation, timing is critical. Organs undergo cold ischemia degradation the moment they are retrieved, leaving medical teams only narrow hourly windows to match, allocate, transport, and surgically implant them into waiting recipients. Organova automates this lifecycle by replacing fragmented telephone chains and manual records with an integrated digital registry, automated algorithmic allocation, and real-time clinical alerts.
+In organ transplantation, timing is critical. Organs undergo cold ischemia degradation the moment they are retrieved, leaving medical teams only narrow hourly windows to match, allocate, transport, and surgically implant them into waiting recipients. Organova simulates and automates this lifecycle with an integrated digital registry, algorithmic allocation, and real-time alerts.
 
 ### What the Platform Offers
 
-- Citizen Organ Pledges and Digital Donor ID: Citizens can register legal organ donation pledges across all major organs and tissues (kidneys, liver, heart, lungs, cornea, pancreas, bone marrow) and receive an instantly verifiable digital donor card with QR credentials.
-- Real-Time Cold Ischemia Tracking: When an organ is harvested at a donor hospital, the system logs its clinical parameters and initiates a live countdown timer reflecting strict medical viability preservation limits.
-- Algorithmic Compatibility Matching: An automated matching engine calculates compatibility scores for waitlisted recipients by evaluating clinical urgency, waitlist tenure, transit proximity, and ABO/HLA blood compatibility.
-- 20-Minute Match Acceptance Windows: When an organ match is proposed, the attending hospital receives a strict 20-minute decision window to review candidate compatibility and accept the allocation. If unaccepted, background sweepers automatically transition the offer to the next eligible candidate in the queue.
-- Emergency Blood Requisitions and SOS Alerts: Trauma centers and citizens can broadcast urgent blood requisitions. Nearby compatible donors receive instant notifications and digital walk-in donor passes.
-- Hospital Inventory Management: Accredited facilities maintain live stock counts across specific blood components (Whole Blood, Packed RBC, Platelets, Plasma) with automated inter-hospital transfer coordination.
-- Master Control Governance: Centralized administrative gateway for verifying medical facilities, managing donation camps, and auditing system transaction logs.
+- Donor Pledges and Digital Cards: Users can pledge organs and tissues (kidneys, liver, heart, lungs, cornea, pancreas, bone marrow) and generate a digital donor card with QR verification.
+- Real-Time Cold Ischemia Tracking: When an organ is logged at a hospital, the system initiates a live countdown timer reflecting medical viability preservation limits.
+- Algorithmic Compatibility Matching: An automated matching engine calculates compatibility scores for waitlisted recipients by evaluating clinical urgency, waitlist tenure, transit proximity, and blood group compatibility.
+- 20-Minute Match Acceptance Windows: When an organ match is proposed, the attending hospital receives a 20-minute decision window to review candidate compatibility and accept the allocation. If unaccepted, background sweepers automatically transition the offer to the next eligible candidate in the queue.
+- Emergency Blood Requisitions and SOS Alerts: Hospitals and users can broadcast urgent blood requisitions. Nearby compatible donors receive instant notifications and digital walk-in passes.
+- Hospital Blood Stock Management: Participating hospitals maintain live stock counts across blood components (Whole Blood, Packed RBC, Platelets, Plasma) with transfer coordination.
+- Master Control Portal: Centralized administrative dashboard for approving hospital accounts, organizing donation camps, and viewing system transaction logs.
 
 ---
 
@@ -54,7 +54,7 @@ In organ transplantation, timing is critical. Organs undergo cold ischemia degra
 Organova operates as a decoupled three-tier system:
 
 ### 1. Frontend (Next.js 16, React 19, Tailwind CSS 4)
-- User Experience: Provides dedicated, responsive interfaces for Citizens, Hospital Coordinators, and System Administrators.
+- User Experience: Provides dedicated, responsive interfaces for Donors, Hospital Coordinators, and Administrators.
 - Real-Time Notifications: Establishes a persistent WebSocket connection via Socket.IO to receive instant alerts (emergency blood requisitions, match proposals, and donor responses) without requiring manual page reloads.
 - Client State and Theme: Manages authentication sessions, role-based routing, and persistent dark/light mode toggling.
 - API Client: Communicates with backend REST endpoints using structured, typed API helpers with automatic token management and error boundaries.
@@ -67,9 +67,9 @@ Organova operates as a decoupled three-tier system:
 - Automated Schema Migrations: Verifies database schema integrity and automatically provisions administrative credentials on startup.
 
 ### 3. Database (MySQL 8.0 / Cloud TiDB)
-- Relational Schema: Stores user accounts, hospital accreditations, recipient waitlists, organ harvest records, match proposals, blood requests, and audit logs.
+- Relational Schema: Stores user accounts, hospital profiles, recipient waitlists, organ harvest records, match proposals, blood requests, and audit logs.
 - Data Integrity: Enforces foreign keys, status enumerations, and indexed queries to ensure rapid lookups during high-frequency matching operations.
-- Audit Trail: Persists immutable records of clinical transactions, including organ retrievals, allocation decisions, hospital acceptances, and emergency dispatches.
+- Audit Trail: Persists records of platform transactions, including organ retrievals, allocation decisions, hospital acceptances, and emergency dispatches.
 
 ---
 
@@ -137,9 +137,8 @@ Open `http://localhost:3000` in your browser.
 | Role | Portal URL | Email | Password |
 | :--- | :--- | :--- | :--- |
 | System Administrator | `/master-control` | admin@mastercontrol.local | AdminSecurePass@2026 |
-| Alternative Admin | `/master-control` | admin@organdonation.gov.in | AdminSecurePass@2026 |
 | Hospital Coordinator | `/hospital/login` | Registered Facility Email | Specified at Registration |
-| Citizen / Donor | `/auth/login` | Registered User Email | Specified at Registration |
+| User / Donor | `/auth/login` | Registered User Email | Specified at Registration |
 
 ---
 
