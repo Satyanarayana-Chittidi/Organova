@@ -140,6 +140,7 @@ async function sendViaBrevo(
       headers: {
         'api-key': apiKey,
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify({
         sender: { name: 'Organova Platform', email: senderEmail },
