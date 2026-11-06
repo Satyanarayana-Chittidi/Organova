@@ -55,8 +55,48 @@ function createDatabasePool() {
 
 const pool = createDatabasePool();
 
+// Helper to ensure target database exists on fresh cloud MySQL / TiDB clusters
+async function ensureDatabaseExists(): Promise<void> {
+  const targetDb = process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db';
+  if (dbUrl) {
+    try {
+      const parsed = new URL(dbUrl);
+      const dbName = parsed.pathname.replace(/^\//, '') || targetDb;
+      const connConfig: any = {
+        host: parsed.hostname,
+        port: Number(parsed.port) || 4000,
+        user: decodeURIComponent(parsed.username),
+        password: decodeURIComponent(parsed.password),
+      };
+      if (dbUrl.includes('tidbcloud.com') || !dbUrl.includes('ssl=')) {
+        connConfig.ssl = { minVersion: 'TLSv1.2', rejectUnauthorized: true };
+      }
+      const connection = await mysql.createConnection(connConfig);
+      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+      console.log(`[DATABASE] ✓ Ensured database '${dbName}' exists on MySQL / TiDB`);
+      await connection.end();
+    } catch (err: any) {
+      console.warn('[DATABASE] Notice during database creation check:', err.message);
+    }
+  } else {
+    try {
+      const connection = await mysql.createConnection({
+        host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
+        port: Number(process.env.MYSQLPORT || process.env.DB_PORT) || 3306,
+        user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
+        password: process.env.MYSQLPASSWORD ?? process.env.DB_PASSWORD ?? '',
+      });
+      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${targetDb}\``);
+      await connection.end();
+    } catch (err: any) {
+      console.warn('[DATABASE] Notice during local database creation check:', err.message);
+    }
+  }
+}
+
 // Helper function to verify database connectivity on server startup
 export async function testDatabaseConnection(): Promise<void> {
+  await ensureDatabaseExists();
   try {
     const connection = await pool.getConnection();
     const targetDb = dbUrl ? 'cloud connection URL' : (process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db');
@@ -69,6 +109,7 @@ export async function testDatabaseConnection(): Promise<void> {
 
 // Automatically seeds the database on startup if fresh/empty tables are detected
 export async function autoMigrateDatabase(force = false): Promise<{ executed: number; errors: string[] }> {
+  await ensureDatabaseExists();
   const result = { executed: 0, errors: [] as string[] };
   try {
     const connection = await pool.getConnection();
