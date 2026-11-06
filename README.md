@@ -130,16 +130,6 @@ Open `http://localhost:3000` in your browser.
 
 ---
 
-## Default Access Credentials
-
-| Role | Portal URL | Email | Password |
-| :--- | :--- | :--- | :--- |
-| System Administrator | `/master-control` | admin@mastercontrol.local | AdminSecurePass@2026 |
-| Hospital Coordinator | `/hospital/login` | Registered Facility Email | Specified at Registration |
-| User / Donor | `/auth/login` | Registered User Email | Specified at Registration |
-
----
-
 ## License
 
 Distributed under the MIT License. Designed and developed by [Satyanarayana Chittidi](https://github.com/Satyanarayana-Chittidi).
