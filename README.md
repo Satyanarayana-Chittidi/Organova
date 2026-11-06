@@ -23,9 +23,14 @@
 
 ## Live Deployments
 
-- Web Application: https://organova.vercel.app
-- Backend API Service: https://organova.onrender.com
-- GitHub Source Repository: https://github.com/Satyanarayana-Chittidi/Organova
+- **Web Application:** https://organova.vercel.app  
+  The frontend application is deployed to Vercel.
+
+- **Backend API Service:** https://organova.onrender.com  
+  The backend API and real-time WebSocket service are deployed to Render.
+
+- **Database:** TiDB  
+  The relational database is hosted on TiDB Cloud, running MySQL in TiDB for structured data storage and transaction management.
 
 ---
 
