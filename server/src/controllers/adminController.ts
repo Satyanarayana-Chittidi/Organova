@@ -10,10 +10,6 @@ import {
   getAdminActivityLogs,
 } from '../services/adminService';
 
-/**
- * GET /api/admin/hubs/pending
- * Admin endpoint: Fetches all medical facilities awaiting verification.
- */
 export async function getPendingHubsHandler(
   req: Request,
   res: Response,
@@ -31,11 +27,6 @@ export async function getPendingHubsHandler(
   }
 }
 
-/**
- * PATCH /api/admin/hubs/:id/verify
- * Admin endpoint: Approves, Rejects, or Suspends an institutional facility.
- * Body: { status: 'ACTIVE' | 'REJECTED' | 'SUSPENDED' }
- */
 export async function verifyHubStatusHandler(
   req: Request,
   res: Response,
@@ -71,10 +62,6 @@ export async function verifyHubStatusHandler(
   }
 }
 
-/**
- * GET /api/admin/metrics
- * Admin endpoint: Real-time macro platform pulse and matrix statistics.
- */
 export async function getPlatformMetricsHandler(
   _req: Request,
   res: Response,
@@ -91,10 +78,6 @@ export async function getPlatformMetricsHandler(
   }
 }
 
-/**
- * GET /api/admin/hubs
- * Admin endpoint: Lists all facilities with optional status filter (e.g. ACTIVE, PENDING_APPROVAL).
- */
 export async function getAllHubsHandler(
   req: Request,
   res: Response,
@@ -113,10 +96,6 @@ export async function getAllHubsHandler(
   }
 }
 
-/**
- * GET /api/admin/entities/search?q=...
- * Admin endpoint: Unified search across citizens and facilities.
- */
 export async function searchEntitiesHandler(
   req: Request,
   res: Response,
@@ -139,10 +118,6 @@ export async function searchEntitiesHandler(
   }
 }
 
-/**
- * GET /api/admin/logs?limit=...
- * Admin endpoint: Chronological activity and transaction logs.
- */
 export async function getActivityLogsHandler(
   req: Request,
   res: Response,

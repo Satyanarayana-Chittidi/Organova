@@ -3,15 +3,12 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create a connection pool to reuse database connections efficiently
-// Supports individual environment variables and cloud connection strings (TiDB / Render / Railway)
 const dbUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
 function createDatabasePool() {
   if (dbUrl) {
     try {
       const isTidb = dbUrl.includes('tidbcloud.com');
-      // If TiDB Cloud is detected and SSL isn't explicitly defined in query params, enforce TLSv1.2
       if (isTidb && !dbUrl.includes('ssl=')) {
         const parsed = new URL(dbUrl);
         return mysql.createPool({
@@ -35,7 +32,6 @@ function createDatabasePool() {
         });
       }
     } catch (e) {
-      // Fall through to standard pool creation
     }
     return mysql.createPool(dbUrl);
   }
@@ -59,7 +55,6 @@ function createDatabasePool() {
 
 const pool = createDatabasePool();
 
-// Handle disconnects on idle sockets from cloud providers gracefully
 pool.on('connection', (connection: any) => {
   connection.on('error', (err: any) => {
     if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
@@ -68,7 +63,6 @@ pool.on('connection', (connection: any) => {
   });
 });
 
-// Helper to ensure target database exists on fresh cloud MySQL / TiDB clusters
 async function ensureDatabaseExists(): Promise<void> {
   const targetDb = process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db';
   if (dbUrl) {
@@ -107,7 +101,6 @@ async function ensureDatabaseExists(): Promise<void> {
   }
 }
 
-// Helper function to verify database connectivity on server startup
 export async function testDatabaseConnection(): Promise<void> {
   await ensureDatabaseExists();
   try {
@@ -120,7 +113,6 @@ export async function testDatabaseConnection(): Promise<void> {
   }
 }
 
-// Automatically checks and verifies database schema readiness on startup
 export async function autoMigrateDatabase(): Promise<{ status: string; tables: number }> {
   await ensureDatabaseExists();
   try {

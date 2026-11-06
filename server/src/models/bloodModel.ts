@@ -16,14 +16,6 @@ import {
 interface BloodInventoryRow extends BloodInventoryItem, RowDataPacket {}
 interface BloodRequestRow extends BloodRequest, RowDataPacket {}
 
-// ====================================================================
-// 1. INVENTORY OPERATIONS
-// ====================================================================
-
-/**
- * Sets an exact stock count for a specific blood group & component.
- * Uses ON DUPLICATE KEY UPDATE to atomically insert or overwrite.
- */
 export async function upsertInventory(
   hubId: number,
   dto: SetInventoryDTO
@@ -46,10 +38,6 @@ export async function upsertInventory(
   return rows[0];
 }
 
-/**
- * Adjusts inventory stock by a delta (+N for additions, -N for consumption).
- * Guarantees stock cannot drop below zero.
- */
 export async function adjustInventory(
   hubId: number,
   bloodGroup: BloodGroup,
@@ -61,7 +49,6 @@ export async function adjustInventory(
   try {
     await connection.beginTransaction();
 
-    // Lock the row for update
     const [rows] = await connection.query<BloodInventoryRow[]>(
       `SELECT * FROM blood_inventory 
        WHERE hub_id = ? AND blood_group = ? AND component = ? 
@@ -104,9 +91,6 @@ export async function adjustInventory(
   }
 }
 
-/**
- * Retrieves the full inventory list for a specific medical hub.
- */
 export async function getInventoryByHubId(hubId: number): Promise<BloodInventoryItem[]> {
   const [rows] = await pool.query<BloodInventoryRow[]>(
     `SELECT * FROM blood_inventory 
@@ -117,10 +101,6 @@ export async function getInventoryByHubId(hubId: number): Promise<BloodInventory
   return rows;
 }
 
-/**
- * Public & Clinical Search: Finds verified ACTIVE facilities that currently
- * possess available blood stock matching requested criteria.
- */
 export async function searchStockInActiveHubs(
   filters: SearchStockFilters
 ): Promise<BloodInventoryItem[]> {
@@ -168,13 +148,6 @@ export async function searchStockInActiveHubs(
   return rows;
 }
 
-// ====================================================================
-// 2. EMERGENCY BLOOD REQUEST OPERATIONS
-// ====================================================================
-
-/**
- * Creates an emergency blood requisition.
- */
 export async function createBloodRequest(
   requesterUserId: string,
   dto: CreateBloodRequestDTO
@@ -206,9 +179,6 @@ export async function createBloodRequest(
   return request;
 }
 
-/**
- * Finds a blood request by its primary key ID, enriched with requester, destination hospital, target hospital, fulfilling facility & donor info.
- */
 export async function findBloodRequestById(id: number): Promise<BloodRequest | null> {
   const query = `
     SELECT 
@@ -236,10 +206,6 @@ export async function findBloodRequestById(id: number): Promise<BloodRequest | n
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Lists blood requests with optional filters, ordered by clinical urgency
- * (CRITICAL > URGENT > ROUTINE) and timestamp.
- */
 export async function listBloodRequests(filters: BloodRequestFilters): Promise<BloodRequest[]> {
   let query = `
     SELECT 
@@ -300,9 +266,6 @@ export async function listBloodRequests(filters: BloodRequestFilters): Promise<B
   return rows;
 }
 
-/**
- * Lists all requests created by a specific user or hospital.
- */
 export async function listRequestsByRequester(userId: string): Promise<BloodRequest[]> {
   const query = `
     SELECT 
@@ -331,12 +294,6 @@ export async function listRequestsByRequester(userId: string): Promise<BloodRequ
   return rows;
 }
 
-/**
- * ACID TRANSACTION: Claim & Approve Blood Request.
- * Locks the request row and inventory row.
- * Validates that the request is still pending and the hub has sufficient stock.
- * Atomically decrements the stock and marks the request as APPROVED.
- */
 export async function claimAndApproveRequest(
   requestId: number,
   fulfillingHubId: number
@@ -346,7 +303,6 @@ export async function claimAndApproveRequest(
   try {
     await connection.beginTransaction();
 
-    // 1. Lock and inspect the requisition row
     const [reqRows] = await connection.query<BloodRequestRow[]>(
       'SELECT * FROM blood_requests WHERE id = ? FOR UPDATE',
       [requestId]
@@ -367,7 +323,6 @@ export async function claimAndApproveRequest(
       throw error;
     }
 
-    // Direct requisition guard: Only the targeted hospital may claim this order
     if (request.target_hub_id && request.target_hub_id !== fulfillingHubId) {
       const error: any = new Error(
         'This requisition is directed to a specific hospital and cannot be claimed by another facility.'
@@ -376,7 +331,6 @@ export async function claimAndApproveRequest(
       throw error;
     }
 
-    // 2. Lock and inspect the facility's inventory row
     const [invRows] = await connection.query<BloodInventoryRow[]>(
       `SELECT * FROM blood_inventory 
        WHERE hub_id = ? AND blood_group = ? AND component = ? 
@@ -393,7 +347,6 @@ export async function claimAndApproveRequest(
       throw error;
     }
 
-    // 3. Atomically decrement inventory units
     await connection.query<ResultSetHeader>(
       `UPDATE blood_inventory 
        SET units_available = units_available - ?, last_updated = NOW()
@@ -401,7 +354,6 @@ export async function claimAndApproveRequest(
       [request.units_requested, fulfillingHubId, request.blood_group, request.component]
     );
 
-    // 4. Update request status to APPROVED with fulfilling facility ID
     await connection.query<ResultSetHeader>(
       `UPDATE blood_requests 
        SET status = 'APPROVED', fulfilling_hub_id = ? 
@@ -421,10 +373,6 @@ export async function claimAndApproveRequest(
   }
 }
 
-/**
- * Updates status of an approved request along the dispatch pipeline (DISPATCHED, COMPLETED).
- * If status is COMPLETED, fulfilled_at timestamp is set to NOW().
- */
 export async function updateRequestStatus(
   requestId: number,
   hubId: number,
@@ -448,14 +396,12 @@ export async function updateRequestStatus(
 
     const request = rows[0];
 
-    // Enforce that only the assigned fulfilling hub can advance the status
     if (request.fulfilling_hub_id !== hubId) {
       const error: any = new Error('Only the fulfilling medical facility can update order dispatch status.');
       error.statusCode = 403;
       throw error;
     }
 
-    // State machine progression check
     if (nextStatus === 'DISPATCHED' && request.status !== 'APPROVED') {
       const error: any = new Error(
         `Invalid status transition: Can only dispatch requests that are 'APPROVED'. Current status: '${request.status}'.`
@@ -493,11 +439,6 @@ export async function updateRequestStatus(
   }
 }
 
-/**
- * ACID TRANSACTION: Concurrency-Safe Living Donor Commitment.
- * Locks the request row to prevent race conditions if multiple donors tap 'I can donate' simultaneously.
- * Only the first committing transaction succeeds; subsequent callers receive 409 Conflict.
- */
 export async function commitLivingDonor(
   requestId: number,
   donorUserId: string
@@ -507,7 +448,6 @@ export async function commitLivingDonor(
   try {
     await connection.beginTransaction();
 
-    // 1. Lock and inspect the requisition row
     const [reqRows] = await connection.query<BloodRequestRow[]>(
       'SELECT * FROM blood_requests WHERE id = ? FOR UPDATE',
       [requestId]
@@ -521,7 +461,6 @@ export async function commitLivingDonor(
 
     const request = reqRows[0];
 
-    // Concurrency Guard: If already claimed or donor committed, reject cleanly
     if (request.status !== 'REQUESTED' || request.donor_user_id) {
       const error: any = new Error(
         'Another donor has just stepped forward to fulfill this request. Thank you for your readiness to save a life!'
@@ -530,7 +469,6 @@ export async function commitLivingDonor(
       throw error;
     }
 
-    // Safety Guard: Citizens cannot donate to their own blood requisition
     if (request.requester_user_id === donorUserId) {
       const error: any = new Error(
         'You cannot commit as a donor for your own blood requisition.'
@@ -539,7 +477,6 @@ export async function commitLivingDonor(
       throw error;
     }
 
-    // 1-to-1 Guard: A donor can only have one active walk-in commitment at a time
     const [activeDonorRows] = await connection.query<BloodRequestRow[]>(
       `SELECT id, blood_group FROM blood_requests 
        WHERE donor_user_id = ? AND status = 'DONOR_COMMITTED' AND id != ?
@@ -555,7 +492,6 @@ export async function commitLivingDonor(
       throw error;
     }
 
-    // 2. Commit the donor atomically
     await connection.query<ResultSetHeader>(
       `UPDATE blood_requests 
        SET status = 'DONOR_COMMITTED', donor_user_id = ? 
@@ -575,10 +511,6 @@ export async function commitLivingDonor(
   }
 }
 
-/**
- * ACID TRANSACTION: Releases a committed donor slot if a donor encounters an emergency on the way.
- * Unlocks the requisition back to 'REQUESTED' so another donor can fulfill it.
- */
 export async function releaseLivingDonor(
   requestId: number,
   donorUserId: string
@@ -614,7 +546,6 @@ export async function releaseLivingDonor(
       throw error;
     }
 
-    // Reset status back to REQUESTED and clear donor
     await connection.query<ResultSetHeader>(
       `UPDATE blood_requests 
        SET status = 'REQUESTED', donor_user_id = NULL 
@@ -634,9 +565,6 @@ export async function releaseLivingDonor(
   }
 }
 
-/**
- * Hospital Phlebotomy Verification: Hospital marks walk-in donor donation as completed.
- */
 export async function completeDonorDonation(
   requestId: number,
   hubId: number
@@ -697,11 +625,6 @@ export async function completeDonorDonation(
   }
 }
 
-/**
- * ACID TRANSACTION: Cancels a blood request.
- * If the request was already APPROVED, the reserved inventory is automatically
- * refunded back into the fulfilling facility's stock.
- */
 export async function cancelBloodRequest(
   requestId: number,
   requesterUserId: string,
@@ -725,14 +648,12 @@ export async function cancelBloodRequest(
 
     const request = rows[0];
 
-    // Permission check: only the requester or an administrator can cancel
     if (!isAdmin && request.requester_user_id !== requesterUserId) {
       const error: any = new Error('You do not have permission to cancel this blood request.');
       error.statusCode = 403;
       throw error;
     }
 
-    // Terminal state checks
     if (request.status === 'COMPLETED') {
       const error: any = new Error('Completed requisitions cannot be cancelled.');
       error.statusCode = 400;
@@ -745,7 +666,6 @@ export async function cancelBloodRequest(
       throw error;
     }
 
-    // If units were deducted under APPROVED or DISPATCHED, replenish the inventory!
     if (
       (request.status === 'APPROVED' || request.status === 'DISPATCHED') &&
       request.fulfilling_hub_id

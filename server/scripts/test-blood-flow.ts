@@ -7,7 +7,6 @@ async function runTest() {
   console.log('🩸 MODULE 5: BLOOD SUPPLY CHAIN & EMERGENCY FULFILLMENT TEST');
   console.log('===============================================================\n');
 
-  // Pre-cleanup test entities
   const bankEmail = 'redcross.hyd@bloodbank.org';
   const bankLicense = 'RC-HYD-BB-2026';
   const requesterEmail = 'trauma.care@cityhospital.com';
@@ -16,7 +15,6 @@ async function runTest() {
   await pool.query('DELETE FROM medical_hubs WHERE license_number = ?', [bankLicense]);
   await pool.query('DELETE FROM users WHERE email IN (?, ?)', [bankEmail, requesterEmail]);
 
-  // Step 1: Register and activate a dedicated Blood Bank
   console.log('▶ [Step 1] Registering and activating Red Cross Blood Bank...');
   const regRes = await fetch(`${BASE_URL}/hubs/register`, {
     method: 'POST',
@@ -43,7 +41,6 @@ async function runTest() {
   }
   const bankHubId = regData.data.id;
 
-  // Admin approves blood bank
   const adminLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -65,7 +62,6 @@ async function runTest() {
   });
   console.log(`  ✓ Blood bank created & verified (ID: ${bankHubId}, Status: ACTIVE)\n`);
 
-  // Login as Blood Bank
   const bankLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -74,7 +70,6 @@ async function runTest() {
   const bankLoginData: any = await bankLoginRes.json();
   const bankToken = bankLoginData.data.token;
 
-  // Step 2: Set stock inventory
   console.log('▶ [Step 2] Stocking blood bank inventory...');
   await fetch(`${BASE_URL}/blood/inventory`, {
     method: 'PUT',
@@ -102,7 +97,6 @@ async function runTest() {
     }),
   });
 
-  // Adjust stock (+5 units of O- PACKED_RBC -> 15 units total)
   await fetch(`${BASE_URL}/blood/inventory/adjust`, {
     method: 'PATCH',
     headers: {
@@ -124,7 +118,6 @@ async function runTest() {
   const rbcItem = myInvData.data.find((i: any) => i.blood_group === 'O-' && i.component === 'PACKED_RBC');
   console.log(`  ✓ O- PACKED_RBC verified at: ${rbcItem.units_available} units (Expected: 15)\n`);
 
-  // Step 3: Public stock search
   console.log('▶ [Step 3] Public searching for O- PACKED_RBC in Hyderabad...');
   const searchRes = await fetch(`${BASE_URL}/blood/inventory/search?blood_group=O-&component=PACKED_RBC&city=Hyderabad`);
   const searchData: any = await searchRes.json();
@@ -133,7 +126,6 @@ async function runTest() {
   }
   console.log(`  ✓ Discovery confirmed: Found '${searchData.data[0].hub_name}' with ${searchData.data[0].units_available} units.\n`);
 
-  // Step 4: Register a trauma requester & submit urgent blood request
   console.log('▶ [Step 4] Registering trauma hospital and placing CRITICAL requisition...');
   const requesterRes = await fetch(`${BASE_URL}/hubs/register`, {
     method: 'POST',
@@ -156,7 +148,6 @@ async function runTest() {
   const requesterData: any = await requesterRes.json();
   const requesterHubId = requesterData.data.id;
 
-  // Approve trauma hospital
   await fetch(`${BASE_URL}/admin/hubs/${requesterHubId}/verify`, {
     method: 'PATCH',
     headers: {
@@ -166,7 +157,6 @@ async function runTest() {
     body: JSON.stringify({ status: 'ACTIVE' }),
   });
 
-  // Login as Trauma Hospital
   const requesterLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -175,7 +165,6 @@ async function runTest() {
   const requesterLoginData: any = await requesterLoginRes.json();
   const requesterToken = requesterLoginData.data.token;
 
-  // Place order for 5 units of O- PACKED_RBC
   const orderRes = await fetch(`${BASE_URL}/blood/requests`, {
     method: 'POST',
     headers: {
@@ -198,7 +187,6 @@ async function runTest() {
   console.log(`  ✓ Blood request created! ID: ${requestId}`);
   console.log(`  ✓ Urgency: '${orderData.data.urgency}', Status: '${orderData.data.status}'\n`);
 
-  // Step 5: Clinical Queue Inspection
   console.log('▶ [Step 5] Checking prioritized clinical requisition queue...');
   const queueRes = await fetch(`${BASE_URL}/blood/requests?status=REQUESTED`, {
     headers: { Authorization: `Bearer ${bankToken}` },
@@ -210,7 +198,6 @@ async function runTest() {
   }
   console.log(`  ✓ Requisition found in active queue (Requester: ${inQueue.requester_email})\n`);
 
-  // Step 6: ACID Claim & Stock Reservation
   console.log(`▶ [Step 6] Blood Bank claims request ID ${requestId} (ACID Transaction)...`);
   const claimRes = await fetch(`${BASE_URL}/blood/requests/${requestId}/claim`, {
     method: 'POST',
@@ -222,7 +209,6 @@ async function runTest() {
   }
   console.log(`  ✓ Request approved! Fulfilling Facility: '${claimData.data.fulfilling_hub_name}'`);
 
-  // Verify stock was atomically decremented from 15 to 10
   const postClaimInvRes = await fetch(`${BASE_URL}/blood/inventory/me`, {
     headers: { Authorization: `Bearer ${bankToken}` },
   });
@@ -230,7 +216,6 @@ async function runTest() {
   const postClaimRbc = postClaimInvData.data.find((i: any) => i.blood_group === 'O-' && i.component === 'PACKED_RBC');
   console.log(`  ✓ Stock verification: O- PACKED_RBC balance = ${postClaimRbc.units_available} (Expected: 10 units)\n`);
 
-  // Step 7: Over-claim Guard Check
   console.log('▶ [Step 7] Testing over-claim guard (requesting 20 units when only 10 available)...');
   const excessOrderRes = await fetch(`${BASE_URL}/blood/requests`, {
     method: 'POST',
@@ -256,7 +241,6 @@ async function runTest() {
   const excessClaimData: any = await excessClaimRes.json();
   console.log(`  ✓ Over-claim properly rejected! HTTP ${excessClaimRes.status}: ${excessClaimData.message}\n`);
 
-  // Step 8: Dispatch & Completion Pipeline
   console.log('▶ [Step 8] Advancing fulfillment pipeline: DISPATCHED -> COMPLETED...');
   const dispatchRes = await fetch(`${BASE_URL}/blood/requests/${requestId}/status`, {
     method: 'PATCH',
@@ -280,9 +264,7 @@ async function runTest() {
   const completeData: any = await completeRes.json();
   console.log(`  ✓ Status advanced to: '${completeData.data.status}' (Fulfilled At: ${completeData.data.fulfilled_at})\n`);
 
-  // Step 9: Cancellation & Automatic Inventory Refund
   console.log('▶ [Step 9] Testing requisition cancellation & automatic stock replenishment...');
-  // Create order for 3 units of B+ PLATELETS
   const cancelTestOrderRes = await fetch(`${BASE_URL}/blood/requests`, {
     method: 'POST',
     headers: {
@@ -300,7 +282,6 @@ async function runTest() {
   const cancelTestOrderData: any = await cancelTestOrderRes.json();
   const cancelOrderId = cancelTestOrderData.data.id;
 
-  // Claim order (stock drops from 15 to 12)
   await fetch(`${BASE_URL}/blood/requests/${cancelOrderId}/claim`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${bankToken}` },
@@ -313,7 +294,6 @@ async function runTest() {
   const midPlatelets = midClaimInvData.data.find((i: any) => i.blood_group === 'B+' && i.component === 'PLATELETS');
   console.log(`  ✓ Claimed: B+ PLATELETS stock reduced to ${midPlatelets.units_available} units.`);
 
-  // Cancel order as requester
   const cancelRes = await fetch(`${BASE_URL}/blood/requests/${cancelOrderId}/cancel`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${requesterToken}` },
@@ -321,7 +301,6 @@ async function runTest() {
   const cancelData: any = await cancelRes.json();
   console.log(`  ✓ Requisition cancelled: status = '${cancelData.data.status}'`);
 
-  // Verify stock was refunded back from 12 to 15!
   const finalInvRes = await fetch(`${BASE_URL}/blood/inventory/me`, {
     headers: { Authorization: `Bearer ${bankToken}` },
   });

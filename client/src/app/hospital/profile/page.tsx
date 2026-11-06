@@ -64,7 +64,6 @@ function HospitalProfileContent() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Edit Facility Profile Modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [submittingEdit, setSubmittingEdit] = useState(false);
   const [editFormData, setEditFormData] = useState({
@@ -78,7 +77,6 @@ function HospitalProfileContent() {
     longitude: '',
   });
 
-  // Ledger Filter & Search
   const [ledgerTab, setLedgerTab] = useState<'ALL' | 'HARVESTS' | 'TRANSPLANTS' | 'WAITLIST' | 'BLOOD'>(
     ['ALL', 'HARVESTS', 'TRANSPLANTS', 'WAITLIST', 'BLOOD'].includes(initialTab)
       ? (initialTab as any)
@@ -175,7 +173,6 @@ function HospitalProfileContent() {
   const waitlist = data?.waitlist || [];
   const bloodTransactions = data?.bloodTransactions || [];
 
-  // Filtered transactions based on active tab and search query
   const filteredHarvests = useMemo(() => {
     if (!searchQuery.trim()) return harvests;
     const q = searchQuery.toLowerCase();
@@ -247,7 +244,6 @@ function HospitalProfileContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200">
       <div className="space-y-8">
-        {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 text-xs font-semibold mb-2 border border-transparent dark:border-rose-900/50">
@@ -281,7 +277,6 @@ function HospitalProfileContent() {
           </div>
         </div>
 
-        {/* Action Alerts */}
         {error && (
           <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
@@ -295,9 +290,6 @@ function HospitalProfileContent() {
           </div>
         )}
 
-        {/* ------------------------------------------------------------- */}
-        {/* 1. FACILITY IDENTITY & ACCREDITATION CARD                     */}
-        {/* ------------------------------------------------------------- */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
           <div className="flex flex-col lg:flex-row items-start justify-between gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-start gap-4">
@@ -356,9 +348,7 @@ function HospitalProfileContent() {
             </div>
           </div>
 
-          {/* Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 text-xs">
-            {/* Contact Info */}
             <div className="space-y-3">
               <span className="text-[11px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block">
                 Official Contacts
@@ -373,7 +363,6 @@ function HospitalProfileContent() {
               </div>
             </div>
 
-            {/* Address & City */}
             <div className="space-y-3">
               <span className="text-[11px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block">
                 Physical Address
@@ -389,7 +378,6 @@ function HospitalProfileContent() {
               </div>
             </div>
 
-            {/* Geo Coordinates */}
             <div className="space-y-3">
               <span className="text-[11px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block">
                 GPS Coordinates
@@ -415,9 +403,6 @@ function HospitalProfileContent() {
           </div>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 2. OPERATIONAL SUMMARY METRICS                                */}
-        {/* ------------------------------------------------------------- */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
@@ -464,12 +449,7 @@ function HospitalProfileContent() {
           </div>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 3. TRANSACTION HISTORY & CLINICAL LEDGER (3 SEPARATE CARDS)   */}
-        {/* ------------------------------------------------------------- */}
-        
-        {/* Unified Search Filter */}
-        <div className="relative">
+<div className="relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
@@ -480,9 +460,6 @@ function HospitalProfileContent() {
           />
         </div>
 
-        {/* ============================================================= */}
-        {/* CARD 1: ORGAN HARVEST PROCUREMENT LEDGER                      */}
-        {/* ============================================================= */}
         <div id="ledger-harvests" className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-3">
@@ -607,9 +584,6 @@ function HospitalProfileContent() {
           )}
         </div>
 
-        {/* ============================================================= */}
-        {/* CARD 2: ORGAN TRANSPLANT SURGICAL LEDGER                      */}
-        {/* ============================================================= */}
         <div id="ledger-transplants" className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-3">
@@ -724,9 +698,6 @@ function HospitalProfileContent() {
           )}
         </div>
 
-        {/* ============================================================= */}
-        {/* CARD 3: BLOOD SUPPLY & DISPENSE TRANSACTIONS                  */}
-        {/* ============================================================= */}
         <div id="ledger-blood" className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-3">
@@ -884,9 +855,6 @@ function HospitalProfileContent() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------- */}
-      {/* EDIT FACILITY PROFILE MODAL                                   */}
-      {/* ------------------------------------------------------------- */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 bg-slate-950/60 backdrop-blur-sm flex justify-center items-start sm:items-center animate-in fade-in duration-150">
           <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 max-w-lg w-full my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto">

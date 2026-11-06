@@ -10,7 +10,6 @@ import {
 interface OrganTypeRow extends OrganTypeEntity, RowDataPacket {}
 interface AvailableOrganRow extends AvailableOrganEntity, RowDataPacket {}
 
-// Base select query enriched with organ type, facility coordinates, and viability countdown
 const ENRICHED_ORGAN_SELECT = `
   SELECT 
     ao.*,
@@ -34,9 +33,6 @@ const ENRICHED_ORGAN_SELECT = `
   LEFT JOIN users u ON u.id = ao.donor_user_id
 `;
 
-/**
- * Retrieves all medically approved organ types with their shelf-life hours.
- */
 export async function listAllOrganTypes(): Promise<OrganTypeEntity[]> {
   const [rows] = await pool.query<OrganTypeRow[]>(
     'SELECT * FROM organ_types ORDER BY category ASC, name ASC'
@@ -44,9 +40,6 @@ export async function listAllOrganTypes(): Promise<OrganTypeEntity[]> {
   return rows;
 }
 
-/**
- * Finds an organ type by its primary key ID.
- */
 export async function findOrganTypeById(id: number): Promise<OrganTypeEntity | null> {
   const [rows] = await pool.query<OrganTypeRow[]>(
     'SELECT * FROM organ_types WHERE id = ? LIMIT 1',
@@ -55,9 +48,6 @@ export async function findOrganTypeById(id: number): Promise<OrganTypeEntity | n
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Inserts a newly harvested organ with its cold ischemia expiration window.
- */
 export async function insertHarvestedOrgan(data: {
   organ_type_id: number;
   donor_user_id: string | null;
@@ -90,19 +80,12 @@ export async function insertHarvestedOrgan(data: {
   return organ;
 }
 
-/**
- * Retrieves a single organ record by its primary key ID with enriched medical details.
- */
 export async function findOrganById(id: number): Promise<AvailableOrganEntity | null> {
   const query = `${ENRICHED_ORGAN_SELECT} WHERE ao.id = ? LIMIT 1`;
   const [rows] = await pool.query<AvailableOrganRow[]>(query, [id]);
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Lists available organs with optional medical and geographic filters.
- * Sorted by shortest remaining viability window first (highest clinical urgency).
- */
 export async function listOrgans(filters: OrganQueryFilters): Promise<AvailableOrganEntity[]> {
   let query = `${ENRICHED_ORGAN_SELECT} WHERE 1=1`;
   const params: any[] = [];
@@ -137,9 +120,6 @@ export async function listOrgans(filters: OrganQueryFilters): Promise<AvailableO
   return rows;
 }
 
-/**
- * Updates an organ's status, physical custody hub, and clinical log notes.
- */
 export async function updateOrganStatus(
   organId: number,
   status: OrganStatus,
@@ -168,10 +148,6 @@ export async function updateOrganStatus(
   return updated!;
 }
 
-/**
- * Automated batch job: Marks organs as EXPIRED if their cold ischemia window
- * has elapsed and they are still in AVAILABLE status.
- */
 export async function expireOverdueOrgans(): Promise<number> {
   const [result] = await pool.query<ResultSetHeader>(
     `UPDATE available_organs 

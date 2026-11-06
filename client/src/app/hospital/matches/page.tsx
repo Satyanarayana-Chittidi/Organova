@@ -51,7 +51,6 @@ function DecisionRoomContent() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(Date.now());
 
-  // Close organ preview dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (organDropdownRef.current && !organDropdownRef.current.contains(e.target as Node)) {
@@ -62,13 +61,11 @@ function DecisionRoomContent() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 1-second global timer tick to keep all active countdown cards ticking in real time
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Real-time expiration detector: Automatically sweep and move to DECLINED when 20-min window expires
   useEffect(() => {
     if (activeOffers.length === 0) return;
     const hasExpired = activeOffers.some(
@@ -81,7 +78,6 @@ function DecisionRoomContent() {
     }
   }, [currentTime, activeOffers]);
 
-  // Periodic 10-second sync to keep active 20-minute window cards updated across the network
   useEffect(() => {
     if (!user) return;
     const interval = setInterval(() => {
@@ -95,7 +91,6 @@ function DecisionRoomContent() {
       const res = await organApi.listOrgans({ only_viable: true });
       if (res.success) {
         const organList = Array.isArray(res.data) ? res.data : [];
-        // Only list organs that are AVAILABLE (exclude organs that have already entered the 20-min window)
         const availableOnly = organList.filter((o) => o.status === 'AVAILABLE');
         setOrgans(availableOnly);
         if (initialOrganId && availableOnly.some((o) => String(o.id) === String(initialOrganId))) {
@@ -135,7 +130,6 @@ function DecisionRoomContent() {
     if (user) loadAll();
   }, [user, authLoading, alerts]);
 
-  // Auto-evaluate when navigating with a specific ?organId= URL query param
   useEffect(() => {
     if (initialOrganId && user) {
       setSelectedOrganId(initialOrganId);
@@ -151,7 +145,6 @@ function DecisionRoomContent() {
     setSuccessMsg(null);
   };
 
-  // Stage 1: Evaluate candidates and view leaderboard (Timer does NOT start)
   const handleRunMatching = async (organIdOverride?: string) => {
     const organToEvaluate = organIdOverride || selectedOrganId;
     if (!organToEvaluate) return;
@@ -188,7 +181,6 @@ function DecisionRoomContent() {
     }
   };
 
-  // Stage 2: Explicitly allocate organ to candidate (Starts the 20-minute response window)
   const handleAllocateOrgan = async (candidateRequestId?: number) => {
     if (!selectedOrganId) return;
     setActionLoading(true);
@@ -201,7 +193,6 @@ function DecisionRoomContent() {
         setSuccessMsg(
           'ORGAN ALLOCATED! 20-minute official response window started. Active offer card added below.'
         );
-        // Clear evaluation view and reload both available organs and active offers
         setLeaderboard([]);
         setSelectedOrganId('');
         await loadAll();
@@ -215,7 +206,6 @@ function DecisionRoomContent() {
     }
   };
 
-  // Handle Accept or Decline for any active 20-minute offer card
   const handleDecision = async (matchId: number, decision: 'ACCEPT' | 'DECLINE') => {
     setActionLoading(true);
     setError(null);
@@ -249,7 +239,6 @@ function DecisionRoomContent() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
       <div className="space-y-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-semibold mb-2 border border-amber-200 dark:border-amber-800/60">
@@ -303,9 +292,6 @@ function DecisionRoomContent() {
           </div>
         )}
 
-        {/* ------------------------------------------------------------- */}
-        {/* 1. RUN MATCHING ENGINE CARD (Only AVAILABLE organs in dropdown)*/}
-        {/* ------------------------------------------------------------- */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-end gap-4 transition-colors">
           <div className="flex-1 w-full">
             <div className="flex items-center justify-between mb-1">
@@ -316,9 +302,7 @@ function DecisionRoomContent() {
                 {organs.length} Available Organ{organs.length === 1 ? '' : 's'}
               </span>
             </div>
-            {/* Rich Organ Dropdown with Previews inside */}
             <div className="relative" ref={organDropdownRef}>
-              {/* Trigger Button */}
               <button
                 type="button"
                 onClick={() => setIsOrganDropdownOpen((prev) => !prev)}
@@ -374,7 +358,6 @@ function DecisionRoomContent() {
                 />
               </button>
 
-              {/* Dropdown Menu Items */}
               {isOrganDropdownOpen && (
                 <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden max-h-72 overflow-y-auto animate-in fade-in duration-150 p-1.5 space-y-1">
                   {organs.length === 0 ? (
@@ -445,12 +428,8 @@ function DecisionRoomContent() {
           </button>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 2. STAGE 1 CANDIDATE LEADERBOARD FOR SELECTED AVAILABLE ORGAN  */}
-        {/* ------------------------------------------------------------- */}
         {leaderboard.length > 0 && (
           <div className="space-y-6">
-            {/* Stage 1 Callout Banner with Facility Scoping */}
             {(() => {
               const topCandidate = leaderboard[0];
               const isTopInpatient = myHub?.id && topCandidate.attendingHubId === myHub.id;
@@ -532,7 +511,6 @@ function DecisionRoomContent() {
               );
             })()}
 
-            {/* Candidate Leaderboard Table */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                 <div>
@@ -636,9 +614,6 @@ function DecisionRoomContent() {
           </div>
         )}
 
-        {/* ------------------------------------------------------------- */}
-        {/* 4. PREVIOUSLY DECLINED CANDIDATES FOR THIS ORGAN             */}
-        {/* ------------------------------------------------------------- */}
         {declinedCandidates.length > 0 && (
           <div className="bg-slate-50 dark:bg-slate-900/60 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 transition-colors">
             <div className="flex items-center gap-2 mb-3">
@@ -675,9 +650,6 @@ function DecisionRoomContent() {
           </div>
         )}
 
-        {/* ------------------------------------------------------------- */}
-        {/* 4. ALL 20-MINUTE ACTIVE WINDOW CARDS (BOTTOM-MOST SECTION)    */}
-        {/* ------------------------------------------------------------- */}
         {activeOffers.length > 0 && (
           <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800">
@@ -698,7 +670,6 @@ function DecisionRoomContent() {
               </span>
             </div>
 
-            {/* Render each 20-minute active window card one by one */}
             {activeOffers.map((offer) => {
               const remainingSecs = Math.max(
                 0,
@@ -724,7 +695,6 @@ function DecisionRoomContent() {
                       </h3>
                     </div>
 
-                    {/* Live Countdown Clock for this specific offer */}
                     <div
                       className={`p-3.5 rounded-2xl border text-center shrink-0 ${
                         isTimedOut
@@ -744,7 +714,6 @@ function DecisionRoomContent() {
                     </div>
                   </div>
 
-                  {/* Candidate, Hospital, and Donor Dossier */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pb-6 border-b border-slate-700/80 text-xs">
                     <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700">
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-1">
@@ -784,7 +753,6 @@ function DecisionRoomContent() {
                     </div>
                   </div>
 
-                  {/* Action Buttons on each active card: ACCEPT vs DECLINE */}
                   <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-xs text-slate-400 flex items-center gap-2 flex-wrap">
                       <span>Current Status: <strong className="text-white uppercase">{offer.status}</strong></span>

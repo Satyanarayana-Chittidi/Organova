@@ -16,23 +16,14 @@ import {
   ConsentType,
 } from '../types/pledge';
 
-/**
- * Returns the reference catalog of all approved organ and donation types.
- */
 export async function getOrganTypesCatalog(): Promise<OrganType[]> {
   return getAllOrganTypes();
 }
 
-/**
- * Submits citizen pledges with medical and clinical validation.
- * Enforces that living donation is only permitted on clinically valid organs.
- * Deselected organs are automatically revoked in the database.
- */
 export async function submitPledges(
   userId: string,
   dto: CreatePledgesDTO
 ): Promise<{ message: string; activePledges: DonorPledge[] }> {
-  // 1. Verify citizen profile exists (donor card requires name, blood group, emergency contact)
   const profile = await findCitizenProfileByUserId(userId);
   if (!profile) {
     const error: any = new Error(
@@ -42,7 +33,6 @@ export async function submitPledges(
     throw error;
   }
 
-  // If user unchecks everything and submits, revoke all pledges cleanly
   if (!dto.pledges || dto.pledges.length === 0) {
     await revokeAllPledgesByUserId(userId);
     return {
@@ -53,7 +43,6 @@ export async function submitPledges(
 
   const submittedOrganTypeIds: number[] = [];
 
-  // 2. Validate and execute each pledge
   for (const item of dto.pledges) {
     let organType: OrganType | null = null;
     if (item.organ_code) {
@@ -69,7 +58,6 @@ export async function submitPledges(
       throw error;
     }
 
-    // Normalize consent type
     let normalizedConsent: ConsentType = 'DECEASED_ONLY';
     const cType = String(item.consent_type).toUpperCase();
     if (cType === 'LIVING' || cType === 'LIVING_ALLOWED') {
@@ -78,7 +66,6 @@ export async function submitPledges(
       normalizedConsent = 'DECEASED_ONLY';
     }
 
-    // Clinical Guardrail: Check living donation eligibility
     if (normalizedConsent === 'LIVING_ALLOWED' && !organType.allow_living_donor) {
       const error: any = new Error(
         `Clinical Violation: Living donation is not permissible for ${organType.name}. Only post-mortem (deceased) donation is allowed.`
@@ -87,12 +74,10 @@ export async function submitPledges(
       throw error;
     }
 
-    // Save or reactivate pledge
     await upsertPledge(userId, organType.id, normalizedConsent);
     submittedOrganTypeIds.push(organType.id);
   }
 
-  // 3. Revoke any previously active pledges that were deselected
   await revokePledgesNotInList(userId, submittedOrganTypeIds);
 
   const activePledges = await getActivePledgesByUserId(userId);
@@ -103,9 +88,6 @@ export async function submitPledges(
   };
 }
 
-/**
- * Retrieves all active pledges for the authenticated citizen.
- */
 export async function getUserPledges(userId: string): Promise<{
   isDonor: boolean;
   totalPledges: number;
@@ -119,9 +101,6 @@ export async function getUserPledges(userId: string): Promise<{
   };
 }
 
-/**
- * Revokes a specific pledge.
- */
 export async function revokeUserPledge(
   userId: string,
   pledgeId: number
@@ -135,9 +114,6 @@ export async function revokeUserPledge(
   return { message: 'Pledge has been revoked successfully.' };
 }
 
-/**
- * Revokes all active pledges for the authenticated citizen.
- */
 export async function revokeAllUserPledges(
   userId: string
 ): Promise<{ message: string }> {
@@ -145,9 +121,6 @@ export async function revokeAllUserPledges(
   return { message: 'All organ donation pledges have been successfully revoked.' };
 }
 
-/**
- * Generates the Digital Donor Card combining citizen details and active pledges.
- */
 export async function generateDonorCard(userId: string): Promise<DonorCardResponse> {
   const profile = await findCitizenProfileByUserId(userId);
   if (!profile) {

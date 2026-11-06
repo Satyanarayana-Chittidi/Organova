@@ -1,6 +1,3 @@
-// ====================================================================
-// MEDICAL HUB & INSTITUTIONAL TYPES
-// ====================================================================
 
 export type HubType = 'HOSPITAL';
 
@@ -10,10 +7,6 @@ export type VerificationStatus =
   | 'REJECTED'
   | 'SUSPENDED';
 
-// --------------------------------------------------------------------
-// 1. DATABASE ENTITY
-// Represents the full medical_hubs row in MySQL
-// --------------------------------------------------------------------
 export interface MedicalHub {
   id: number;
   user_id: string;
@@ -31,14 +24,9 @@ export interface MedicalHub {
   verified_by_admin_id: string | null;
   verified_at: Date | null;
   created_at: Date;
-  email?: string; // Enriched from users table in joins
+  email?: string;
 }
 
-// --------------------------------------------------------------------
-// 2. DATA TRANSFER OBJECTS (DTOs)
-// --------------------------------------------------------------------
-
-// Step 1: Complete registration payload for institutional onboarding
 export interface RegisterHubDTO {
   email: string;
   password: string;
@@ -54,19 +42,16 @@ export interface RegisterHubDTO {
   longitude: number;
 }
 
-// Admin verification action payload
 export interface VerifyHubDTO {
   status: 'ACTIVE' | 'REJECTED' | 'SUSPENDED';
 }
 
-// Public directory search filter parameters
 export interface HubQueryFilters {
   hub_type?: HubType;
   city?: string;
   search?: string;
 }
 
-// Facility profile update payload
 export interface UpdateHubProfileDTO {
   name?: string;
   contact_phone?: string;
@@ -78,7 +63,6 @@ export interface UpdateHubProfileDTO {
   longitude?: number;
 }
 
-// Hospital operational and clinical transaction history
 export interface HubTransactionHistory {
   facility: MedicalHub;
   stats: {

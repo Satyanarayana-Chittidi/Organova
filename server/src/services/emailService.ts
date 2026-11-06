@@ -13,10 +13,6 @@ interface SendOtpResult {
 
 let transporter: Transporter | null = null;
 
-/**
- * Initializes and returns the active Nodemailer transporter.
- * If SMTP credentials are not configured, returns null to signal fallback to console logging.
- */
 export function getEmailTransporter(): Transporter | null {
   if (transporter) {
     return transporter;
@@ -31,7 +27,6 @@ export function getEmailTransporter(): Transporter | null {
     return null;
   }
 
-  // Strip spaces if user pasted Google 4-block app password format ("abcd efgh ijkl mnop")
   const pass = rawPass.replace(/\s+/g, '');
 
   const isSecure = process.env.SMTP_SECURE === 'true' || port === 465;
@@ -47,7 +42,6 @@ export function getEmailTransporter(): Transporter | null {
     tls: {
       rejectUnauthorized: process.env.NODE_ENV === 'production',
     },
-    // Enforce 5s timeout so cloud providers like Render that block ports fail fast instead of hanging
     connectionTimeout: 5000,
     greetingTimeout: 5000,
     socketTimeout: 5000,
@@ -56,9 +50,6 @@ export function getEmailTransporter(): Transporter | null {
   return transporter;
 }
 
-/**
- * Verifies email service connectivity on server startup.
- */
 export async function testSmtpConnection(): Promise<boolean> {
   if (process.env.RESEND_API_KEY) {
     console.log('[EMAIL] ✓ Active Resend HTTP API (Port 443 HTTPS - bypasses Render port blocks)');
@@ -86,10 +77,6 @@ export async function testSmtpConnection(): Promise<boolean> {
   }
 }
 
-/**
- * Sends email via Resend HTTP REST API over Port 443 (HTTPS).
- * Highly recommended for Render free tier which blocks SMTP ports 25/465/587.
- */
 async function sendViaResend(
   apiKey: string,
   toEmail: string,
@@ -125,9 +112,6 @@ async function sendViaResend(
   }
 }
 
-/**
- * Sends email via Brevo (Sendinblue) HTTP REST API over Port 443 (HTTPS).
- */
 async function sendViaBrevo(
   apiKey: string,
   toEmail: string,
@@ -164,9 +148,6 @@ async function sendViaBrevo(
   }
 }
 
-/**
- * Sends a 6-digit OTP verification email to the user.
- */
 export async function sendOtpEmail(toEmail: string, otp: string): Promise<SendOtpResult> {
   const htmlContent = `
 <!DOCTYPE html>
@@ -258,19 +239,16 @@ export async function sendOtpEmail(toEmail: string, otp: string): Promise<SendOt
 </html>
   `;
 
-  // 1. If Resend API key is configured (preferred for Render free tier)
   if (process.env.RESEND_API_KEY) {
     const resendResult = await sendViaResend(process.env.RESEND_API_KEY, toEmail, otp, htmlContent);
     if (resendResult.success) return resendResult;
   }
 
-  // 2. If Brevo API key is configured
   if (process.env.BREVO_API_KEY) {
     const brevoResult = await sendViaBrevo(process.env.BREVO_API_KEY, toEmail, otp, htmlContent);
     if (brevoResult.success) return brevoResult;
   }
 
-  // 3. Fallback to Nodemailer SMTP
   const mailer = getEmailTransporter();
   const fromAddress = process.env.SMTP_FROM || `"Organova" <${process.env.SMTP_USER || 'no-reply@organova.local'}>`;
 
@@ -291,7 +269,6 @@ export async function sendOtpEmail(toEmail: string, otp: string): Promise<SendOt
     }
   }
 
-  // 4. Safe fallback: print OTP to console so development and testing NEVER halt
   console.log('----------------------------------------------------');
   console.log(`[AUTH-OTP-FALLBACK] Candidate: ${toEmail} | Verification Code: ${otp}`);
   console.log('----------------------------------------------------');

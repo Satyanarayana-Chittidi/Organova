@@ -11,25 +11,20 @@ dotenv.config();
 
 const PORT = Number(process.env.PORT) || 5000;
 
-// Create standard Node.js HTTP server wrapping our Express application
 const server = http.createServer(app);
 
-// Initialize real-time WebSocket server
 initSocketServer(server);
 
-// Server startup lifecycle
 async function startServer(): Promise<void> {
   console.log('====================================================');
   console.log('  ORGANOVA PLATFORM: BACKEND SERVER');
   console.log('====================================================');
 
-  // 1. Verify database, cache, and email connectivity
   await testDatabaseConnection();
   await autoMigrateDatabase();
   await testRedisConnection();
   await testSmtpConnection();
 
-  // 2. Start HTTP listener
   server.listen(PORT, () => {
     console.log(`[SERVER] Running in ${process.env.NODE_ENV || 'development'} mode`);
     console.log(`[SERVER] Listening on http://localhost:${PORT}`);
@@ -37,7 +32,6 @@ async function startServer(): Promise<void> {
     console.log('====================================================');
   });
 
-  // 3. Automated 15-second background sweeper for expired 20-minute match offers
   setInterval(async () => {
     try {
       const result = await sweepTimedOutMatches();
@@ -50,7 +44,6 @@ async function startServer(): Promise<void> {
   }, 15000);
 }
 
-// Handle termination signals for clean, graceful server shutdowns
 process.on('SIGINT', () => {
   console.log('\n[SERVER] Received SIGINT. Gracefully shutting down...');
   server.close(() => {

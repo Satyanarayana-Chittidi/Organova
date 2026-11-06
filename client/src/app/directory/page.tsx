@@ -48,7 +48,6 @@ export default function DirectoryPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200">
-      {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-10">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-transparent dark:border-blue-900/50 text-xs font-semibold mb-3">
           <Hospital className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -62,7 +61,6 @@ export default function DirectoryPage() {
         </p>
       </div>
 
-      {/* Filter Toolbar */}
       <form
         onSubmit={handleSearch}
         className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm mb-10 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end transition-colors"
@@ -105,7 +103,6 @@ export default function DirectoryPage() {
         </button>
       </form>
 
-      {/* Directory Cards */}
       <div className="space-y-4">
         <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-slate-800">
           <span>{hubs.length} verified center(s) registered</span>

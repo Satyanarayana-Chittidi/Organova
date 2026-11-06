@@ -3,10 +3,6 @@ import * as authService from '../services/authService';
 import { AUTH_COOKIE_NAME, cookieOptions } from '../utils/jwt';
 import { RegisterDTO, VerifyOtpDTO, LoginDTO } from '../types/auth';
 
-/**
- * Handles Step 1: User Registration
- * POST /api/auth/register
- */
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, password, role }: RegisterDTO = req.body;
@@ -30,14 +26,10 @@ export async function register(req: Request, res: Response, next: NextFunction):
       },
     });
   } catch (error) {
-    next(error); // Forward to global error handler in app.ts
+    next(error);
   }
 }
 
-/**
- * Handles Step 2: OTP Verification & Initial Login
- * POST /api/auth/verify-otp
- */
 export async function verifyOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, otp }: VerifyOtpDTO = req.body;
@@ -52,7 +44,6 @@ export async function verifyOtp(req: Request, res: Response, next: NextFunction)
 
     const result = await authService.verifyOtp({ email, otp });
 
-    // Attach the secure, HTTP-only JWT session cookie to the browser
     res.cookie(AUTH_COOKIE_NAME, result.token, cookieOptions);
 
     res.status(200).json({
@@ -68,10 +59,6 @@ export async function verifyOtp(req: Request, res: Response, next: NextFunction)
   }
 }
 
-/**
- * Handles Standard User Login
- * POST /api/auth/login
- */
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, password }: LoginDTO = req.body;
@@ -86,9 +73,6 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 
     const result = await authService.loginUser({ email, password });
 
-    // Attach the secure, HTTP-only JWT session cookie ONLY for non-ADMIN users.
-    // For ADMIN accounts, we do NOT attach a domain-wide cookie. This keeps the admin
-    // session strictly isolated to Master Control and prevents privilege leakage to public tabs.
     if (result.user.role === 'ADMIN') {
       res.clearCookie(AUTH_COOKIE_NAME, {
         ...cookieOptions,
@@ -111,13 +95,8 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
-/**
- * Handles User Logout
- * POST /api/auth/logout
- */
 export async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // Clear the HTTP-only authentication cookie
     res.clearCookie(AUTH_COOKIE_NAME, {
       ...cookieOptions,
       maxAge: 0,
@@ -132,13 +111,8 @@ export async function logout(req: Request, res: Response, next: NextFunction): P
   }
 }
 
-/**
- * Fetches Currently Authenticated User Session
- * GET /api/auth/me
- */
 export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // The userId is injected into req.user by our authenticate middleware
     const currentUser = (req as any).user;
 
     const userProfile = await authService.getUserProfile(currentUser.userId);

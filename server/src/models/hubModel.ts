@@ -12,9 +12,6 @@ import {
 
 interface MedicalHubRow extends MedicalHub, RowDataPacket {}
 
-/**
- * Finds a medical hub by its linked user_id foreign key.
- */
 export async function findHubByUserId(userId: string): Promise<MedicalHub | null> {
   const [rows] = await pool.query<MedicalHubRow[]>(
     'SELECT * FROM medical_hubs WHERE user_id = ? LIMIT 1',
@@ -23,9 +20,6 @@ export async function findHubByUserId(userId: string): Promise<MedicalHub | null
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Finds a medical hub by its primary key ID.
- */
 export async function findHubById(id: number): Promise<MedicalHub | null> {
   const [rows] = await pool.query<MedicalHubRow[]>(
     'SELECT * FROM medical_hubs WHERE id = ? LIMIT 1',
@@ -34,9 +28,6 @@ export async function findHubById(id: number): Promise<MedicalHub | null> {
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Checks if a facility with the given facility license number is already registered.
- */
 export async function findHubByLicense(licenseNumber: string): Promise<MedicalHub | null> {
   const [rows] = await pool.query<MedicalHubRow[]>(
     'SELECT * FROM medical_hubs WHERE license_number = ? LIMIT 1',
@@ -45,12 +36,6 @@ export async function findHubByLicense(licenseNumber: string): Promise<MedicalHu
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Registers an institution using an ACID Transaction:
- * 1. Inserts authentication record into 'users' (role = HOSPITAL).
- * 2. Inserts institutional profile into 'medical_hubs' (status = 'PENDING_APPROVAL').
- * If either step fails, the entire transaction rolls back automatically.
- */
 export async function createHubWithUser(
   userId: string,
   dto: RegisterHubDTO,
@@ -61,14 +46,12 @@ export async function createHubWithUser(
   try {
     await connection.beginTransaction();
 
-    // 1. Create auth user row
     await connection.query<ResultSetHeader>(
       `INSERT INTO users (id, email, password_hash, role, auth_provider, is_active, is_verified)
        VALUES (?, ?, ?, ?, 'LOCAL', TRUE, TRUE)`,
       [userId, dto.email.toLowerCase().trim(), passwordHash, dto.hub_type]
     );
 
-    // 2. Create medical hub row in PENDING_APPROVAL state
     const [hubResult] = await connection.query<ResultSetHeader>(
       `INSERT INTO medical_hubs (
          user_id, hub_type, name, license_number, contact_phone,
@@ -104,9 +87,6 @@ export async function createHubWithUser(
   }
 }
 
-/**
- * Updates a facility's verification status by an Admin (e.g. ACTIVE, REJECTED, SUSPENDED).
- */
 export async function updateHubVerificationStatus(
   hubId: number,
   status: VerificationStatus,
@@ -121,10 +101,6 @@ export async function updateHubVerificationStatus(
   return result.affectedRows > 0;
 }
 
-/**
- * Public directory search: Returns only ACTIVE (verified) medical hubs.
- * Supports filtering by hub_type, city, and name search.
- */
 export async function listActiveHubs(filters: HubQueryFilters): Promise<MedicalHub[]> {
   let query = "SELECT * FROM medical_hubs WHERE verification_status = 'ACTIVE'";
   const params: any[] = [];
@@ -151,9 +127,6 @@ export async function listActiveHubs(filters: HubQueryFilters): Promise<MedicalH
   return rows;
 }
 
-/**
- * Admin view: Lists all facilities awaiting approval.
- */
 export async function listPendingHubs(): Promise<MedicalHub[]> {
   const query = `
     SELECT mh.*, u.email 
@@ -166,9 +139,6 @@ export async function listPendingHubs(): Promise<MedicalHub[]> {
   return rows;
 }
 
-/**
- * Returns all distinct cities where active hospitals are registered.
- */
 export async function getDistinctHubCities(): Promise<string[]> {
   const query = `
     SELECT DISTINCT city 
@@ -182,9 +152,6 @@ export async function getDistinctHubCities(): Promise<string[]> {
   return rows.map((r: any) => r.city);
 }
 
-/**
- * Retrieves the full operational and clinical transaction history for a medical facility.
- */
 export async function getHubTransactionHistory(hubId: number): Promise<HubTransactionHistory> {
   const hub = await findHubById(hubId);
   if (!hub) {
@@ -193,7 +160,6 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     throw error;
   }
 
-  // 1. Organs harvested by this hub
   const [harvests] = await pool.query<RowDataPacket[]>(`
     SELECT 
       ao.id,
@@ -229,7 +195,6 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     ORDER BY ao.harvested_at DESC
   `, [hubId]);
 
-  // 2. Transplants / Matches performed or received by this hub
   const [transplants] = await pool.query<RowDataPacket[]>(`
     SELECT 
       tm.id AS match_id,
@@ -263,7 +228,6 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     ORDER BY tm.offered_at DESC
   `, [hubId, hubId]);
 
-  // 3. Waitlist patients registered by this facility
   const [waitlist] = await pool.query<RowDataPacket[]>(`
     SELECT 
       tr.id,
@@ -285,7 +249,6 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
     ORDER BY tr.created_at DESC
   `, [hubId]);
 
-  // 4. Blood transactions
   const [blood] = await pool.query<RowDataPacket[]>(`
     SELECT 
       br.id,
@@ -335,9 +298,6 @@ export async function getHubTransactionHistory(hubId: number): Promise<HubTransa
   };
 }
 
-/**
- * Updates a facility's contact and location details.
- */
 export async function updateHubProfile(hubId: number, dto: UpdateHubProfileDTO): Promise<MedicalHub> {
   const fields: string[] = [];
   const values: any[] = [];

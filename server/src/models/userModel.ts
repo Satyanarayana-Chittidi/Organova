@@ -2,13 +2,8 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import pool from '../config/database';
 import { User, UserRole } from '../types/auth';
 
-// Interface extending User with mysql2's RowDataPacket for strict typing
 interface UserRow extends User, RowDataPacket {}
 
-/**
- * Finds a user by their unique email address.
- * Automatically normalizes email to lowercase and trims whitespace.
- */
 export async function findUserByEmail(email: string): Promise<User | null> {
   const [rows] = await pool.query<UserRow[]>(
     'SELECT * FROM users WHERE email = ? LIMIT 1',
@@ -17,9 +12,6 @@ export async function findUserByEmail(email: string): Promise<User | null> {
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Finds a user by their primary key UUID.
- */
 export async function findUserById(id: string): Promise<User | null> {
   const [rows] = await pool.query<UserRow[]>(
     'SELECT * FROM users WHERE id = ? LIMIT 1',
@@ -28,9 +20,6 @@ export async function findUserById(id: string): Promise<User | null> {
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Finds a user by their unique Google OAuth account ID.
- */
 export async function findUserByGoogleId(googleId: string): Promise<User | null> {
   const [rows] = await pool.query<UserRow[]>(
     'SELECT * FROM users WHERE google_id = ? LIMIT 1',
@@ -39,9 +28,6 @@ export async function findUserByGoogleId(googleId: string): Promise<User | null>
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Inserts a new local user (Email + Password) upon successful verification.
- */
 export async function createLocalUser(params: {
   id: string;
   email: string;
@@ -62,9 +48,6 @@ export async function createLocalUser(params: {
   return user;
 }
 
-/**
- * Inserts a new Google OAuth user (auto-verified, no password).
- */
 export async function createGoogleUser(params: {
   id: string;
   email: string;
@@ -84,9 +67,6 @@ export async function createGoogleUser(params: {
   return user;
 }
 
-/**
- * Marks a user's account as email-verified after submitting a correct OTP.
- */
 export async function markUserAsVerified(userId: string): Promise<void> {
   await pool.query<ResultSetHeader>(
     'UPDATE users SET is_verified = TRUE WHERE id = ?',

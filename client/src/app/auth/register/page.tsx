@@ -21,7 +21,6 @@ export default function RegisterPage() {
   const [otpSuccess, setOtpSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Step 1: Initiate Registration
   const handleInitiate = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -40,7 +39,6 @@ export default function RegisterPage() {
     }
   };
 
-  // Step 2: Verify 6-digit OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -50,7 +48,6 @@ export default function RegisterPage() {
       await authApi.verifyOtp({ email, otp });
       setOtpSuccess(true);
       await refreshUser();
-      // Brief pause so user sees verification confirmed
       setTimeout(() => {
         router.push('/citizen/profile/edit?from=signup');
       }, 700);

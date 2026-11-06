@@ -29,9 +29,6 @@ import {
   UpdateHubProfileDTO,
 } from '../types/hub';
 
-/**
- * Validates registration DTO for medical institutions.
- */
 function validateRegistrationInput(dto: RegisterHubDTO): void {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!dto.email || !emailRegex.test(dto.email.trim())) {
@@ -46,7 +43,6 @@ function validateRegistrationInput(dto: RegisterHubDTO): void {
     throw error;
   }
 
-  // All registered medical facilities are consolidated under HOSPITAL
   dto.hub_type = 'HOSPITAL';
 
   if (!dto.name || dto.name.trim().length === 0) {
@@ -87,10 +83,6 @@ function validateRegistrationInput(dto: RegisterHubDTO): void {
   }
 }
 
-/**
- * Registers a new hospital facility
- * in an initial PENDING_APPROVAL state.
- */
 export async function registerHub(dto: RegisterHubDTO): Promise<{
   message: string;
   hub: MedicalHub;
@@ -100,7 +92,6 @@ export async function registerHub(dto: RegisterHubDTO): Promise<{
   const normalizedEmail = dto.email.toLowerCase().trim();
   const normalizedLicense = dto.license_number.trim().toUpperCase();
 
-  // 1. Ensure email is not already registered
   const existingUser = await findUserByEmail(normalizedEmail);
   if (existingUser) {
     const error: any = new Error('An account with this email address already exists.');
@@ -108,7 +99,6 @@ export async function registerHub(dto: RegisterHubDTO): Promise<{
     throw error;
   }
 
-  // 2. Ensure facility license is unique
   const existingHub = await findHubByLicense(normalizedLicense);
   if (existingHub) {
     const error: any = new Error(
@@ -118,11 +108,9 @@ export async function registerHub(dto: RegisterHubDTO): Promise<{
     throw error;
   }
 
-  // 3. Hash institutional account password
   const passwordHash = await hashPassword(dto.password);
   const userId = crypto.randomUUID();
 
-  // 4. Atomically persist user & medical hub profile
   const hub = await createHubWithUser(
     userId,
     {
@@ -139,9 +127,6 @@ export async function registerHub(dto: RegisterHubDTO): Promise<{
   };
 }
 
-/**
- * Retrieves the institutional profile for the currently authenticated facility user.
- */
 export async function getHubByUserId(userId: string): Promise<MedicalHub> {
   const hub = await findHubByUserId(userId);
   if (!hub) {
@@ -152,9 +137,6 @@ export async function getHubByUserId(userId: string): Promise<MedicalHub> {
   return hub;
 }
 
-/**
- * Retrieves a single medical facility by its primary key ID.
- */
 export async function getHubById(id: number): Promise<MedicalHub> {
   const hub = await findHubById(id);
   if (!hub) {
@@ -165,24 +147,14 @@ export async function getHubById(id: number): Promise<MedicalHub> {
   return hub;
 }
 
-/**
- * Public directory search: Returns only ACTIVE (admin-verified) facilities.
- */
 export async function listPublicHubs(filters: HubQueryFilters): Promise<MedicalHub[]> {
   return await listActiveHubs(filters);
 }
 
-/**
- * Admin workflow: Lists all facilities pending verification.
- */
 export async function listPendingHubsForAdmin(): Promise<MedicalHub[]> {
   return await listPendingHubs();
 }
 
-/**
- * Admin workflow: Audits and updates a facility's verification status
- * (e.g. ACTIVE, REJECTED, SUSPENDED).
- */
 export async function verifyHubStatus(
   hubId: number,
   status: 'ACTIVE' | 'REJECTED' | 'SUSPENDED',
@@ -211,26 +183,16 @@ export async function verifyHubStatus(
   };
 }
 
-/**
- * Returns distinct cities where active hospitals are registered.
- */
 export async function getAvailableHubCities(): Promise<string[]> {
   return await getDistinctHubCities();
 }
 
-/**
- * Searches registered citizen accounts by name, email, or phone.
- * Restricts access to verified medical facilities.
- */
 export async function searchCitizensService(
   query: string
 ): Promise<RegisteredCitizenSearchResult[]> {
   return await searchRegisteredCitizens(query);
 }
 
-/**
- * Hospital Master Control: Creates a citizen account with pre-verified status and auto-generated temp password.
- */
 export async function masterRegisterCitizenService(
   callerUserId: string,
   dto: MasterRegisterCitizenDTO
@@ -262,9 +224,6 @@ export async function masterRegisterCitizenService(
   };
 }
 
-/**
- * Retrieves the full operational and clinical ledger history for the calling facility.
- */
 export async function getHubHistoryService(userId: string): Promise<HubTransactionHistory> {
   const hub = await findHubByUserId(userId);
   if (!hub) {
@@ -275,9 +234,6 @@ export async function getHubHistoryService(userId: string): Promise<HubTransacti
   return await getHubTransactionHistory(hub.id);
 }
 
-/**
- * Updates facility profile details.
- */
 export async function updateHubProfileService(
   userId: string,
   dto: UpdateHubProfileDTO

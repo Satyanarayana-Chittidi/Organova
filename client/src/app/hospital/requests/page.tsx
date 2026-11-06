@@ -63,22 +63,19 @@ export default function HospitalRequestsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrganType, setSelectedOrganType] = useState<string>('ALL');
   const [selectedUrgency, setSelectedUrgency] = useState<string>('ALL');
   const [selectedBloodGroup, setSelectedBloodGroup] = useState<string>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
 
-  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [linkedCitizen, setLinkedCitizen] = useState<LinkedCitizen | null>(null);
 
-  // New Patient Form State
   const [formData, setFormData] = useState({
-    organ_type_id: 4, // default Kidney
+    organ_type_id: 4,
     blood_group: 'O+',
     urgency_tier: 'TIER_2_URGENT',
     medical_summary: '',
@@ -123,7 +120,6 @@ export default function HospitalRequestsPage() {
     if (user) loadData();
   }, [user, authLoading]);
 
-  // Handle Register Candidate
   const handleCreateRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
@@ -176,7 +172,6 @@ export default function HospitalRequestsPage() {
     }
   };
 
-  // Filtered Queue
   const filteredWaitlist = waitlist.filter((c) => {
     if (selectedOrganType !== 'ALL' && String(c.organ_type_id) !== selectedOrganType) return false;
     if (selectedUrgency !== 'ALL' && c.urgency_tier !== selectedUrgency) return false;
@@ -195,7 +190,6 @@ export default function HospitalRequestsPage() {
     return true;
   });
 
-  // KPI Calculations
   const totalCount = waitlist.length;
   const emergencyCount = waitlist.filter((c) => c.urgency_tier === 'TIER_1_EMERGENCY').length;
   const urgentCount = waitlist.filter((c) => c.urgency_tier === 'TIER_2_URGENT').length;
@@ -203,7 +197,6 @@ export default function HospitalRequestsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200">
-      {/* Top Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4 mb-8">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 text-xs font-semibold mb-2">
@@ -219,7 +212,6 @@ export default function HospitalRequestsPage() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Refresh Button */}
           <button
             onClick={() => loadData(true)}
             disabled={refreshing}
@@ -229,7 +221,6 @@ export default function HospitalRequestsPage() {
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
 
-          {/* Decision Room Link */}
           <Link
             href="/hospital/matches"
             className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
@@ -238,7 +229,6 @@ export default function HospitalRequestsPage() {
             Decision Room →
           </Link>
 
-          {/* Register Patient Button */}
           <button
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-600 text-white font-bold text-xs shadow-md shadow-rose-500/20 flex items-center gap-1.5 transition-all cursor-pointer"
@@ -249,7 +239,6 @@ export default function HospitalRequestsPage() {
         </div>
       </div>
 
-      {/* Notification Banner */}
       {notification && (
         <div
           className={`mb-6 p-4 rounded-2xl border text-xs sm:text-sm font-medium flex items-center justify-between gap-3 ${
@@ -275,9 +264,7 @@ export default function HospitalRequestsPage() {
         </div>
       )}
 
-      {/* KPI Cards Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {/* KPI 1: Total */}
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
@@ -292,7 +279,6 @@ export default function HospitalRequestsPage() {
           </div>
         </div>
 
-        {/* KPI 2: Tier 1 Emergency */}
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
             <Flame className="w-5 h-5 text-red-600" />
@@ -312,7 +298,6 @@ export default function HospitalRequestsPage() {
           </div>
         </div>
 
-        {/* KPI 3: Tier 2 Urgent */}
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
             <Clock className="w-5 h-5" />
@@ -327,7 +312,6 @@ export default function HospitalRequestsPage() {
           </div>
         </div>
 
-        {/* KPI 4: Pending Match Offers */}
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <Activity className="w-5 h-5" />
@@ -343,10 +327,8 @@ export default function HospitalRequestsPage() {
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
       <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs mb-8 space-y-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-          {/* Search Box */}
           <div className="relative w-full md:w-80">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
@@ -358,9 +340,7 @@ export default function HospitalRequestsPage() {
             />
           </div>
 
-          {/* Quick Filters */}
           <div className="flex items-center gap-2 flex-wrap w-full md:w-auto">
-            {/* Organ Filter */}
             <select
               value={selectedOrganType}
               onChange={(e) => setSelectedOrganType(e.target.value)}
@@ -374,7 +354,6 @@ export default function HospitalRequestsPage() {
               ))}
             </select>
 
-            {/* Urgency Filter */}
             <select
               value={selectedUrgency}
               onChange={(e) => setSelectedUrgency(e.target.value)}
@@ -386,7 +365,6 @@ export default function HospitalRequestsPage() {
               <option value="TIER_3_ROUTINE">Tier 3 - Routine</option>
             </select>
 
-            {/* Blood Group Filter */}
             <select
               value={selectedBloodGroup}
               onChange={(e) => setSelectedBloodGroup(e.target.value)}
@@ -400,7 +378,6 @@ export default function HospitalRequestsPage() {
               ))}
             </select>
 
-            {/* Status Filter */}
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
@@ -436,7 +413,6 @@ export default function HospitalRequestsPage() {
         </div>
       </div>
 
-      {/* Waitlist Queue List */}
       {loading ? (
         <div className="py-20 flex flex-col justify-center items-center text-slate-400 text-xs gap-3">
           <span className="w-6 h-6 border-3 border-rose-500 border-t-transparent rounded-full animate-spin"></span>
@@ -479,7 +455,6 @@ export default function HospitalRequestsPage() {
                 }`}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  {/* Left: Patient Details & Badges */}
                   <div className="flex items-start gap-3.5 flex-1 min-w-0">
                     <OrganImage
                       organ={candidate.organ_name || candidate.organ_code}
@@ -488,7 +463,6 @@ export default function HospitalRequestsPage() {
                     />
                     <div className="space-y-2 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      {/* Urgency Badge */}
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
                           isEmergency
@@ -506,17 +480,14 @@ export default function HospitalRequestsPage() {
                           : 'Tier 3 Routine'}
                       </span>
 
-                      {/* Organ Badge */}
                       <span className="px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-black">
                         {candidate.organ_name || candidate.organ_code || 'Organ'}
                       </span>
 
-                      {/* Blood Group */}
                       <span className="px-2.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-xs font-black">
                         {candidate.blood_group}
                       </span>
 
-                      {/* Status Badge */}
                       <span
                         className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
                           candidate.status === 'WAITING_LIST'
@@ -532,7 +503,6 @@ export default function HospitalRequestsPage() {
                       </span>
                     </div>
 
-                    {/* Patient Name and Hub Details */}
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -551,7 +521,6 @@ export default function HospitalRequestsPage() {
                       </p>
                     </div>
 
-                    {/* Medical Summary */}
                     {candidate.medical_summary && (
                       <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800 leading-relaxed">
                         {candidate.medical_summary.replace(/\[MOCK TEST\]\s*/gi, '').replace(/\[TEST\]\s*/gi, '').trim()}
@@ -560,7 +529,6 @@ export default function HospitalRequestsPage() {
                   </div>
                 </div>
 
-                {/* Right: Days Waiting */}
                   <div className="flex lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-1 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800 text-left lg:text-right">
                     <div className="flex items-center lg:justify-end gap-1 text-slate-700 dark:text-slate-300 font-bold text-xs">
                       <Clock className="w-3.5 h-3.5 text-slate-400" />
@@ -577,11 +545,9 @@ export default function HospitalRequestsPage() {
         </div>
       )}
 
-      {/* REGISTER CANDIDATE MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs p-4 sm:p-6 flex justify-center items-start sm:items-center">
           <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] flex flex-col animate-in fade-in zoom-in-95">
-            {/* Pinned Modal Header (Never Clipped) */}
             <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-white dark:bg-slate-900">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
@@ -606,7 +572,6 @@ export default function HospitalRequestsPage() {
               </button>
             </div>
 
-            {/* Scrollable Form Body */}
             <form onSubmit={handleCreateRequest} className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
               {formError && (
                 <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs font-semibold flex items-center gap-2">
@@ -615,7 +580,6 @@ export default function HospitalRequestsPage() {
                 </div>
               )}
 
-              {/* Citizen Account Linker & Create New Account */}
               <CitizenAccountLinker
                 label="Candidate Citizen Account *"
                 sublabel="Links this transplant candidate directly to their citizen account so it appears in their Waitlist Record & history."
@@ -631,7 +595,6 @@ export default function HospitalRequestsPage() {
                 }}
               />
 
-              {/* Organ Needed & Blood Group */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -668,7 +631,6 @@ export default function HospitalRequestsPage() {
                 </div>
               </div>
 
-              {/* Urgency Tier */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Clinical Urgency Status *
@@ -684,7 +646,6 @@ export default function HospitalRequestsPage() {
                 </select>
               </div>
 
-              {/* Clinical Summary & Diagnosis */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Clinical Summary & Crossmatch Workup *
@@ -699,7 +660,6 @@ export default function HospitalRequestsPage() {
                 />
               </div>
 
-              {/* Pinned Modal Footer */}
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0 sticky bottom-0 bg-white dark:bg-slate-900">
                 <button
                   type="button"

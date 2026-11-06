@@ -23,14 +23,10 @@ const VALID_BLOOD_GROUPS: BloodGroup[] = [
   'O-',
 ];
 
-/**
- * Validates medical and demographic data before saving/updating a citizen profile.
- */
 export async function saveCitizenProfile(
   userId: string,
   dto: UpsertCitizenProfileDTO
 ): Promise<CitizenProfile> {
-  // 1. Verify user exists
   const user = await findUserById(userId);
   if (!user) {
     const error: any = new Error('User not found.');
@@ -38,14 +34,12 @@ export async function saveCitizenProfile(
     throw error;
   }
 
-  // 2. Ensure only standard citizen accounts ('USER') can create this profile
   if (user.role !== 'USER') {
     const error: any = new Error('Access denied. Only citizen accounts can create a citizen profile.');
     error.statusCode = 403;
     throw error;
   }
 
-  // 3. Validate Blood Group serology
   if (!VALID_BLOOD_GROUPS.includes(dto.blood_group)) {
     const error: any = new Error(
       `Invalid blood group. Permitted values: ${VALID_BLOOD_GROUPS.join(', ')}`
@@ -54,7 +48,6 @@ export async function saveCitizenProfile(
     throw error;
   }
 
-  // 4. Validate Date of Birth (must be a valid date in the past)
   const dob = new Date(dto.date_of_birth);
   if (isNaN(dob.getTime()) || dob > new Date()) {
     const error: any = new Error('Invalid date of birth. Must be a valid date in the past (YYYY-MM-DD).');
@@ -62,7 +55,6 @@ export async function saveCitizenProfile(
     throw error;
   }
 
-  // 5. Validate Required Fields
   if (!dto.full_name?.trim() || !dto.phone_number?.trim()) {
     const error: any = new Error('Full name and primary phone number are mandatory.');
     error.statusCode = 400;
@@ -81,13 +73,9 @@ export async function saveCitizenProfile(
     throw error;
   }
 
-  // 6. Persist to MySQL via Model
   return upsertCitizenProfile(userId, dto);
 }
 
-/**
- * Retrieves the citizen profile and checks if progressive onboarding is completed.
- */
 export async function getCitizenProfile(userId: string): Promise<{
   isProfileComplete: boolean;
   profile: CitizenProfile | null;
@@ -99,9 +87,6 @@ export async function getCitizenProfile(userId: string): Promise<{
   };
 }
 
-/**
- * Updates avatar image URL for a citizen.
- */
 export async function setAvatar(
   userId: string,
   avatarUrl: string | null
@@ -115,9 +100,6 @@ export async function setAvatar(
   await updateCitizenAvatar(userId, avatarUrl);
 }
 
-/**
- * Retrieves the comprehensive lifetime donation history for the authenticated citizen.
- */
 export async function getDonationHistory(userId: string): Promise<CitizenDonationHistory> {
   const user = await findUserById(userId);
   if (!user) {

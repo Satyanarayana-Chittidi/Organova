@@ -22,20 +22,16 @@ import { MedicalHub } from '../types/hub';
 
 const VALID_BLOOD_GROUPS: BloodGroup[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-// Allowed state transitions in organ lifecycle
 const ALLOWED_TRANSITIONS: Record<OrganStatus, OrganStatus[]> = {
   AVAILABLE: ['MATCHING', 'ALLOCATED', 'IN_TRANSIT', 'EXPIRED'],
   MATCHING: ['AVAILABLE', 'ALLOCATED', 'EXPIRED'],
   ALLOCATED: ['AVAILABLE', 'IN_TRANSIT', 'EXPIRED'],
   IN_TRANSIT: ['DELIVERED', 'EXPIRED'],
   DELIVERED: ['TRANSPLANTED', 'EXPIRED'],
-  TRANSPLANTED: [], // Terminal state
-  EXPIRED: [],      // Terminal state
+  TRANSPLANTED: [],
+  EXPIRED: [],
 };
 
-/**
- * Validates that the caller is an active, verified Hospital.
- */
 async function getVerifiedActiveHub(userId: string): Promise<MedicalHub> {
   const hub = await findHubByUserId(userId);
   if (!hub) {
@@ -55,23 +51,16 @@ async function getVerifiedActiveHub(userId: string): Promise<MedicalHub> {
   return hub;
 }
 
-/**
- * Fetches all supported organ types with medical viability windows.
- */
 export async function getOrganTypes(): Promise<OrganTypeEntity[]> {
   return await listAllOrganTypes();
 }
 
-/**
- * Logs a harvested organ into the platform and calculates its cold ischemia expiration.
- */
 export async function harvestOrgan(
   userId: string,
   dto: HarvestOrganDTO
 ): Promise<AvailableOrganEntity> {
   const hub = await getVerifiedActiveHub(userId);
 
-  // 1. Validate organ type
   const organType = await findOrganTypeById(dto.organ_type_id);
   if (!organType) {
     const error: any = new Error(`Invalid organ_type_id: ${dto.organ_type_id}.`);
@@ -79,14 +68,12 @@ export async function harvestOrgan(
     throw error;
   }
 
-  // 2. Validate blood group
   if (!VALID_BLOOD_GROUPS.includes(dto.blood_group)) {
     const error: any = new Error(`Invalid blood group: '${dto.blood_group}'.`);
     error.statusCode = 400;
     throw error;
   }
 
-  // 3. Validate harvest timestamp
   const harvestTime = new Date(dto.harvested_at);
   if (isNaN(harvestTime.getTime())) {
     const error: any = new Error('Invalid harvested_at date string.');
@@ -94,14 +81,12 @@ export async function harvestOrgan(
     throw error;
   }
 
-  // Cannot be in the future (with 1-minute clock drift tolerance)
   if (harvestTime.getTime() > Date.now() + 60 * 1000) {
     const error: any = new Error('Harvest timestamp cannot be in the future.');
     error.statusCode = 400;
     throw error;
   }
 
-  // 4. Calculate cold ischemia expiration: harvestTime + max_viability_hours (or year 2099 if never_expires is set)
   let expiresAt: Date;
   if (dto.never_expires) {
     expiresAt = new Date('2099-12-31T23:59:59.000Z');
@@ -118,7 +103,6 @@ export async function harvestOrgan(
     }
   }
 
-  // 5. Check donor user if supplied
   let donorUserId: string | null = null;
   if (dto.donor_user_id) {
     const donor = await findUserById(dto.donor_user_id);
@@ -130,7 +114,6 @@ export async function harvestOrgan(
     donorUserId = donor.id;
   }
 
-  // 6. Insert organ record
   return await insertHarvestedOrgan({
     organ_type_id: organType.id,
     donor_user_id: donorUserId,
@@ -143,9 +126,6 @@ export async function harvestOrgan(
   });
 }
 
-/**
- * Retrieves details for a specific organ by ID.
- */
 export async function getOrganById(organId: number): Promise<AvailableOrganEntity> {
   const organ = await findOrganById(organId);
   if (!organ) {
@@ -156,18 +136,11 @@ export async function getOrganById(organId: number): Promise<AvailableOrganEntit
   return organ;
 }
 
-/**
- * Lists organs across the platform with filtering.
- */
 export async function getOrgans(filters: OrganQueryFilters): Promise<AvailableOrganEntity[]> {
-  // Pre-run automatic expiration for overdue records
   await expireOverdueOrgans();
   return await listOrgans(filters);
 }
 
-/**
- * Updates an organ's status, location/custody hub, and clinical logs.
- */
 export async function changeOrganStatus(
   userId: string,
   organId: number,
@@ -182,7 +155,6 @@ export async function changeOrganStatus(
     throw error;
   }
 
-  // State machine transition validation
   const allowedNext = ALLOWED_TRANSITIONS[organ.status];
   if (!allowedNext || !allowedNext.includes(dto.status)) {
     const error: any = new Error(
@@ -192,7 +164,6 @@ export async function changeOrganStatus(
     throw error;
   }
 
-  // If changing custody hub, ensure target hub exists
   if (dto.current_hub_id !== undefined) {
     const targetHub = await findHubById(dto.current_hub_id);
     if (!targetHub) {
@@ -210,9 +181,6 @@ export async function changeOrganStatus(
   );
 }
 
-/**
- * Scheduled or manual maintenance job: updates status to EXPIRED for overdue organs.
- */
 export async function runExpirationSweep(): Promise<{ expiredCount: number }> {
   const expiredCount = await expireOverdueOrgans();
   return { expiredCount };

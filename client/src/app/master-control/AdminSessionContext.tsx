@@ -14,9 +14,6 @@ interface AdminSessionContextType {
 const AdminSessionContext = createContext<AdminSessionContextType | undefined>(undefined);
 
 export function AdminSessionProvider({ children }: { children: ReactNode }) {
-  // STRICT SECURITY RULE:
-  // isAdminUnlocked is ALWAYS initialized to false on page load or browser refresh.
-  // It is never persisted in localStorage or cookies to prevent unauthorized physical access.
   const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
   const [adminUser, setAdminUser] = useState<AuthUser | null>(null);
 
@@ -28,14 +25,12 @@ export function AdminSessionProvider({ children }: { children: ReactNode }) {
     const token = res.data?.token;
 
     if (!user || user.role !== 'ADMIN') {
-      // Immediately reject non-admin users trying to access master-control
       setAdminToken(null);
       setAdminUser(null);
       setIsAdminUnlocked(false);
       throw new Error('Access Denied: Email is not authorized for administrative access.');
     }
 
-    // Set volatile in-memory token for admin API calls
     setAdminToken(token);
     setAdminUser(user);
     setIsAdminUnlocked(true);

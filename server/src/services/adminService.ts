@@ -18,13 +18,11 @@ export interface AdminPlatformMetrics {
 }
 
 export async function getAdminPlatformMetrics(): Promise<AdminPlatformMetrics> {
-  // 1. Active hubs count
   const [hubRows] = await pool.query<RowDataPacket[]>(
     "SELECT COUNT(*) AS count FROM medical_hubs WHERE verification_status = 'ACTIVE'"
   );
   const activeHubsCount = Number(hubRows[0]?.count || 0);
 
-  // 2. Blood metrics
   const [bloodStockRows] = await pool.query<RowDataPacket[]>(
     'SELECT COALESCE(SUM(units_available), 0) AS total_available FROM blood_inventory'
   );
@@ -45,7 +43,6 @@ export async function getAdminPlatformMetrics(): Promise<AdminPlatformMetrics> {
   const donatedUnits = Number(donatedRows[0]?.donated_units || 0);
   const donorCount = Number(donatedRows[0]?.donor_count || 0);
 
-  // 3. Organ metrics (excluding blood)
   const [activeOrganCountRows] = await pool.query<RowDataPacket[]>(
     `SELECT COUNT(*) AS count 
      FROM available_organs ao
@@ -132,7 +129,6 @@ export async function getAdminHubsList(status?: string): Promise<any[]> {
 export async function searchAdminEntities(queryStr: string): Promise<{ citizens: any[]; hubs: any[] }> {
   const q = `%${queryStr.trim()}%`;
 
-  // Search citizens
   const [citizens] = await pool.query<RowDataPacket[]>(
     `SELECT 
        cp.id,
@@ -155,7 +151,6 @@ export async function searchAdminEntities(queryStr: string): Promise<{ citizens:
     [q, q, q, q]
   );
 
-  // Search hubs
   const [hubs] = await pool.query<RowDataPacket[]>(
     `SELECT 
        mh.*,
@@ -176,7 +171,6 @@ export async function searchAdminEntities(queryStr: string): Promise<{ citizens:
 export async function getAdminActivityLogs(limit: number = 50): Promise<any[]> {
   const safeLimit = Math.min(Math.max(Number(limit) || 50, 5), 200);
 
-  // 1. Harvest logs (with hospital name, city, organ name)
   const [harvests] = await pool.query<RowDataPacket[]>(
     `SELECT 
        ao.id,
@@ -203,7 +197,6 @@ export async function getAdminActivityLogs(limit: number = 50): Promise<any[]> {
     [safeLimit]
   );
 
-  // 2. Match logs (with candidate name, attending/harvesting hospital & city)
   const [matches] = await pool.query<RowDataPacket[]>(
     `SELECT 
        m.id,
@@ -247,7 +240,6 @@ export async function getAdminActivityLogs(limit: number = 50): Promise<any[]> {
     [safeLimit]
   );
 
-  // 3. Facility Verification logs
   const [verifications] = await pool.query<RowDataPacket[]>(
     `SELECT 
        mh.id,
@@ -274,7 +266,6 @@ export async function getAdminActivityLogs(limit: number = 50): Promise<any[]> {
     [safeLimit]
   );
 
-  // 4. Blood Request logs (with receiving hospital and fulfilling hospital)
   const [bloodLogs] = await pool.query<RowDataPacket[]>(
     `SELECT 
        br.id,
@@ -310,7 +301,6 @@ export async function getAdminActivityLogs(limit: number = 50): Promise<any[]> {
     [safeLimit]
   );
 
-  // Merge and sort descending
   const combined = [...harvests, ...matches, ...verifications, ...bloodLogs];
   combined.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 

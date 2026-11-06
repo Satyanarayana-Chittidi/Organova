@@ -21,10 +21,6 @@ function parseIdParam(param: string | string[] | undefined): number {
   return id;
 }
 
-/**
- * GET /api/organs/types
- * Returns all supported organ types and shelf-life hours.
- */
 export async function getOrganTypesHandler(
   req: Request,
   res: Response,
@@ -42,10 +38,6 @@ export async function getOrganTypesHandler(
   }
 }
 
-/**
- * POST /api/organs/harvest
- * Hospital logs a newly harvested donor organ into the network grid.
- */
 export async function harvestOrganHandler(
   req: Request,
   res: Response,
@@ -64,10 +56,6 @@ export async function harvestOrganHandler(
   }
 }
 
-/**
- * GET /api/organs/:id
- * Retrieves details for a specific organ, including live countdown minutes.
- */
 export async function getOrganByIdHandler(
   req: Request,
   res: Response,
@@ -85,10 +73,6 @@ export async function getOrganByIdHandler(
   }
 }
 
-/**
- * GET /api/organs
- * Query available organs across facilities with medical and geographic filters.
- */
 export async function listOrgansHandler(
   req: Request,
   res: Response,
@@ -117,10 +101,6 @@ export async function listOrgansHandler(
   }
 }
 
-/**
- * PATCH /api/organs/:id/status
- * Updates organ status along transit/transplant state machine.
- */
 export async function updateOrganStatusHandler(
   req: Request,
   res: Response,
@@ -141,10 +121,6 @@ export async function updateOrganStatusHandler(
   }
 }
 
-/**
- * POST /api/organs/sweep-expired
- * Maintenance endpoint: manually triggers sweeping of overdue organs.
- */
 export async function sweepExpiredOrgansHandler(
   req: Request,
   res: Response,

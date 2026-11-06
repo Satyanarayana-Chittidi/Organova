@@ -18,7 +18,6 @@ async function runVerification(): Promise<void> {
     }
   }
 
-  // Test 1: HTTP Health Endpoint
   try {
     const res = await fetch('http://localhost:5000/api/health');
     const data = (await res.json()) as any;
@@ -27,7 +26,6 @@ async function runVerification(): Promise<void> {
     record('HTTP /api/health Endpoint', false, err.message);
   }
 
-  // Test 2: HTTP 404 Route Handler
   try {
     const res = await fetch('http://localhost:5000/api/nonexistent-route');
     const data = (await res.json()) as any;
@@ -36,7 +34,6 @@ async function runVerification(): Promise<void> {
     record('HTTP 404 Error Handler', false, err.message);
   }
 
-  // Test 3: MySQL Connection Pool Ping
   try {
     const [rows] = await pool.query('SELECT 1 + 1 AS sum');
     const sum = (rows as any)[0].sum;
@@ -45,7 +42,6 @@ async function runVerification(): Promise<void> {
     record('MySQL Connection Pool Connectivity', false, err.message);
   }
 
-  // Test 4: Verify Table Count (10 Tables)
   try {
     const [rows] = await pool.query('SHOW TABLES');
     const tables = (rows as any[]).map((r) => Object.values(r)[0]);
@@ -54,7 +50,6 @@ async function runVerification(): Promise<void> {
     record('Database Schema Verification', false, err.message);
   }
 
-  // Test 5: Verify Seeded Organ Types (8 Medical Types)
   try {
     const [rows] = await pool.query('SELECT code, name, category, max_viability_hours FROM organ_types ORDER BY id ASC');
     const items = rows as any[];

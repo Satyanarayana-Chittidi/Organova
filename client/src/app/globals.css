@@ -39,7 +39,6 @@ body {
   color-scheme: dark;
 }
 
-/* Form Controls Baseline */
 input, select, textarea {
   color: #0f172a;
   background-color: #ffffff;
@@ -51,13 +50,11 @@ input::placeholder, textarea::placeholder {
   opacity: 1;
 }
 
-/* Select element styling: gray when placeholder is selected, black when item is selected */
 select.is-placeholder,
 select:has(option[value=""]:checked) {
   color: #94a3b8 !important;
 }
 
-/* Dropdown menu items: placeholder gray, selectable options crisp black */
 select option[value=""] {
   color: #94a3b8 !important;
   background-color: #ffffff;
@@ -68,13 +65,11 @@ select option:not([value=""]) {
   background-color: #ffffff;
 }
 
-/* Date Input: Light scheme */
 input[type="date"],
 input[type="datetime-local"] {
   color-scheme: light;
 }
 
-/* Dark Mode Form Overrides */
 .dark input,
 .dark select,
 .dark textarea {
@@ -83,7 +78,6 @@ input[type="datetime-local"] {
   color-scheme: dark;
 }
 
-/* Ensure transparent inputs inside custom comboboxes / dropdowns remain completely transparent */
 input.bg-transparent,
 textarea.bg-transparent,
 .dark input.bg-transparent,

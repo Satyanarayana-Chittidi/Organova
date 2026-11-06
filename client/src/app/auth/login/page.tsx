@@ -40,7 +40,6 @@ function LoginContent() {
     try {
       const user = await login(email, password);
 
-      // Role-based redirect
       if (user.role === 'ADMIN') {
         await logout();
         setError('Administrative accounts must authenticate directly via the designated Master Control Gateway.');
@@ -60,7 +59,6 @@ function LoginContent() {
   return (
     <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-6 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-        {/* Portal Switcher Tabs */}
         <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
           <button
             type="button"
@@ -94,7 +92,6 @@ function LoginContent() {
           </button>
         </div>
 
-        {/* Portal Header */}
         <div className="text-center">
           {portal === 'hospital' ? (
             <>
@@ -215,7 +212,6 @@ function LoginContent() {
           </button>
         </form>
 
-        {/* Dynamic Role-Specific Footer */}
         <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
           {portal === 'hospital' ? (
             <p className="text-xs text-slate-600 dark:text-slate-400">

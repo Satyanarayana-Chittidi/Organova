@@ -19,22 +19,15 @@ dotenv.config();
 
 const app: Application = express();
 
-// Ensure uploads/avatars directory exists
 const uploadDir = path.join(__dirname, '../uploads/avatars');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// --------------------------------------------------------------------
-// 1. GLOBAL MIDDLEWARES
-// --------------------------------------------------------------------
-
-// Cross-Origin Resource Sharing (Allows Next.js frontend to communicate with API)
 const clientUrl = process.env.CLIENT_URL;
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
       if (!origin) return callback(null, true);
       if (
         !clientUrl ||
@@ -46,29 +39,21 @@ app.use(
       ) {
         return callback(null, true);
       }
-      return callback(null, true); // Permissive to prevent CORS lockout on dynamic deployment domains
+      return callback(null, true);
     },
-    credentials: true, // Allows HTTP-only cookies to pass through
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
-// Parses incoming JSON request payloads into req.body (10MB limit for image data URLs)
 app.use(express.json({ limit: '10mb' }));
 
-// Parses URL-encoded form data
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Parses cookie headers into req.cookies
 app.use(cookieParser());
 
-// Serve uploaded assets statically (avatars, documents)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-// --------------------------------------------------------------------
-// 2. ROOT & HEALTH-CHECK ROUTES
-// --------------------------------------------------------------------
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({
@@ -92,10 +77,6 @@ app.get('/api/health/seed', async (req: Request, res: Response) => {
   }
 });
 
-// --------------------------------------------------------------------
-// 3. API FEATURE ROUTES
-// --------------------------------------------------------------------
-
 app.use('/api/auth', authRoutes);
 app.use('/api/citizen', citizenRoutes);
 app.use('/api/donor', pledgeRoutes);
@@ -106,20 +87,12 @@ app.use('/api/organs', organRoutes);
 app.use('/api/transplant', transplantRoutes);
 app.use('/api/camps', campRoutes);
 
-// --------------------------------------------------------------------
-// 4. 404 NOT FOUND HANDLER
-// --------------------------------------------------------------------
-
 app.use((req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: `Route not found: ${req.method} ${req.originalUrl}`,
   });
 });
-
-// --------------------------------------------------------------------
-// 4. GLOBAL ERROR HANDLING MIDDLEWARE
-// --------------------------------------------------------------------
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('[SERVER] Unhandled Exception:', err);

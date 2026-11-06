@@ -1,6 +1,3 @@
-// ====================================================================
-// CITIZEN PROFILE TYPES
-// ====================================================================
 
 export type Gender = 'MALE' | 'FEMALE' | 'OTHER';
 
@@ -14,10 +11,6 @@ export type BloodGroup =
   | 'O+'
   | 'O-';
 
-// --------------------------------------------------------------------
-// 1. DATABASE ENTITY
-// Represents the full citizen profile row in MySQL
-// --------------------------------------------------------------------
 export interface CitizenProfile {
   id: number;
   user_id: string;
@@ -36,13 +29,9 @@ export interface CitizenProfile {
   created_at: Date;
 }
 
-// --------------------------------------------------------------------
-// 2. DATA TRANSFER OBJECT (DTO)
-// Payload submitted by a citizen when completing or updating their profile
-// --------------------------------------------------------------------
 export interface UpsertCitizenProfileDTO {
   full_name: string;
-  date_of_birth: string; // YYYY-MM-DD format
+  date_of_birth: string;
   gender: Gender;
   blood_group: BloodGroup;
   phone_number: string;
@@ -55,9 +44,6 @@ export interface UpsertCitizenProfileDTO {
   avatar_url?: string | null;
 }
 
-// --------------------------------------------------------------------
-// 3. DONATION TRANSACTION HISTORY
-// --------------------------------------------------------------------
 export interface CitizenBloodDonation {
   id: number;
   blood_group: BloodGroup;

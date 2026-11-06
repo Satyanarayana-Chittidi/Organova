@@ -39,9 +39,6 @@ const VALID_BLOOD_GROUPS: BloodGroup[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 
 const VALID_COMPONENTS: BloodComponent[] = ['WHOLE_BLOOD', 'PACKED_RBC', 'PLATELETS', 'PLASMA'];
 const VALID_URGENCIES: BloodUrgency[] = ['CRITICAL', 'URGENT', 'ROUTINE'];
 
-/**
- * Helper to ensure calling user is an authorized, ACTIVE medical hub (Hospital).
- */
 async function getVerifiedActiveHub(userId: string): Promise<MedicalHub> {
   const hub = await findHubByUserId(userId);
   if (!hub) {
@@ -61,13 +58,6 @@ async function getVerifiedActiveHub(userId: string): Promise<MedicalHub> {
   return hub;
 }
 
-// ====================================================================
-// 1. INVENTORY MANAGEMENT SERVICES
-// ====================================================================
-
-/**
- * Sets specific stock count for a blood group and component in an active hub.
- */
 export async function setFacilityInventory(
   userId: string,
   dto: SetInventoryDTO
@@ -95,9 +85,6 @@ export async function setFacilityInventory(
   return await upsertInventory(hub.id, dto);
 }
 
-/**
- * Adjusts inventory (+N / -N) for an active hub.
- */
 export async function adjustFacilityInventory(
   userId: string,
   dto: AdjustInventoryDTO
@@ -124,11 +111,9 @@ export async function adjustFacilityInventory(
 
   const updatedItem = await adjustInventory(hub.id, dto.blood_group, dto.component, dto.delta_units);
 
-  // Automatically record this transaction into blood_requests for institutional & citizen auditing
   try {
     const units = Math.abs(dto.delta_units);
     if (dto.delta_units > 0) {
-      // INWARD / DONATION
       const donorUserId = dto.linked_user_id || null;
       await pool.query(
         `INSERT INTO blood_requests (
@@ -152,7 +137,6 @@ export async function adjustFacilityInventory(
         ]
       );
     } else {
-      // OUTWARD / DISPENSE / TRANSFUSION
       const recipientUserId = dto.linked_user_id || userId;
       await pool.query(
         `INSERT INTO blood_requests (
@@ -182,30 +166,15 @@ export async function adjustFacilityInventory(
   return updatedItem;
 }
 
-/**
- * Fetches all inventory records for the logged-in facility.
- */
 export async function getFacilityInventory(userId: string): Promise<BloodInventoryItem[]> {
   const hub = await getVerifiedActiveHub(userId);
   return await getInventoryByHubId(hub.id);
 }
 
-/**
- * Searches active facilities that currently hold stock.
- */
 export async function searchBloodStock(filters: SearchStockFilters): Promise<BloodInventoryItem[]> {
   return await searchStockInActiveHubs(filters);
 }
 
-// ====================================================================
-// 2. REQUISITION & FULFILLMENT SERVICES
-// ====================================================================
-// BLOOD COMPATIBILITY & TRANSFUSION MATCHING
-// ====================================================================
-
-/**
- * Returns all compatible donor blood groups that a patient of `recipientGroup` can receive.
- */
 export function getCompatibleBloodGroups(recipientGroup: BloodGroup): BloodGroup[] {
   switch (recipientGroup) {
     case 'O-': return ['O-'];
@@ -220,35 +189,20 @@ export function getCompatibleBloodGroups(recipientGroup: BloodGroup): BloodGroup
   }
 }
 
-/**
- * Returns all patient blood groups that a donor of `donorGroup` can safely donate to.
- */
 export function getCanDonateTo(donorGroup: BloodGroup): BloodGroup[] {
   switch (donorGroup) {
-    case 'O-': return ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']; // Universal donor
+    case 'O-': return ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'];
     case 'O+': return ['O+', 'A+', 'B+', 'AB+'];
     case 'A-': return ['A-', 'A+', 'AB-', 'AB+'];
     case 'A+': return ['A+', 'AB+'];
     case 'B-': return ['B-', 'B+', 'AB-', 'AB+'];
     case 'B+': return ['B+', 'AB+'];
     case 'AB-': return ['AB-', 'AB+'];
-    case 'AB+': return ['AB+']; // Universal recipient
+    case 'AB+': return ['AB+'];
     default: return [donorGroup];
   }
 }
 
-/**
- * Submits a new emergency or routine blood requisition.
- * Destination hospital MUST be a verified medical hub on our network.
- * Intelligent Clinical Inventory Check:
- *   1. Check receiving hospital's own inventory for compatible blood.
- *   2. If receiving hospital possesses ALL required units:
- *      Direct requisition strictly to this hospital's portal for approval (No outside SOS or donor alerts).
- *   3. If receiving hospital has PARTIAL stock:
- *      Create in-house order for available units, and send SOS request for remaining units.
- *   4. If receiving hospital possesses 0 compatible units:
- *      Broadcast SOS to compatible living donors and notify hospitals with required units.
- */
 export async function createRequest(
   userId: string,
   dto: CreateBloodRequestDTO
@@ -277,7 +231,6 @@ export async function createRequest(
     throw error;
   }
 
-  // Network-closed integrity: Destination MUST be an active verified medical facility on the platform
   if (!dto.destination_hub_id || !Number.isInteger(Number(dto.destination_hub_id))) {
     const error: any = new Error('A valid receiving hospital on the network must be selected.');
     error.statusCode = 400;
@@ -291,12 +244,10 @@ export async function createRequest(
     throw error;
   }
 
-  // Auto-fill delivery address from destination hospital details if empty
   if (!dto.delivery_address || dto.delivery_address.trim().length === 0) {
     dto.delivery_address = `${destHub.name}, ${destHub.address_line}, ${destHub.city}`;
   }
 
-  // If a specific supplying hospital was targeted explicitly by caller (e.g. from Blood Finder stock search)
   if (dto.target_hub_id) {
     const targetHub = await findHubById(Number(dto.target_hub_id));
     if (!targetHub || targetHub.verification_status !== 'ACTIVE') {
@@ -325,12 +276,8 @@ export async function createRequest(
     return request;
   }
 
-  // ------------------------------------------------------------------
-  // INTELLIGENT CLINICAL INVENTORY CHECK AT RECEIVING HOSPITAL
-  // ------------------------------------------------------------------
   const compatibleGroups = getCompatibleBloodGroups(dto.blood_group);
 
-  // Check receiving hospital's own inventory for compatible blood in this component
   const [invRows]: any = await pool.query(
     `SELECT blood_group, units_available 
      FROM blood_inventory 
@@ -343,12 +290,10 @@ export async function createRequest(
 
   let bestMatch: { blood_group: BloodGroup; units_available: number } | null = null;
   if (invRows && invRows.length > 0) {
-    // If exact match is available and satisfies required units, prioritize exact match
     const exact = invRows.find((r: any) => r.blood_group === dto.blood_group);
     if (exact && exact.units_available >= dto.units_requested) {
       bestMatch = exact;
     } else {
-      // Otherwise, select the compatible group having the maximum available stock
       const sorted = [...invRows].sort((a: any, b: any) => b.units_available - a.units_available);
       bestMatch = sorted[0];
     }
@@ -356,7 +301,6 @@ export async function createRequest(
 
   const availableAtHospital = bestMatch ? bestMatch.units_available : 0;
 
-  // CASE 1: Receiving hospital has ALL required units in their own stock
   if (bestMatch && availableAtHospital >= dto.units_requested) {
     const inHouseDto: CreateBloodRequestDTO = {
       ...dto,
@@ -365,7 +309,6 @@ export async function createRequest(
     };
     const request = await createBloodRequest(userId, inHouseDto);
 
-    // Send targeted alert ONLY to this specific hospital portal (No living donor SOS or outside broadcast)
     try {
       const io = getIO();
       io.to(`hub:${destHub.id}`).emit('BLOOD_REQUEST_ALERT', {
@@ -394,11 +337,9 @@ export async function createRequest(
     });
   }
 
-  // CASE 2: Receiving hospital has PARTIAL units (e.g. 2 units available, 5 requested)
   if (bestMatch && availableAtHospital > 0 && availableAtHospital < dto.units_requested) {
     const remainingUnits = dto.units_requested - availableAtHospital;
 
-    // Part 1: In-house requisition for the units the hospital currently possesses
     const inHouseDto: CreateBloodRequestDTO = {
       ...dto,
       blood_group: bestMatch.blood_group,
@@ -425,7 +366,6 @@ export async function createRequest(
       console.warn('[WEBSOCKET] Failed to emit in-house partial alert:', err);
     }
 
-    // Part 2: Open SOS requisition for the remaining units
     const sosDto: CreateBloodRequestDTO = {
       ...dto,
       units_requested: remainingUnits,
@@ -433,7 +373,6 @@ export async function createRequest(
     };
     const sosReq = await createBloodRequest(userId, sosDto);
 
-    // Find other hubs that have the remaining units
     const [supplyingHubs]: any = await pool.query(
       `SELECT DISTINCT hub_id FROM blood_inventory 
        WHERE component = ? AND blood_group IN (?) AND units_available >= ? AND hub_id != ?`,
@@ -470,8 +409,6 @@ export async function createRequest(
     });
   }
 
-  // CASE 3: Hospital possesses 0 compatible units
-  // Send open SOS request to hubs having required blood in required qty and to compatible donors
   const sosDto: CreateBloodRequestDTO = {
     ...dto,
     target_hub_id: null,
@@ -514,9 +451,6 @@ export async function createRequest(
   });
 }
 
-/**
- * Retrieves details for a specific blood request by ID.
- */
 export async function getRequestById(requestId: number): Promise<BloodRequest> {
   const request = await findBloodRequestById(requestId);
   if (!request) {
@@ -527,23 +461,14 @@ export async function getRequestById(requestId: number): Promise<BloodRequest> {
   return request;
 }
 
-/**
- * Lists requisitions across the platform with clinical sorting and filtering.
- */
 export async function getRequisitionQueue(filters: BloodRequestFilters): Promise<BloodRequest[]> {
   return await listBloodRequests(filters);
 }
 
-/**
- * Lists all requests created by the authenticated user.
- */
 export async function getMyRequests(userId: string): Promise<BloodRequest[]> {
   return await listRequestsByRequester(userId);
 }
 
-/**
- * Claims and approves an open blood request on behalf of an active facility.
- */
 export async function claimRequest(userId: string, requestId: number): Promise<BloodRequest> {
   const hub = await getVerifiedActiveHub(userId);
   const claimed = await claimAndApproveRequest(requestId, hub.id);
@@ -562,9 +487,6 @@ export async function claimRequest(userId: string, requestId: number): Promise<B
   return claimed;
 }
 
-/**
- * Advances the fulfillment workflow (DISPATCHED, COMPLETED).
- */
 export async function updateDispatchStatus(
   userId: string,
   requestId: number,
@@ -589,9 +511,6 @@ export async function updateDispatchStatus(
   return updated;
 }
 
-/**
- * Cancels a blood request with automatic inventory refund if previously approved.
- */
 export async function cancelRequest(
   userId: string,
   requestId: number,
@@ -615,10 +534,6 @@ export async function cancelRequest(
   return cancelled;
 }
 
-/**
- * Living Citizen Donor commits to fulfill a blood requisition.
- * Concurrency-safe: atomic lock prevents double-commitment.
- */
 export async function commitDonor(userId: string, requestId: number): Promise<BloodRequest> {
   const existing = await findBloodRequestById(requestId);
   if (!existing) {
@@ -635,7 +550,6 @@ export async function commitDonor(userId: string, requestId: number): Promise<Bl
     throw error;
   }
 
-  // 1-to-1 Commitment Guard: A donor can only have one active walk-in commitment at a time
   const [activeCommitments]: any = await pool.query(
     `SELECT id FROM blood_requests WHERE donor_user_id = ? AND status = 'DONOR_COMMITTED' AND id != ? LIMIT 1`,
     [userId, requestId]
@@ -666,9 +580,6 @@ export async function commitDonor(userId: string, requestId: number): Promise<Bl
   return updated;
 }
 
-/**
- * Hospital confirms phlebotomy collection and screening for walk-in donor.
- */
 export async function completeDonorDonationService(
   userId: string,
   requestId: number
@@ -692,10 +603,6 @@ export async function completeDonorDonationService(
   return updated;
 }
 
-/**
- * Living citizen donor releases commitment if unable to reach hospital in time.
- * Reverts requisition status back to 'REQUESTED' for other donors.
- */
 export async function releaseDonor(
   userId: string,
   requestId: number
@@ -727,13 +634,6 @@ export interface EmergencyAlertItem {
   meta: any;
 }
 
-/**
- * Retrieves persistent active emergency alerts for a user upon login or page load.
- * For citizens:
- *   1. Active walk-in commitment pass (DONOR_COMMITTED by this user)
- *   2. Pending 'REQUESTED' blood orders matching their blood type.
- * For hospitals: Finds pending orders targeted to their facility or city-wide SOS.
- */
 export async function getActiveEmergencyAlerts(
   userId: string,
   role: string
@@ -741,7 +641,6 @@ export async function getActiveEmergencyAlerts(
   const alerts: EmergencyAlertItem[] = [];
 
   if (role === 'USER') {
-    // 1. Check if user has an active committed walk-in pass
     const [committedPasses]: any = await pool.query(
       `SELECT br.id, br.blood_group, br.component, br.units_requested, br.urgency, 
               br.created_at,

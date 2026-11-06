@@ -30,10 +30,8 @@ export default function AvatarCropperModal({
   const [containerSize, setContainerSize] = useState<{ width: number; height: number }>({ width: 360, height: 360 });
   const [processing, setProcessing] = useState<boolean>(false);
 
-  // Circle diameter inside viewport
   const circleDiameter = Math.min(containerSize.width * 0.72, 260);
 
-  // Load natural image when imageSrc opens
   useEffect(() => {
     if (!imageSrc || !isOpen) {
       setImgElement(null);
@@ -54,7 +52,6 @@ export default function AvatarCropperModal({
     img.src = imageSrc;
   }, [imageSrc, isOpen]);
 
-  // Update container dimensions on mount / resize
   useEffect(() => {
     if (!isOpen) return;
 
@@ -76,7 +73,6 @@ export default function AvatarCropperModal({
     };
   }, [isOpen]);
 
-  // Keyboard shortcut: Escape to close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen && !processing && !isUploading) {
@@ -87,7 +83,6 @@ export default function AvatarCropperModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, processing, isUploading, onClose]);
 
-  // Base scale fits the full uploaded image inside the viewport box
   const baseScale =
     imgSize.width && imgSize.height
       ? Math.min(containerSize.width / imgSize.width, containerSize.height / imgSize.height)
@@ -95,7 +90,6 @@ export default function AvatarCropperModal({
 
   const currentScale = baseScale * zoom;
 
-  // Strict pan bounding so the edge of the image never goes out of the viewing window / crop circle
   const clampPan = useCallback(
     (targetPan: { x: number; y: number }, scale: number) => {
       if (!imgSize.width || !imgSize.height) return targetPan;
@@ -103,8 +97,6 @@ export default function AvatarCropperModal({
       const dispW = imgSize.width * scale;
       const dispH = imgSize.height * scale;
 
-      // When the image spans across the circle, constrain pan so the edge never goes inside the circle.
-      // If narrower than the circle, keep the image within the container window.
       let maxPanX: number;
       if (dispW >= circleDiameter) {
         maxPanX = (dispW - circleDiameter) / 2;
@@ -127,12 +119,10 @@ export default function AvatarCropperModal({
     [imgSize, circleDiameter, containerSize]
   );
 
-  // Re-clamp panning whenever zoom or scale changes
   useEffect(() => {
     setPan((prev) => clampPan(prev, baseScale * zoom));
   }, [zoom, baseScale, clampPan]);
 
-  // Pointer drag events for fluid, unified mouse and touch interaction
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (processing || isUploading) return;
     e.preventDefault();
@@ -165,7 +155,6 @@ export default function AvatarCropperModal({
     }
   };
 
-  // Mouse wheel zoom
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
     const delta = e.deltaY * -0.0015;
@@ -179,19 +168,17 @@ export default function AvatarCropperModal({
     setPan((prev) => clampPan(prev, baseScale * newZoom));
   };
 
-  // Reset positioning & zoom
   const handleReset = () => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
   };
 
-  // HTML5 Canvas Crop & Export
   const handleCropAndApply = useCallback(async () => {
     if (!imgElement || !imgSize.width || !imgSize.height || processing || isUploading) return;
     setProcessing(true);
 
     try {
-      const destSize = 512; // 512x512 high-resolution square avatar
+      const destSize = 512;
       const canvas = document.createElement('canvas');
       canvas.width = destSize;
       canvas.height = destSize;
@@ -201,19 +188,14 @@ export default function AvatarCropperModal({
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      // Neutral background fill
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, destSize, destSize);
 
-      // Ratio from screen circle diameter to destination canvas
       const M = destSize / circleDiameter;
 
-      // Scaled dimensions on the destination canvas
       const canvasImgW = imgSize.width * currentScale * M;
       const canvasImgH = imgSize.height * currentScale * M;
 
-      // Center of canvas is (destSize/2, destSize/2)
-      // Displacement of image center from circle center is (pan.x, pan.y)
       const canvasImgX = destSize / 2 + pan.x * M - canvasImgW / 2;
       const canvasImgY = destSize / 2 + pan.y * M - canvasImgH / 2;
 
@@ -262,7 +244,6 @@ export default function AvatarCropperModal({
         className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 max-w-sm sm:max-w-md w-full shadow-2xl flex flex-col items-center gap-5 text-white animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between w-full">
           <div>
             <h3 className="text-base font-bold text-white tracking-tight">Adjust Profile Photo</h3>
@@ -279,7 +260,6 @@ export default function AvatarCropperModal({
           </button>
         </div>
 
-        {/* Viewport Box */}
         <div
           ref={containerRef}
           onPointerDown={handlePointerDown}
@@ -289,7 +269,6 @@ export default function AvatarCropperModal({
           onWheel={handleWheel}
           className="relative w-80 h-80 sm:w-96 sm:h-96 rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 cursor-grab active:cursor-grabbing touch-none select-none flex items-center justify-center shadow-inner"
         >
-          {/* Full uploaded image scaled and panned */}
           {imgElement && imgSize.width > 0 && (
             <img
               src={imageSrc}
@@ -310,7 +289,6 @@ export default function AvatarCropperModal({
             />
           )}
 
-          {/* Dimming Mask: Area outside the circle is darkened; inside circle is 100% clear */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div
               style={{
@@ -319,19 +297,16 @@ export default function AvatarCropperModal({
               }}
               className="rounded-full border-2 border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.65)] relative"
             >
-              {/* Subtle accent border */}
               <div className="absolute inset-0 rounded-full border border-white/20" />
             </div>
           </div>
 
-          {/* Floating Interaction Hint */}
           <div className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] text-slate-300 font-medium pointer-events-none flex items-center gap-1.5 shadow-sm border border-white/10">
             <Move className="w-3 h-3 text-rose-400" />
             Drag to reposition
           </div>
         </div>
 
-        {/* Zoom Controls & Slider */}
         <div className="flex items-center gap-3 w-full px-2">
           <button
             type="button"
@@ -379,7 +354,6 @@ export default function AvatarCropperModal({
           </button>
         </div>
 
-        {/* Modal Action Buttons */}
         <div className="flex items-center justify-end gap-3 w-full pt-1 border-t border-slate-800">
           <button
             type="button"

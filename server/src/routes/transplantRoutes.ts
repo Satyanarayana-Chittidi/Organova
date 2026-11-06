@@ -16,11 +16,6 @@ import { authenticate, authorizeRoles } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// ====================================================================
-// 1. WAITLIST ROUTES
-// ====================================================================
-
-// Attending Hospital registers a verified patient onto the waitlist
 router.post(
   '/requests',
   authenticate,
@@ -28,7 +23,6 @@ router.post(
   addPatientHandler
 );
 
-// Clinical queue of waiting patients
 router.get(
   '/requests',
   authenticate,
@@ -36,17 +30,10 @@ router.get(
   getWaitlistQueueHandler
 );
 
-// Recipient Passport: Patient views their own registration & match status
 router.get('/requests/mine', authenticate, getMyWaitlistRequestsHandler);
 
-// Single waitlist request details
 router.get('/requests/:id', authenticate, getRequestDetailsHandler);
 
-// ====================================================================
-// 2. MATCHING & OFFER ROUTES
-// ====================================================================
-
-// Triggers the multi-factor scoring matching engine for an available organ (candidate evaluation / preview)
 router.post(
   '/matches/organ/:organId',
   authenticate,
@@ -54,7 +41,6 @@ router.post(
   runMatchingHandler
 );
 
-// Explicit allocation of organ to a candidate, initiating the 20-minute response window
 router.post(
   '/matches/organ/:organId/allocate',
   authenticate,
@@ -62,7 +48,6 @@ router.post(
   allocateOrganHandler
 );
 
-// Patient (via citizen portal) or Attending Hospital accepts or declines a 20-minute match offer
 router.post(
   '/matches/:id/respond',
   authenticate,
@@ -70,7 +55,6 @@ router.post(
   respondToMatchHandler
 );
 
-// Active 20-minute match offers across the network
 router.get(
   '/matches/active',
   authenticate,
@@ -78,10 +62,8 @@ router.get(
   getActiveMatchesHandler
 );
 
-// Match offer details & countdown timer
 router.get('/matches/:id', authenticate, getMatchDetailsHandler);
 
-// Cron / Admin endpoint: sweeps overdue match offers and triggers automated failover
 router.post(
   '/matches/sweep-timeouts',
   authenticate,
@@ -89,7 +71,6 @@ router.post(
   sweepTimeoutsHandler
 );
 
-// Testing & Verification: Seeds never-expiring test organs and multi-scenario patient requests
 router.post(
   '/seed-mocks',
   authenticate,

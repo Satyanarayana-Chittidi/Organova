@@ -25,7 +25,6 @@ import {
   BloodRequestFilters,
 } from '../types/blood';
 
-// Helper to safely extract integer ID from request params
 function parseIdParam(param: string | string[] | undefined): number {
   const raw = Array.isArray(param) ? param[0] : param;
   const id = parseInt(raw || '', 10);
@@ -37,14 +36,6 @@ function parseIdParam(param: string | string[] | undefined): number {
   return id;
 }
 
-// ====================================================================
-// 1. INVENTORY CONTROLLER HANDLERS
-// ====================================================================
-
-/**
- * PUT /api/blood/inventory
- * Sets the exact available unit count for a blood group and component.
- */
 export async function setInventoryHandler(
   req: Request,
   res: Response,
@@ -63,10 +54,6 @@ export async function setInventoryHandler(
   }
 }
 
-/**
- * PATCH /api/blood/inventory/adjust
- * Adjusts inventory (+N to add units, -N to deduct units).
- */
 export async function adjustInventoryHandler(
   req: Request,
   res: Response,
@@ -85,10 +72,6 @@ export async function adjustInventoryHandler(
   }
 }
 
-/**
- * GET /api/blood/inventory/me
- * Retrieves full stock breakdown for the calling hospital.
- */
 export async function getMyInventoryHandler(
   req: Request,
   res: Response,
@@ -107,10 +90,6 @@ export async function getMyInventoryHandler(
   }
 }
 
-/**
- * GET /api/blood/inventory/search
- * Public search endpoint: Discovers active facilities holding blood stock.
- */
 export async function searchStockHandler(
   req: Request,
   res: Response,
@@ -137,14 +116,6 @@ export async function searchStockHandler(
   }
 }
 
-// ====================================================================
-// 2. REQUISITION CONTROLLER HANDLERS
-// ====================================================================
-
-/**
- * POST /api/blood/requests
- * Creates a new emergency or routine blood requisition.
- */
 export async function createRequestHandler(
   req: Request,
   res: Response,
@@ -163,10 +134,6 @@ export async function createRequestHandler(
   }
 }
 
-/**
- * GET /api/blood/requests/mine
- * Returns all blood requests submitted by the logged-in user or hospital.
- */
 export async function getMyRequestsHandler(
   req: Request,
   res: Response,
@@ -185,10 +152,6 @@ export async function getMyRequestsHandler(
   }
 }
 
-/**
- * GET /api/blood/requests
- * Clinical dashboard: Lists requisitions ordered by urgency (CRITICAL > URGENT > ROUTINE).
- */
 export async function listRequestsHandler(
   req: Request,
   res: Response,
@@ -216,10 +179,6 @@ export async function listRequestsHandler(
   }
 }
 
-/**
- * GET /api/blood/requests/:id
- * Fetches details for a single request.
- */
 export async function getRequestByIdHandler(
   req: Request,
   res: Response,
@@ -237,10 +196,6 @@ export async function getRequestByIdHandler(
   }
 }
 
-/**
- * POST /api/blood/requests/:id/claim
- * Claims and approves a pending requisition by an active Hospital.
- */
 export async function claimRequestHandler(
   req: Request,
   res: Response,
@@ -261,10 +216,6 @@ export async function claimRequestHandler(
   }
 }
 
-/**
- * PATCH /api/blood/requests/:id/status
- * Advances the fulfillment status (DISPATCHED, COMPLETED).
- */
 export async function updateDispatchStatusHandler(
   req: Request,
   res: Response,
@@ -294,10 +245,6 @@ export async function updateDispatchStatusHandler(
   }
 }
 
-/**
- * POST /api/blood/requests/:id/cancel
- * Cancels a requisition with automatic inventory refund if previously approved.
- */
 export async function cancelRequestHandler(
   req: Request,
   res: Response,
@@ -319,11 +266,6 @@ export async function cancelRequestHandler(
   }
 }
 
-/**
- * POST /api/blood/requests/:id/commit-donor
- * Allows a matching living citizen donor to commit to a walk-in emergency donation.
- * ACID transactional row-lock ensures concurrency safety.
- */
 export async function commitDonorHandler(
   req: Request,
   res: Response,
@@ -344,11 +286,6 @@ export async function commitDonorHandler(
   }
 }
 
-/**
- * POST /api/blood/requests/:id/release-donor
- * Living citizen donor releases their walk-in commitment if unable to reach hospital in time.
- * Resets status to 'REQUESTED' for other donors.
- */
 export async function releaseDonorHandler(
   req: Request,
   res: Response,
@@ -369,10 +306,6 @@ export async function releaseDonorHandler(
   }
 }
 
-/**
- * POST /api/blood/requests/:id/complete-donor
- * Attending receiving hospital verifies walk-in donor arrival and successful phlebotomy draw.
- */
 export async function completeDonorDonationHandler(
   req: Request,
   res: Response,
@@ -393,10 +326,6 @@ export async function completeDonorDonationHandler(
   }
 }
 
-/**
- * GET /api/blood/requests/alerts
- * Returns active persistent alerts for the authenticated user (matching donors & hospitals).
- */
 export async function getActiveAlertsHandler(
   req: Request,
   res: Response,

@@ -4,10 +4,6 @@ import { BloodDonationCamp, CreateCampDTO, UpdateCampDTO } from '../types/camp';
 
 type CampRow = BloodDonationCamp & RowDataPacket;
 
-/**
- * Automatically transitions broadcasted camps to 'COMPLETED'
- * if their end date and end time have passed.
- */
 export async function autoCompletePastCamps(): Promise<void> {
   try {
     const [rows] = await pool.query<CampRow[]>(`
@@ -223,7 +219,6 @@ export async function listCamps(filters: { status?: string; city?: string } = {}
     query += ` AND c.status = ?`;
     params.push(filters.status);
   } else if (!filters.status) {
-    // By default, list active and upcoming broadcasted camps
     query += ` AND c.status IN ('UPCOMING', 'ACTIVE')`;
   }
 

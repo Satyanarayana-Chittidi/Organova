@@ -63,7 +63,6 @@ function DonateBloodContent() {
   const { user, loading: authLoading } = useAuth();
   const { refreshAlerts, socket, alerts } = useSocket();
 
-  // Check if donor has an active commitment for a different requisition (1-to-1 guard)
   const otherActivePass = alerts?.find(
     (a) => a.type === 'ACTIVE_DONOR_PASS' && a.meta?.requestId && Number(a.meta.requestId) !== requestId
   );
@@ -78,7 +77,6 @@ function DonateBloodContent() {
   const [isReleasing, setIsReleasing] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
-  // Self-declaration checklist before enabling the commitment button
   const [criteriaChecked, setCriteriaChecked] = useState({
     healthy: false,
     interval: false,
@@ -109,7 +107,6 @@ function DonateBloodContent() {
     }
   };
 
-  // Reset interactive states whenever visiting/revisiting this requisition
   useEffect(() => {
     setActionError(null);
     setActionSuccess(null);
@@ -125,7 +122,6 @@ function DonateBloodContent() {
     }
   }, [requestId, authLoading]);
 
-  // Listen for real-time status updates for this requisition
   useEffect(() => {
     if (!socket || isNaN(requestId)) return;
     const handleStatusChanged = (data: any) => {
@@ -144,7 +140,6 @@ function DonateBloodContent() {
     };
   }, [socket, requestId]);
 
-  // Auto-dismiss transient success alerts
   useEffect(() => {
     if (actionSuccess) {
       const timer = setTimeout(() => {
@@ -154,7 +149,6 @@ function DonateBloodContent() {
     }
   }, [actionSuccess]);
 
-  // Handle donor commitment
   const handleCommitToDonate = async () => {
     if (user && request && request.requester_user_id === user.id) {
       setActionError('You cannot commit as a donor for your own blood requisition.');
@@ -208,7 +202,6 @@ function DonateBloodContent() {
     }
   };
 
-  // Handle emergency release
   const handleReleaseCommitment = async () => {
     const confirmRelease = window.confirm(
       'Are you sure you need to release this commitment? The emergency request will immediately be returned to the open network for another donor.'
@@ -240,7 +233,6 @@ function DonateBloodContent() {
     }
   };
 
-  // Handle requisition cancellation by requester
   const handleCancelRequest = async () => {
     const confirmCancel = window.confirm(
       'Are you sure you want to cancel this emergency blood requisition? Active broadcasts and donor alerts will be cancelled immediately.'
@@ -321,7 +313,6 @@ function DonateBloodContent() {
   const isRequisitionView = fromHistory || fromEmergency || isMyOwnRequest || isCancelled || isCompleted;
   const canCancel = (isMyOwnRequest || user?.role === 'ADMIN') && !isCancelled && !isCompleted;
 
-  // Google Maps navigation query
   const mapsSearchQuery = encodeURIComponent(
     `${request.destination_hub_name}, ${request.destination_hub_address || ''}, ${
       request.destination_hub_city || ''
@@ -332,7 +323,6 @@ function DonateBloodContent() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-4xl mx-auto">
-        {/* Navigation Breadcrumb */}
         <div className="mb-6 flex items-center justify-between">
           <button
             type="button"
@@ -354,7 +344,6 @@ function DonateBloodContent() {
           <span className="text-xs font-mono text-slate-400">Requisition #BR-{request.id}</span>
         </div>
 
-        {/* Action Alerts */}
         {actionError && (
           <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
@@ -393,7 +382,6 @@ function DonateBloodContent() {
           </div>
         )}
 
-        {/* Active Walk-In Phlebotomy Pass (Shown on top when committed by current user) */}
         {isCommittedByMe && !isCancelled && (
           <div className="mb-8 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-800 text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
             <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
@@ -440,14 +428,12 @@ function DonateBloodContent() {
               </div>
             </div>
 
-            {/* Arrival Instruction Note */}
             <div className="bg-white/10 rounded-xl p-4 text-xs text-emerald-50 leading-relaxed mb-6">
               <strong>Instructions upon arrival:</strong> Head directly to the Emergency Blood Bank or Phlebotomy
               Counter at {request.destination_hub_name}. State that you are the walk-in donor for Requisition #BR-
               {request.id}. The attending clinical team will perform rapid cross-matching and collection.
             </div>
 
-            {/* Interactive Actions & Release Commitment in Bottom Right Corner */}
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
               <div className="flex flex-wrap items-center gap-3">
                 <a
@@ -472,7 +458,6 @@ function DonateBloodContent() {
                 )}
               </div>
 
-              {/* Release Commitment Button in bottom right corner of the card */}
               <button
                 type="button"
                 onClick={handleReleaseCommitment}
@@ -485,9 +470,7 @@ function DonateBloodContent() {
           </div>
         )}
 
-        {/* Main Requisition Details Card (Parent / Ultimate Div) */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-8">
-          {/* Card Header */}
           <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
@@ -516,7 +499,6 @@ function DonateBloodContent() {
               </div>
             </div>
 
-            {/* Current Status Pill */}
             <div>
               {isCancelled && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold">
@@ -551,12 +533,9 @@ function DonateBloodContent() {
             </div>
           </div>
 
-          {/* Requisition View Layout (Same style as cancelled request: 2 cards side-by-side on top, wide status card underneath) */}
           {isRequisitionView ? (
             <div className="p-6 space-y-6">
-              {/* Top Row: Requested Specimen & Receiving Hospital Side-by-Side */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-                {/* CARD 1: Requested Specimen */}
                 <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-3">
@@ -623,7 +602,6 @@ function DonateBloodContent() {
                   </div>
                 </div>
 
-                {/* CARD 2: Receiving Hospital */}
                 <div className="border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 bg-white dark:bg-slate-800/70 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
@@ -672,7 +650,6 @@ function DonateBloodContent() {
                 </div>
               </div>
 
-              {/* Wide Status Card Under Both of Them */}
               <div className="w-full rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-center space-y-4 shadow-2xs">
                 {isCancelled && (
                   <>
@@ -833,9 +810,7 @@ function DonateBloodContent() {
               </div>
             </div>
           ) : (
-            /* Four Cards on Top (2x2 Balanced Equal-Height Grid) for active orders */
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-            {/* CARD 1 (Top-Left): Requested Specimen */}
             <div className="order-1 md:order-1 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -879,7 +854,6 @@ function DonateBloodContent() {
               </div>
             </div>
 
-            {/* CARD 3 (Top-Right): Solemn Life-Safety Advisory */}
             <div className="order-3 md:order-2 rounded-2xl p-5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-200 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 font-bold text-amber-800 dark:text-amber-300 text-sm mb-2">
@@ -898,7 +872,6 @@ function DonateBloodContent() {
               </p>
             </div>
 
-            {/* CARD 2 (Bottom-Left): Receiving Hospital */}
             <div className="order-2 md:order-3 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 bg-white dark:bg-slate-800/70 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
@@ -945,7 +918,6 @@ function DonateBloodContent() {
               )}
             </div>
 
-              {/* CARD 4 (Bottom-Right): Donor Readiness Checklist */}
               <div className="order-4 md:order-4 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 bg-white dark:bg-slate-800/70 flex flex-col justify-between">
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3">
@@ -1012,7 +984,6 @@ function DonateBloodContent() {
             </div>
           )}
 
-          {/* Action Buttons Section Underneath the Four Cards — For Donor Commitment Flow */}
           {!isRequisitionView && (
             <div className="px-6 pb-6 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex flex-col items-center justify-center">
               {isOpen && hasOtherActiveCommitment && (

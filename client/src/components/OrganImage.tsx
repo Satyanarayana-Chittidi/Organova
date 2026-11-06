@@ -3,9 +3,6 @@
 import React from 'react';
 import { Heart, Droplet } from 'lucide-react';
 
-/**
- * Returns the public path to the transparent organ illustration, or null if cellular/unknown.
- */
 export function getOrganImagePath(organIdentifier?: string | null): string | null {
   if (!organIdentifier) return null;
   const str = String(organIdentifier).toUpperCase();
@@ -22,9 +19,6 @@ export function getOrganImagePath(organIdentifier?: string | null): string | nul
   return null;
 }
 
-/**
- * Formats user-facing display names for organs (e.g. Kidney vs Kidneys in living vs deceased context).
- */
 export function getOrganDisplayName(
   nameOrCode?: string | null,
   consentType?: 'LIVING' | 'DECEASED'
@@ -50,9 +44,6 @@ export function getOrganDisplayName(
   return String(nameOrCode);
 }
 
-/**
- * Clinical subtitles describing physiological category.
- */
 export function getOrganSubtitle(
   nameOrCode?: string | null,
   consentType?: 'LIVING' | 'DECEASED'
@@ -96,9 +87,6 @@ interface OrganImageProps {
   showContainer?: boolean;
 }
 
-/**
- * Universal component to display transparent organ PNGs across Citizen, Hub, and Master Control portals.
- */
 export default function OrganImage({
   organ,
   size = 'md',

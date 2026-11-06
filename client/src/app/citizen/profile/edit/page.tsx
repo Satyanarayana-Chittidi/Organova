@@ -66,7 +66,6 @@ function EditProfileContent() {
           }
         }
       } catch (err) {
-        // First-time signup may not have profile yet; that's normal
       } finally {
         setFetching(false);
       }
@@ -139,7 +138,6 @@ function EditProfileContent() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-10 transition-colors">
         
-        {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800 gap-4 mb-6">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-xs font-semibold mb-2">
@@ -169,7 +167,6 @@ function EditProfileContent() {
           )}
         </div>
 
-        {/* Alerts */}
         {error && (
           <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs flex items-center gap-2 mb-6">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -177,9 +174,7 @@ function EditProfileContent() {
           </div>
         )}
 
-        {/* Edit Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Section 1: Personal Identification */}
           <div>
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
               <User className="w-4 h-4 text-slate-500 dark:text-slate-400" />
@@ -269,7 +264,6 @@ function EditProfileContent() {
             </div>
           </div>
 
-          {/* Section 2: Emergency Contact */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
               <Phone className="w-4 h-4 text-slate-500 dark:text-slate-400" />
@@ -302,7 +296,6 @@ function EditProfileContent() {
             </div>
           </div>
 
-          {/* Section 3: Physical Address */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-slate-500 dark:text-slate-400" />
@@ -360,7 +353,6 @@ function EditProfileContent() {
             </div>
           </div>
 
-          {/* Form Actions */}
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
             <div>
               {!isFromSignup && (

@@ -47,7 +47,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   useEffect(() => {
-    // Only connect socket if user is authenticated
     if (!user) {
       if (socket) {
         socket.disconnect();
@@ -58,7 +57,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Initial persistent fetch of active emergency alerts matching this user (role/blood group)
     refreshAlerts();
 
     const SOCKET_URL =
@@ -78,7 +76,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setConnected(false);
     });
 
-    // Event 1: Organ Match Proposal to Attending Hospital
     s.on('MATCH_OFFER_RECEIVED', (data: any) => {
       const alert: LiveAlert = {
         id: Math.random().toString(),
@@ -91,7 +88,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setAlerts((prev) => [alert, ...prev]);
     });
 
-    // Event 2: Recipient Patient Match Alert
     s.on('RECIPIENT_MATCH_ALERT', (data: any) => {
       const alert: LiveAlert = {
         id: Math.random().toString(),
@@ -103,19 +99,16 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setAlerts((prev) => [alert, ...prev]);
     });
 
-    // Event 3: Emergency Blood Requisition Alert (Broadcast to Hubs & Matching Citizens)
     s.on('BLOOD_REQUEST_ALERT', (data: any) => {
       refreshAlerts();
     });
 
-    // Event 4: Blood Order Status Changed
     s.on('BLOOD_ORDER_STATUS_CHANGED', (data: any) => {
       if (data?.status === 'ALL_CLEARED') {
         setAlerts([]);
       } else if (data?.requestId) {
         const reqIdStr = String(data.requestId);
         if (data.status === 'CANCELLED' || data.status === 'COMPLETED') {
-          // Immediately purge alerts matching this request ID
           setAlerts((prev) =>
             prev.filter((a) => {
               const aReqId = a.meta?.requestId ? String(a.meta.requestId) : null;
@@ -125,7 +118,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
             })
           );
         } else if (data.status === 'DONOR_COMMITTED') {
-          // If a donor committed, other users shouldn't see it as an open SOS alert
           setAlerts((prev) =>
             prev.filter((a) => a.id !== `blood-req-${reqIdStr}`)
           );

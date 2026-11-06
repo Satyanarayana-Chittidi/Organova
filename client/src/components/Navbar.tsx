@@ -48,7 +48,6 @@ export default function Navbar() {
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
-  // Admin Search Click Handler: scrolls to registry-explorer and focuses search input
   const handleAdminSearchClick = (e: React.MouseEvent) => {
     if (pathname === '/master-control') {
       e.preventDefault();
@@ -65,7 +64,6 @@ export default function Navbar() {
     }
   };
 
-  // Filter alerts for the notification bell (exclude citizen's own requisitions)
   const visibleAlerts = alerts.filter(
     (a) => !a.meta?.requesterUserId || a.meta?.requesterUserId !== user?.id
   );
@@ -73,7 +71,6 @@ export default function Navbar() {
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const alertsMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -95,7 +92,6 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 xl:px-8">
         <div className="flex justify-between h-16 items-center gap-2 sm:gap-4">
           
-          {/* Logo & Brand */}
           <Link
             href={pathname.startsWith('/master-control') ? '/master-control' : '/'}
             className="flex items-center gap-2 sm:gap-2.5 shrink min-w-0 group"
@@ -113,10 +109,8 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Center Navigation Links (Hidden on mobile & tablet screens, visible on desktop >= 1280px) */}
           <div className="hidden xl:flex items-center gap-1 shrink-0">
             {pathname.startsWith('/master-control') ? (
-              /* Administrative Top-Level Navigation */
               <>
                 <Link
                   href="/master-control"
@@ -177,7 +171,6 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              /* General & Clinical Coordinator Navigation */
               <>
                 <Link
                   href="/"
@@ -227,7 +220,6 @@ export default function Navbar() {
                   Camps
                 </Link>
 
-                {/* Citizen Links */}
                 {user?.role === 'USER' && (
                   <>
                     <span className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1 shrink-0"></span>
@@ -270,7 +262,6 @@ export default function Navbar() {
                   </>
                 )}
 
-                {/* Hospital Coordinator Navigation */}
                 {user?.role === 'HOSPITAL' && (
                   <>
                     <span className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1 shrink-0"></span>
@@ -329,9 +320,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Right Action / Auth Panel */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            {/* Dark Mode Toggle directly in the Navbar */}
             <button
               type="button"
               onClick={toggleTheme}
@@ -345,7 +334,6 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* Live Alerts Bell */}
             {!pathname.startsWith('/master-control') && user && (
               <div className="relative" ref={alertsMenuRef}>
                 <button
@@ -362,7 +350,6 @@ export default function Navbar() {
                   )}
                 </button>
 
-                {/* Alerts Dropdown Panel */}
                 {alertsOpen && (
                   <div className="absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-24px)] bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-2">
@@ -390,7 +377,6 @@ export default function Navbar() {
                               </span>
                               <p className="text-slate-700 dark:text-slate-300 leading-snug">{alert.message}</p>
                               
-                              {/* Direct Action Link */}
                               {(alert.type === 'ACTIVE_DONOR_PASS' || alert.type === 'BLOOD_DONOR_SOS') && alert.meta?.requestId && (
                                 <Link
                                   href={`/blood/donate/${alert.meta.requestId}`}
@@ -442,7 +428,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Master Control Admin: Direct Lock Console Button */}
             {pathname.startsWith('/master-control') && (
               <button
                 type="button"
@@ -457,7 +442,6 @@ export default function Navbar() {
               </button>
             )}
 
-            {/* Authenticated User: Round PFP Button with Dropdown (Only on non-master-control routes) */}
             {!pathname.startsWith('/master-control') && user && (
               <div className="relative" ref={profileMenuRef}>
                 <button
@@ -479,10 +463,8 @@ export default function Navbar() {
                   )}
                 </button>
 
-                {/* Profile & Options Dropdown */}
                 {profileMenuOpen && (
                   <div className="absolute right-0 mt-2.5 w-64 max-w-[calc(100vw-24px)] bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                    {/* User Identity Header */}
                     <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
@@ -509,7 +491,6 @@ export default function Navbar() {
                       </div>
                     </div>
 
-                    {/* Role-Specific Navigation Options (Only for USER and HOSPITAL roles, NOT ADMIN) */}
                     {user.role === 'USER' && (
                       <>
                         <Link
@@ -574,7 +555,6 @@ export default function Navbar() {
                       </>
                     )}
 
-                    {/* Divider & Log Out */}
                     <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
                     <button
                       type="button"
@@ -597,7 +577,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Mobile Menu Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -609,11 +588,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="xl:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-3 pb-6 space-y-1 text-sm font-medium">
           {pathname.startsWith('/master-control') ? (
-            /* Admin Mobile Links */
             <>
               <Link
                 href="/master-control"
@@ -657,7 +634,6 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            /* Non-Admin Mobile Links */
             <>
               <Link
                 href="/"
@@ -694,7 +670,6 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Mobile Theme Toggle Button */}
           <button
             type="button"
             onClick={toggleTheme}

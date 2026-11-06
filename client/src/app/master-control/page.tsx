@@ -37,7 +37,6 @@ import {
   Navigation,
 } from 'lucide-react';
 
-// Helper component to render structured log metadata details without raw JSON
 function LogDetailsGrid({ meta }: { meta: any }) {
   const parsedMeta = typeof meta === 'string' ? (() => { try { return JSON.parse(meta); } catch { return {}; } })() : (meta || {});
 
@@ -103,7 +102,6 @@ export default function MasterControlPage() {
   const { user } = useAuth();
   const { isAdminUnlocked, adminUser, lockTerminal } = useAdminSession();
 
-  // Dashboard Data State
   const [metrics, setMetrics] = useState<any>(null);
   const [pendingHubs, setPendingHubs] = useState<any[]>([]);
   const [recentLogs, setRecentLogs] = useState<any[]>([]);
@@ -111,18 +109,14 @@ export default function MasterControlPage() {
   const [auditLoadingId, setAuditLoadingId] = useState<number | null>(null);
   const [actionMsg, setActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Pending Hub Modal State
   const [selectedPendingHub, setSelectedPendingHub] = useState<any | null>(null);
 
-  // Recent Logs Expanded State
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
-  // Entity Explorer Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<{ citizens: any[]; hubs: any[] } | null>(null);
   const [searching, setSearching] = useState(false);
 
-  // Auto-focus and scroll to Registry Explorer when navigated from search button or URL hash
   useEffect(() => {
     if (isAdminUnlocked) {
       const handleFocusCheck = () => {
@@ -142,7 +136,6 @@ export default function MasterControlPage() {
     }
   }, [isAdminUnlocked]);
 
-  // Load dashboard data whenever terminal is unlocked
   useEffect(() => {
     if (isAdminUnlocked) {
       loadDashboardData();
@@ -169,12 +162,10 @@ export default function MasterControlPage() {
     }
   };
 
-  // Lock Terminal / Sign Out
   const handleLockTerminal = () => {
     lockTerminal();
   };
 
-  // Audit Decision on Pending Hub
   const handleAuditDecision = async (hubId: number, status: 'ACTIVE' | 'REJECTED' | 'SUSPENDED') => {
     setAuditLoadingId(hubId);
     setActionMsg(null);
@@ -197,7 +188,6 @@ export default function MasterControlPage() {
     }
   };
 
-  // Instant Entity Search
   const handleSearchEntities = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
@@ -218,19 +208,12 @@ export default function MasterControlPage() {
     }
   };
 
-  // --------------------------------------------------------------------------
-  // RENDER: ADMIN GATE LOGIN (When Session is Locked)
-  // --------------------------------------------------------------------------
   if (!isAdminUnlocked) {
     return null;
   }
 
-  // --------------------------------------------------------------------------
-  // RENDER: UNLOCKED MASTER CONTROL COMMAND CENTER
-  // --------------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-      {/* Top Administrative Bar */}
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-600 to-red-600 text-white flex items-center justify-center shadow-md shadow-rose-600/20 shrink-0">
@@ -309,9 +292,6 @@ export default function MasterControlPage() {
       )}
 
       <div className="max-w-7xl mx-auto space-y-10">
-        {/* ================================================================== */}
-        {/* SECTION 1: FACILITY VERIFICATION DESK (TOP PRIORITY)              */}
-        {/* ================================================================== */}
         <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
@@ -395,7 +375,6 @@ export default function MasterControlPage() {
                     </div>
                   </div>
 
-                  {/* Audit Action Buttons */}
                   <div className="pt-3 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
                     <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:underline">
                       <span>Click to view full dossier</span>
@@ -432,7 +411,6 @@ export default function MasterControlPage() {
             </div>
           )}
 
-          {/* Full Facility Dossier Pop-up Modal */}
           {selectedPendingHub && (
             <div
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150"
@@ -442,7 +420,6 @@ export default function MasterControlPage() {
                 className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Modal Header */}
                 <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                   <div>
                     <div className="flex items-center gap-2 mb-1.5">
@@ -470,7 +447,6 @@ export default function MasterControlPage() {
                   </button>
                 </div>
 
-                {/* Information Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/70 space-y-1">
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
@@ -544,7 +520,6 @@ export default function MasterControlPage() {
                   </div>
                 </div>
 
-                {/* Modal Footer Actions */}
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3 flex-wrap">
                   <button
                     type="button"
@@ -587,9 +562,6 @@ export default function MasterControlPage() {
           )}
         </section>
 
-        {/* ================================================================== */}
-        {/* SECTION 2: REGISTRY & ENTITY EXPLORER (MOVED DIRECTLY UNDER SEC 1) */}
-        {/* ================================================================== */}
         <section id="registry-explorer" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -637,11 +609,9 @@ export default function MasterControlPage() {
             </button>
           </form>
 
-          {/* Search Results Display */}
           {searchResults && (
             <div className="space-y-4 pt-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Citizens Panel */}
                 <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-white">
                     <span className="flex items-center gap-1.5">
@@ -679,7 +649,6 @@ export default function MasterControlPage() {
                   )}
                 </div>
 
-                {/* Facilities Panel */}
                 <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-white">
                     <span className="flex items-center gap-1.5">
@@ -727,9 +696,6 @@ export default function MasterControlPage() {
           )}
         </section>
 
-        {/* ================================================================== */}
-        {/* SECTION 3: PLATFORM PULSE MATRIX (3 FOCUSED CARDS)                 */}
-        {/* ================================================================== */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -740,7 +706,6 @@ export default function MasterControlPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* CARD 1: ACTIVE MEDICAL HUBS */}
             <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-5">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -774,7 +739,6 @@ export default function MasterControlPage() {
               </div>
             </div>
 
-            {/* CARD 2: NETWORK BLOOD UNITS (MACRO NON-CLINICAL OVERVIEW) */}
             <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-5">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -814,7 +778,6 @@ export default function MasterControlPage() {
               </div>
             </div>
 
-            {/* CARD 3: HARVESTED ORGANS (ACTIVE BREAKDOWN & TRANSPLANTS) */}
             <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-5">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -834,7 +797,6 @@ export default function MasterControlPage() {
                   <span className="text-xs font-bold text-slate-500">Live Ready</span>
                 </div>
 
-                {/* Individual Organ Category Breakdown (Blood excluded) */}
                 <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 space-y-1.5">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">
                     Live Active Breakdown:
@@ -862,7 +824,6 @@ export default function MasterControlPage() {
                   </div>
                 </div>
 
-                {/* Standalone Lifetime Metrics */}
                 <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                   <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                     <span className="text-[10px] text-slate-400 block">Total Harvested:</span>
@@ -882,9 +843,6 @@ export default function MasterControlPage() {
           </div>
         </section>
 
-        {/* ================================================================== */}
-        {/* SECTION 4: AUDIT LOGS (PREVIEW & LINK TO FULL LOGS)                */}
-        {/* ================================================================== */}
         <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
             <div>
@@ -975,7 +933,6 @@ export default function MasterControlPage() {
                       </div>
                     </div>
 
-                    {/* Structured Details Preview */}
                     {isExpanded && log.meta && (
                       <LogDetailsGrid meta={log.meta} />
                     )}

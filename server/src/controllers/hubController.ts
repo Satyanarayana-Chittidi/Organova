@@ -12,11 +12,6 @@ import {
 } from '../services/hubService';
 import { HubQueryFilters, HubType } from '../types/hub';
 
-/**
- * POST /api/hubs/register
- * Public onboarding endpoint for Accredited Hospitals.
- * Saves the full institution profile in PENDING_APPROVAL state.
- */
 export async function registerHubHandler(
   req: Request,
   res: Response,
@@ -34,10 +29,6 @@ export async function registerHubHandler(
   }
 }
 
-/**
- * GET /api/hubs/me
- * Protected endpoint for institutional users to view their own facility profile & status.
- */
 export async function getMyHubProfileHandler(
   req: Request,
   res: Response,
@@ -55,10 +46,6 @@ export async function getMyHubProfileHandler(
   }
 }
 
-/**
- * GET /api/hubs/me/history
- * Protected: Medical facility views its full transaction ledger (harvests, transplants, waitlist, blood).
- */
 export async function getMyHubHistoryHandler(
   req: Request,
   res: Response,
@@ -76,10 +63,6 @@ export async function getMyHubHistoryHandler(
   }
 }
 
-/**
- * PUT /api/hubs/me
- * Protected: Updates medical facility profile information.
- */
 export async function updateMyHubProfileHandler(
   req: Request,
   res: Response,
@@ -98,13 +81,6 @@ export async function updateMyHubProfileHandler(
   }
 }
 
-/**
- * GET /api/hubs/directory
- * Public directory search for citizens and coordinators to find verified facilities.
- * Query Parameters:
- *   - city: string
- *   - search: string
- */
 export async function getPublicDirectoryHandler(
   req: Request,
   res: Response,
@@ -128,11 +104,6 @@ export async function getPublicDirectoryHandler(
   }
 }
 
-/**
- * GET /api/hubs/:id
- * Retrieves details for a specific medical facility by ID.
- * Only returns ACTIVE facilities publicly.
- */
 export async function getHubByIdHandler(
   req: Request,
   res: Response,
@@ -148,7 +119,6 @@ export async function getHubByIdHandler(
 
     const hub = await getHubById(hubId);
 
-    // If facility is not yet ACTIVE, hide it from the public unless requested by owner or admin
     if (hub.verification_status !== 'ACTIVE') {
       const isOwner = req.user && req.user.userId === hub.user_id;
       const isAdmin = req.user && req.user.role === 'ADMIN';
@@ -171,10 +141,6 @@ export async function getHubByIdHandler(
   }
 }
 
-/**
- * GET /api/hubs/cities
- * Retrieves all distinct cities where active hospitals exist.
- */
 export async function getHubCitiesHandler(
   req: Request,
   res: Response,
@@ -191,10 +157,6 @@ export async function getHubCitiesHandler(
   }
 }
 
-/**
- * GET /api/hubs/citizens/search
- * Protected: Medical hubs search registered citizens to link donor/recipient records.
- */
 export async function searchCitizensHandler(
   req: Request,
   res: Response,
@@ -213,10 +175,6 @@ export async function searchCitizensHandler(
   }
 }
 
-/**
- * POST /api/hubs/citizens/master-register
- * Protected: Hospital Master Control registers a citizen with auto-generated temp password (No OTP).
- */
 export async function masterRegisterCitizenHandler(
   req: Request,
   res: Response,

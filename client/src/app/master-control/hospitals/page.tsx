@@ -79,7 +79,6 @@ export default function MasterHubsPage() {
     }
   };
 
-  // Filtered Hubs
   const filteredHubs = hubs.filter((h) => {
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
@@ -94,7 +93,6 @@ export default function MasterHubsPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors py-8 px-4 sm:px-6 lg:px-8 space-y-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
             <Link
@@ -141,10 +139,8 @@ export default function MasterHubsPage() {
           </div>
         )}
 
-        {/* Filter and Search Bar */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-            {/* Search Input */}
             <div className="relative w-full">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
@@ -157,7 +153,6 @@ export default function MasterHubsPage() {
             </div>
           </div>
 
-          {/* Status Segmented Filter */}
           <div className="flex items-center gap-1.5 border-t border-slate-100 dark:border-slate-800 pt-3 flex-wrap">
             <span className="text-[11px] font-bold text-slate-400 mr-1">Status:</span>
             {[
@@ -182,7 +177,6 @@ export default function MasterHubsPage() {
           </div>
         </div>
 
-        {/* Hubs Grid */}
         {loading ? (
           <div className="py-16 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
             <span className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
@@ -202,7 +196,6 @@ export default function MasterHubsPage() {
                 className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex flex-col justify-between space-y-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
               >
                 <div className="space-y-3">
-                  {/* Top Badges */}
                   <div className="flex items-center justify-between gap-2">
                     <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900">
                       Hospital
@@ -229,7 +222,6 @@ export default function MasterHubsPage() {
                     </p>
                   </div>
 
-                  {/* Contact Dossier */}
                   <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 pt-1">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -245,7 +237,6 @@ export default function MasterHubsPage() {
                     </div>
                   </div>
 
-                  {/* Real-time Stored Assets Matrix */}
                   <div className="grid grid-cols-2 gap-2 pt-2 text-xs">
                     <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-center gap-2">
                       <Heart className="w-4 h-4 text-rose-500 shrink-0" />
@@ -264,7 +255,6 @@ export default function MasterHubsPage() {
                   </div>
                 </div>
 
-                {/* Administrative Controls */}
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hub.name}, ${hub.city}`)}`}

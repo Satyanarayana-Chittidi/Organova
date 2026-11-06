@@ -50,7 +50,6 @@ export default function CitizenProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Group pledges by organ to unify Living & Deceased consents cleanly
   const groupedPledges = React.useMemo(() => {
     const map = new Map<
       string,
@@ -118,8 +117,6 @@ export default function CitizenProfilePage() {
     });
   }, [pledges]);
 
-  // Extract recent unified donations (blood & organs)
-  // Blood Transactions (both Donated & Received)
   const bloodTransactions = React.useMemo(() => {
     if (!donationHistory) return [];
     const donated = (donationHistory.bloodDonations || []).map((b: any) => ({
@@ -161,7 +158,6 @@ export default function CitizenProfilePage() {
     );
   }, [donationHistory]);
 
-  // Organ Transactions (both Donated & Received)
   const organTransactions = React.useMemo(() => {
     if (!donationHistory) return [];
     const donated = (donationHistory.organDonations || []).map((o: any) => ({
@@ -207,7 +203,6 @@ export default function CitizenProfilePage() {
     const loadProfileAndPledges = async () => {
       try {
         setLoading(true);
-        // Load profile, active pledges, and lifetime donation history in parallel
         const [profileRes, pledgesRes, historyRes] = await Promise.allSettled([
           citizenApi.getProfile(),
           donorApi.getMyPledges(),
@@ -257,7 +252,6 @@ export default function CitizenProfilePage() {
     }
   }, [user, authLoading, router]);
 
-  // Keyboard shortcut to close photo modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && showPhotoModal) {
@@ -290,7 +284,6 @@ export default function CitizenProfilePage() {
     };
     reader.readAsDataURL(file);
 
-    // Reset input value so selecting the same file again triggers change
     e.target.value = '';
   };
 
@@ -374,7 +367,6 @@ export default function CitizenProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200 space-y-8">
-      {/* Hidden File Input for Avatar Upload */}
         <input
           type="file"
           ref={fileInputRef}
@@ -383,7 +375,6 @@ export default function CitizenProfilePage() {
           className="hidden"
         />
 
-        {/* Alerts */}
         {error && (
           <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs flex items-center gap-2 mb-6">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -391,10 +382,8 @@ export default function CitizenProfilePage() {
           </div>
         )}
 
-        {/* Section 1: Account Identity Banner */}
         <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 shadow-sm">
           <div className="flex items-center gap-4">
-            {/* Clickable Profile Picture that opens the Lightbox Modal */}
             <div
               onClick={() => setShowPhotoModal(true)}
               className="relative group shrink-0 cursor-pointer rounded-full transition-transform hover:scale-105 active:scale-95"
@@ -412,7 +401,6 @@ export default function CitizenProfilePage() {
                 </div>
               )}
 
-              {/* Subtle hover overlay hint */}
               <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                 <Maximize2 className="w-5 h-5 text-white" />
               </div>
@@ -445,7 +433,6 @@ export default function CitizenProfilePage() {
           </div>
         </div>
 
-        {/* Section 2: Pledges in Expanded View */}
         <div className="mb-8">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
             <div>
@@ -538,7 +525,6 @@ export default function CitizenProfilePage() {
           )}
         </div>
 
-        {/* Section 3: Additional Details under Pledges */}
         <div className="mb-8">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
             <div>
@@ -561,7 +547,6 @@ export default function CitizenProfilePage() {
           </div>
 
           {!hasCompleteDetails ? (
-            /* When details are missing, show the Plus logo card with the caption */
             <Link
               href="/citizen/profile/edit"
               className="group flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-rose-400 dark:hover:border-rose-500 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-rose-50/30 dark:hover:bg-rose-950/20 transition-all text-center cursor-pointer block"
@@ -577,9 +562,7 @@ export default function CitizenProfilePage() {
               </p>
             </Link>
           ) : (
-            /* Details Grid: 3 Distinct Cards */
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Card 1: Personal & Medical */}
               <div className="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
@@ -609,7 +592,6 @@ export default function CitizenProfilePage() {
                 </div>
               </div>
 
-              {/* Card 2: Emergency Next of Kin */}
               <div className="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5 text-rose-500" />
@@ -630,7 +612,6 @@ export default function CitizenProfilePage() {
                 </div>
               </div>
 
-              {/* Card 3: Residential Address */}
               <div className="md:col-span-2 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-blue-500" />
@@ -647,7 +628,6 @@ export default function CitizenProfilePage() {
           )}
         </div>
 
-        {/* SECTION 4: Blood Transactions History Card */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs transition-colors space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-4">
             <div className="flex items-center gap-3">
@@ -678,7 +658,6 @@ export default function CitizenProfilePage() {
             </Link>
           </div>
 
-          {/* Blood Summary Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
@@ -719,7 +698,6 @@ export default function CitizenProfilePage() {
             </div>
           </div>
 
-          {/* Blood Transactions List or Clean Empty State */}
           {bloodTransactions.length > 0 ? (
             <div className="space-y-3">
               {bloodTransactions.slice(0, 3).map((item: any) => (
@@ -826,7 +804,6 @@ export default function CitizenProfilePage() {
               )}
             </div>
           ) : (
-            /* Clean Friendly Empty State */
             <div className="p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 text-center">
               <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-3">
                 <Droplet className="w-6 h-6 fill-rose-500/20" />
@@ -857,7 +834,6 @@ export default function CitizenProfilePage() {
           )}
         </div>
 
-        {/* SECTION 5: Organ & Transplant History Card */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs transition-colors space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-4">
             <div className="flex items-center gap-3">
@@ -888,7 +864,6 @@ export default function CitizenProfilePage() {
             </Link>
           </div>
 
-          {/* Organ Summary Stats */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
@@ -915,7 +890,6 @@ export default function CitizenProfilePage() {
             </div>
           </div>
 
-          {/* Organ Transactions List or Clean Empty State */}
           {organTransactions.length > 0 ? (
             <div className="space-y-3">
               {organTransactions.slice(0, 3).map((item: any) => (
@@ -1039,7 +1013,6 @@ export default function CitizenProfilePage() {
               )}
             </div>
           ) : (
-            /* Clean Friendly Empty State */
             <div className="p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 text-center">
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
                 <Activity className="w-6 h-6" />
@@ -1070,13 +1043,11 @@ export default function CitizenProfilePage() {
           )}
         </div>
 
-      {/* Expanded Profile Picture Instagram-style Lightbox Modal */}
       {showPhotoModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200 select-none"
           onClick={() => !uploadingAvatar && setShowPhotoModal(false)}
         >
-          {/* Top-Right Sleek Close Button */}
           <button
             type="button"
             disabled={uploadingAvatar}
@@ -1087,12 +1058,10 @@ export default function CitizenProfilePage() {
             <X className="w-6 h-6" />
           </button>
 
-          {/* Modal Content: No white background, just the circular photo and action buttons */}
           <div
             className="flex flex-col items-center justify-center gap-6 max-w-sm w-full animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Expanded Circular Photo Container */}
             <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full overflow-hidden border-4 border-white/25 shadow-2xl ring-4 ring-black/40 flex items-center justify-center bg-slate-900">
               {avatarUrl ? (
                 <img
@@ -1114,13 +1083,11 @@ export default function CitizenProfilePage() {
               )}
             </div>
 
-            {/* Profile User Info */}
             <div className="text-center text-white">
               <h3 className="text-lg font-bold tracking-tight">{fullName || 'Citizen Profile Photo'}</h3>
               <p className="text-xs text-white/70 font-mono mt-0.5">{user?.email}</p>
             </div>
 
-            {/* Floating Action Buttons */}
             <div className="flex items-center justify-center gap-3 w-full">
               <button
                 type="button"
@@ -1147,7 +1114,6 @@ export default function CitizenProfilePage() {
           </div>
         </div>
       )}
-      {/* Interactive Avatar Cropper & Zoom Modal */}
       <AvatarCropperModal
         isOpen={showCropperModal}
         imageSrc={cropImageSrc}

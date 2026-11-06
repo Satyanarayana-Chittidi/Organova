@@ -73,7 +73,6 @@ export default function HarvestOrganPage() {
       router.push('/auth/login');
       return;
     }
-    // Default harvestedAt to local current ISO timestamp (YYYY-MM-DDTHH:mm)
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     setHarvestedAt(now.toISOString().slice(0, 16));
@@ -81,7 +80,6 @@ export default function HarvestOrganPage() {
     if (user) loadData();
   }, [user, authLoading]);
 
-  // Close organ preview dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (organDropdownRef.current && !organDropdownRef.current.contains(e.target as Node)) {
@@ -175,9 +173,6 @@ export default function HarvestOrganPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
-      {/* ------------------------------------------------------------- */}
-      {/* 1. EXECUTIVE OPERATIONAL OVERVIEW METRICS BAR (3 CLEAN CARDS) */}
-      {/* ------------------------------------------------------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
@@ -216,11 +211,7 @@ export default function HarvestOrganPage() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 2. MAIN WORKSPACE: FORM & LIVE ORGAN LEDGER                   */}
-      {/* ------------------------------------------------------------- */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Log Harvest Form (Roomy 5-col layout) */}
         <div className="xl:col-span-5 col-span-12 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs transition-colors space-y-6">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-xs font-semibold mb-2">
@@ -250,13 +241,11 @@ export default function HarvestOrganPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Rich Organ / Tissue Selection Dropdown with Previews inside */}
             <div className="relative" ref={organDropdownRef}>
               <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
                 Organ / Tissue *
               </label>
 
-              {/* Trigger Button */}
               <button
                 type="button"
                 onClick={() => setIsOrganDropdownOpen((prev) => !prev)}
@@ -300,7 +289,6 @@ export default function HarvestOrganPage() {
                 />
               </button>
 
-              {/* Dropdown Menu Items */}
               {isOrganDropdownOpen && (
                 <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden max-h-64 overflow-y-auto animate-in fade-in duration-150 p-1.5 space-y-1">
                   {organTypes.map((t) => {
@@ -343,7 +331,6 @@ export default function HarvestOrganPage() {
               )}
             </div>
 
-            {/* Blood Group and Timestamp Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -397,7 +384,6 @@ export default function HarvestOrganPage() {
               </div>
             </div>
 
-            {/* Clinical Preservation Notes */}
             <div>
               <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
                 Clinical Preservation Notes
@@ -411,7 +397,6 @@ export default function HarvestOrganPage() {
               />
             </div>
 
-            {/* Donor Citizen Account Linkage (Optional) */}
             <div className="pt-2">
               <CitizenAccountLinker
                 label="Donor Citizen Profile (Optional)"
@@ -440,10 +425,8 @@ export default function HarvestOrganPage() {
           </form>
         </div>
 
-        {/* Right Column: Live Network Organs (Roomy 7-col layout) */}
         <div className="xl:col-span-7 col-span-12 space-y-6">
           <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
-            {/* Header with Navigation and Refresh */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
               <div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -475,7 +458,6 @@ export default function HarvestOrganPage() {
               </div>
             </div>
 
-            {/* Filter and Search Bar */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -488,7 +470,6 @@ export default function HarvestOrganPage() {
                 />
               </div>
 
-              {/* Status Filter Tabs (Clean: All, Available, Matching) */}
               <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs font-semibold overflow-x-auto shrink-0">
                 <button
                   type="button"
@@ -526,20 +507,18 @@ export default function HarvestOrganPage() {
               </div>
             </div>
 
-            {/* Empty state */}
             {filteredOrgans.length === 0 && !loading && (
               <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-xs bg-slate-50/50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
                 No active viable organs matching the current criteria.
               </div>
             )}
 
-            {/* List of active organs (completely normal presentation) */}
             <div className="space-y-4">
               {filteredOrgans.map((organ) => {
                 const remMins = organ.remaining_minutes || 0;
                 const hours = Math.floor(remMins / 60);
                 const mins = remMins % 60;
-                const isUrgent = remMins > 0 && remMins < 120; // less than 2 hours left
+                const isUrgent = remMins > 0 && remMins < 120;
                 const cleanNotes = formatCleanNotes(organ.clinical_notes);
 
                 return (
@@ -547,7 +526,6 @@ export default function HarvestOrganPage() {
                     key={organ.id}
                     className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all space-y-3"
                   >
-                    {/* Top Row: Details on Left, Shelf-Life Clock & Action CTA on Right */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-start gap-3.5 flex-1 min-w-0">
                         <OrganImage
@@ -595,7 +573,6 @@ export default function HarvestOrganPage() {
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
-                        {/* Normal Cold Ischemia Shelf-Life Clock */}
                         <div
                           className={`px-3.5 py-2.5 rounded-2xl border text-center shrink-0 ${
                             isUrgent
@@ -624,7 +601,6 @@ export default function HarvestOrganPage() {
                           </span>
                         </div>
 
-                        {/* Action CTA */}
                         {organ.status === 'AVAILABLE' ? (
                           <Link
                             href={`/hospital/matches?organId=${organ.id}`}
@@ -649,7 +625,6 @@ export default function HarvestOrganPage() {
                       </div>
                     </div>
 
-                    {/* Bottom Row: Full-Width Clinical Note spanning 100% of the organ card */}
                     {cleanNotes && (
                       <div className="w-full pt-1">
                         <div className="p-3 rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-300 leading-relaxed break-words whitespace-pre-wrap flex items-start gap-2.5">

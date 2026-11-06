@@ -3,7 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import { Request } from 'express';
 
-// Ensure the avatar upload directory exists
 const uploadDir = path.join(__dirname, '../../uploads/avatars');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -40,6 +39,6 @@ export const uploadAvatarMiddleware = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024,
   },
 });

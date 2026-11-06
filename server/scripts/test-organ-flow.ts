@@ -7,7 +7,6 @@ async function runTest() {
   console.log('🫀 MODULE 6: ORGAN HARVEST & COLD ISCHEMIA ENGINE TEST SUITE');
   console.log('===============================================================\n');
 
-  // Pre-cleanup of test entities
   const hospEmail = 'apollo.delhi@hospital.org';
   const hospLicense = 'APOLLO-DELHI-CIT-01';
 
@@ -15,7 +14,6 @@ async function runTest() {
   await pool.query('DELETE FROM medical_hubs WHERE license_number = ?', [hospLicense]);
   await pool.query('DELETE FROM users WHERE email = ?', [hospEmail]);
 
-  // Step 1: Query approved organ types and viability limits
   console.log('▶ [Step 1] Inspecting approved organ types & cold ischemia limits...');
   const typesRes = await fetch(`${BASE_URL}/organs/types`);
   const typesData: any = await typesRes.json();
@@ -31,7 +29,6 @@ async function runTest() {
   console.log(`  ✓ Kidney shelf-life:  ${kidneyType.max_viability_hours} hours`);
   console.log(`  ✓ Cornea shelf-life:  ${corneaType.max_viability_hours} hours (${corneaType.max_viability_hours / 24} days)\n`);
 
-  // Step 2: Register & activate transplant hospital
   console.log('▶ [Step 2] Registering & activating Apollo Transplant Hospital...');
   const regRes = await fetch(`${BASE_URL}/hubs/register`, {
     method: 'POST',
@@ -54,7 +51,6 @@ async function runTest() {
   const regData: any = await regRes.json();
   const hospHubId = regData.data.id;
 
-  // Admin approves hospital
   const adminLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -75,7 +71,6 @@ async function runTest() {
     body: JSON.stringify({ status: 'ACTIVE' }),
   });
 
-  // Login as Hospital
   const hospLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -85,9 +80,8 @@ async function runTest() {
   const hospToken = hospLoginData.data.token;
   console.log(`  ✓ Apollo Hospital activated (ID: ${hospHubId})\n`);
 
-  // Step 3: Log harvested donor Heart
   console.log('▶ [Step 3] Logging harvested Heart (Cold Ischemia window = 6 hours)...');
-  const harvestTime = new Date(Date.now() - 30 * 60 * 1000); // Harvested 30 mins ago
+  const harvestTime = new Date(Date.now() - 30 * 60 * 1000);
   const harvestRes = await fetch(`${BASE_URL}/organs/harvest`, {
     method: 'POST',
     headers: {
@@ -113,9 +107,7 @@ async function runTest() {
   console.log(`  ✓ Calculated Expiration: ${harvestData.data.expires_at}`);
   console.log(`  ✓ Live Remaining Minutes: ${harvestData.data.remaining_minutes} mins (~5.5 hours remaining)\n`);
 
-  // Step 4: Medical Guardrails Check
   console.log('▶ [Step 4] Testing medical validity guardrails...');
-  // A. Future harvest date
   const futureHarvestRes = await fetch(`${BASE_URL}/organs/harvest`, {
     method: 'POST',
     headers: {
@@ -130,7 +122,6 @@ async function runTest() {
   });
   console.log(`  ✓ Future harvest rejected: HTTP ${futureHarvestRes.status}`);
 
-  // B. Harvested past cold ischemia limit (Heart harvested 8 hours ago, limit is 6h)
   const expiredHarvestRes = await fetch(`${BASE_URL}/organs/harvest`, {
     method: 'POST',
     headers: {
@@ -146,7 +137,6 @@ async function runTest() {
   const expiredHarvestData: any = await expiredHarvestRes.json();
   console.log(`  ✓ Non-viable harvest rejected: HTTP ${expiredHarvestRes.status} (${expiredHarvestData.message})\n`);
 
-  // Step 5: Querying viable organs
   console.log('▶ [Step 5] Searching network for viable O+ organs...');
   const searchRes = await fetch(`${BASE_URL}/organs?blood_group=${encodeURIComponent('O+')}&only_viable=true`, {
     headers: { Authorization: `Bearer ${hospToken}` },
@@ -159,10 +149,8 @@ async function runTest() {
   console.log(`  ✓ Found viable organ: '${found.organ_name}' at '${found.current_hub_name}'`);
   console.log(`  ✓ Custody Coordinates: (${found.current_hub_latitude}, ${found.current_hub_longitude})\n`);
 
-  // Step 6: Transit & Transplant State Progression
   console.log('▶ [Step 6] Advancing organ lifecycle along the transplant corridor...');
   
-  // AVAILABLE -> ALLOCATED
   const allocRes = await fetch(`${BASE_URL}/organs/${organId}/status`, {
     method: 'PATCH',
     headers: {
@@ -177,7 +165,6 @@ async function runTest() {
   const allocData: any = await allocRes.json();
   console.log(`  ✓ State transition 1: '${allocData.data.status}'`);
 
-  // ALLOCATED -> IN_TRANSIT
   const transitRes = await fetch(`${BASE_URL}/organs/${organId}/status`, {
     method: 'PATCH',
     headers: {
@@ -192,7 +179,6 @@ async function runTest() {
   const transitData: any = await transitRes.json();
   console.log(`  ✓ State transition 2: '${transitData.data.status}'`);
 
-  // IN_TRANSIT -> DELIVERED
   const deliverRes = await fetch(`${BASE_URL}/organs/${organId}/status`, {
     method: 'PATCH',
     headers: {
@@ -207,7 +193,6 @@ async function runTest() {
   const deliverData: any = await deliverRes.json();
   console.log(`  ✓ State transition 3: '${deliverData.data.status}'`);
 
-  // DELIVERED -> TRANSPLANTED
   const txRes = await fetch(`${BASE_URL}/organs/${organId}/status`, {
     method: 'PATCH',
     headers: {
@@ -222,7 +207,6 @@ async function runTest() {
   const txData: any = await txRes.json();
   console.log(`  ✓ State transition 4: '${txData.data.status}'\n`);
 
-  // Step 7: Terminal State Immutability
   console.log('▶ [Step 7] Testing terminal state immutability...');
   const illegalRevertRes = await fetch(`${BASE_URL}/organs/${organId}/status`, {
     method: 'PATCH',
@@ -235,9 +219,7 @@ async function runTest() {
   const illegalRevertData: any = await illegalRevertRes.json();
   console.log(`  ✓ Illegal status reversal prevented: HTTP ${illegalRevertRes.status} (${illegalRevertData.message})\n`);
 
-  // Step 8: Cold Ischemia Expiration Sweeper Test
   console.log('▶ [Step 8] Testing automatic cold ischemia expiration sweep...');
-  // Directly insert an organ whose expires_at is 1 hour in the past
   const pastHarvest = new Date(Date.now() - 7 * 3600 * 1000);
   const pastExpires = new Date(Date.now() - 1 * 3600 * 1000);
 
@@ -250,7 +232,6 @@ async function runTest() {
   );
   const overdueOrganId = insertPast.insertId;
 
-  // Run expiration sweep via Admin endpoint
   const sweepRes = await fetch(`${BASE_URL}/organs/sweep-expired`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${adminToken}` },
@@ -258,7 +239,6 @@ async function runTest() {
   const sweepData: any = await sweepRes.json();
   console.log(`  ✓ Sweep completed: ${sweepData.data.expiredCount} overdue organ(s) transitioned to EXPIRED.`);
 
-  // Verify status in DB
   const [checkRow]: any = await pool.query('SELECT status FROM available_organs WHERE id = ?', [overdueOrganId]);
   if (checkRow[0].status !== 'EXPIRED') {
     throw new Error(`Failed: Overdue organ has status '${checkRow[0].status}' instead of 'EXPIRED'.`);

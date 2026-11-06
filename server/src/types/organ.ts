@@ -1,6 +1,3 @@
-// ====================================================================
-// ORGAN HARVEST & COLD ISCHEMIA VIABILITY TYPES
-// ====================================================================
 
 import { BloodGroup } from './blood';
 
@@ -25,10 +22,6 @@ export type OrganStatus =
   | 'TRANSPLANTED'
   | 'EXPIRED';
 
-// --------------------------------------------------------------------
-// 1. DATABASE ENTITIES
-// --------------------------------------------------------------------
-
 export interface OrganTypeEntity {
   id: number;
   code: OrganCode;
@@ -51,7 +44,6 @@ export interface AvailableOrganEntity {
   clinical_notes: string | null;
   created_at: Date;
 
-  // Enriched clinical and facility fields from joins
   organ_name?: string;
   organ_code?: OrganCode;
   organ_category?: OrganCategory;
@@ -67,15 +59,11 @@ export interface AvailableOrganEntity {
   is_viable?: boolean;
 }
 
-// --------------------------------------------------------------------
-// 2. DATA TRANSFER OBJECTS (DTOs)
-// --------------------------------------------------------------------
-
 export interface HarvestOrganDTO {
   organ_type_id: number;
   donor_user_id?: string;
   blood_group: BloodGroup;
-  harvested_at: string; // ISO 8601 string
+  harvested_at: string;
   clinical_notes?: string;
   never_expires?: boolean;
 }

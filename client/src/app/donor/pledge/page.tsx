@@ -52,14 +52,11 @@ export default function DonorPledgePage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal State for New Pledge Selection
   const [modalTarget, setModalTarget] = useState<ModalTarget | null>(null);
   const [isDeclarationChecked, setIsDeclarationChecked] = useState(false);
 
-  // Modal State for Revoke All Confirmation
   const [isRevokeAllOpen, setIsRevokeAllOpen] = useState(false);
 
-  // Docking State: floats over viewport while scrolling, docks at end of page to never leak into footer
   const [isDocked, setIsDocked] = useState(false);
   const dockSentinelRef = React.useRef<HTMLDivElement>(null);
 
@@ -128,33 +125,22 @@ export default function DonorPledgePage() {
     );
   };
 
-  /**
-   * Tile click handler:
-   * - If already selected: Deselect immediately on click (normal deselect, no popup)
-   * - If unselected: Show declaration popup modal with legal info & pledge confirmation checkbox
-   */
   const handleTileClick = (organ: OrganType, consentType: 'DECEASED' | 'LIVING') => {
     setError(null);
     setSuccessMsg(null);
 
     if (isSelected(organ.id, consentType)) {
-      // Normal Deselect on Click
       setPledges((prev) =>
         prev.filter(
           (p) => !(p.organ_type_id === organ.id && p.consent_type === consentType)
         )
       );
     } else {
-      // Open pledge popup modal for newly selected organ
       setModalTarget({ organ, consentType });
       setIsDeclarationChecked(false);
     }
   };
 
-  /**
-   * Confirm pledge from modal:
-   * Adds the organ to active pledges and closes modal
-   */
   const handleConfirmModalPledge = () => {
     if (!modalTarget || !isDeclarationChecked) return;
 
@@ -179,10 +165,6 @@ export default function DonorPledgePage() {
     }
   };
 
-  /**
-   * Save pledges to database:
-   * Deselected organs are automatically revoked in the DB.
-   */
   const handlePledgeOrgans = async () => {
     setSaving(true);
     setError(null);
@@ -205,10 +187,6 @@ export default function DonorPledgePage() {
     }
   };
 
-  /**
-   * Revoke all pledges handler with modal confirmation:
-   * Revokes all user pledges in database and clears local state
-   */
   const handleRevokeAllConfirm = async () => {
     setRevoking(true);
     setError(null);
@@ -271,7 +249,6 @@ export default function DonorPledgePage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-12 w-full transition-colors duration-200">
       <div className="space-y-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-transparent dark:border-amber-900/50 text-xs font-semibold mb-2">
@@ -321,7 +298,6 @@ export default function DonorPledgePage() {
           </div>
         )}
 
-        {/* Section 1: Living Allowed Donations */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
           <div className="mb-6">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white transition-colors">
@@ -347,7 +323,6 @@ export default function DonorPledgePage() {
                   }`}
                 >
                   <div>
-                    {/* Top Row: Badge on Left, Checkbox on Right */}
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-950/70 border border-emerald-200/50 dark:border-emerald-800/50 px-2 py-0.5 rounded-md">
                         Living
@@ -363,7 +338,6 @@ export default function DonorPledgePage() {
                       </div>
                     </div>
 
-                    {/* Middle: Name & Viability on Left, Organ Image on Right */}
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg mb-1 leading-snug">
@@ -384,7 +358,6 @@ export default function DonorPledgePage() {
                     </div>
                   </div>
 
-                  {/* Bottom: Status Action */}
                   <div
                     className={`mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-xs font-medium transition-colors ${
                       active ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
@@ -398,7 +371,6 @@ export default function DonorPledgePage() {
           </div>
         </div>
 
-        {/* Section 2: Deceased Allowed Donations */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
           <div className="mb-6">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white transition-colors">
@@ -424,7 +396,6 @@ export default function DonorPledgePage() {
                   }`}
                 >
                   <div>
-                    {/* Top Row: Badge on Left, Checkbox on Right */}
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-950/70 border border-rose-200/50 dark:border-rose-800/50 px-2 py-0.5 rounded-md">
                         Deceased
@@ -440,7 +411,6 @@ export default function DonorPledgePage() {
                       </div>
                     </div>
 
-                    {/* Middle: Name & Shelf-Life on Left, Organ Image on Right */}
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg mb-1 leading-snug">
@@ -461,7 +431,6 @@ export default function DonorPledgePage() {
                     </div>
                   </div>
 
-                  {/* Bottom: Status Action */}
                   <div
                     className={`mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-xs font-medium transition-colors ${
                       active ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-slate-500 dark:text-slate-400'
@@ -475,7 +444,6 @@ export default function DonorPledgePage() {
           </div>
         </div>
 
-        {/* Dock Area at End of Page: Takes its natural place above footer and stops floating */}
         <div ref={dockSentinelRef} className="w-full max-w-3xl mx-auto pt-6 min-h-[64px]">
           {isDocked && (
             <div className="w-full animate-in fade-in duration-200">
@@ -518,7 +486,6 @@ export default function DonorPledgePage() {
         </div>
       </div>
 
-      {/* Floating Viewport Pill: Active while scrolling until reaching the end of the page */}
       {!isDocked && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl pointer-events-none transition-all duration-300 animate-in fade-in">
           <div className="pointer-events-auto px-5 sm:px-7 py-3 rounded-full backdrop-blur-2xl backdrop-saturate-150 bg-white/85 dark:bg-slate-900/85 border border-white/60 dark:border-white/10 shadow-2xl shadow-slate-900/15 dark:shadow-black/60 ring-1 ring-black/5 dark:ring-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 transition-all duration-300">
@@ -558,9 +525,6 @@ export default function DonorPledgePage() {
         </div>
       )}
 
-      {/* ==================================================================== */}
-      {/* PLEDGE DECLARATION POPUP MODAL (Shows when clicking an unselected tile) */}
-      {/* ==================================================================== */}
       {modalTarget && (
         <div
           role="dialog"
@@ -568,7 +532,6 @@ export default function DonorPledgePage() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
         >
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto transition-colors">
-            {/* Close Button */}
             <button
               onClick={() => {
                 setModalTarget(null);
@@ -579,7 +542,6 @@ export default function DonorPledgePage() {
               <X className="w-5 h-5" />
             </button>
 
-            {/* Modal Title & Organ Indicator */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0 pr-2">
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -611,7 +573,6 @@ export default function DonorPledgePage() {
               )}
             </div>
 
-            {/* Educational & Clinical Explanation */}
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
               <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
@@ -636,7 +597,6 @@ export default function DonorPledgePage() {
               )}
             </div>
 
-            {/* Legal Protections & Rights */}
             <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
               <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                 <Scale className="w-4 h-4 text-indigo-500" />
@@ -664,7 +624,6 @@ export default function DonorPledgePage() {
               </ul>
             </div>
 
-            {/* Cool Pledge Phrase Checkbox */}
             <div className="pt-2">
               <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 cursor-pointer transition-colors">
                 <input
@@ -683,7 +642,6 @@ export default function DonorPledgePage() {
               </label>
             </div>
 
-            {/* Modal Actions */}
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
@@ -709,9 +667,6 @@ export default function DonorPledgePage() {
         </div>
       )}
 
-      {/* ==================================================================== */}
-      {/* REVOKE ALL PLEDGES CONFIRMATION MODAL */}
-      {/* ==================================================================== */}
       {isRevokeAllOpen && (
         <div
           role="dialog"

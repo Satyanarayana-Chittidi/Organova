@@ -7,7 +7,6 @@ import { JWTPayload } from '../types/auth';
 
 let io: SocketIOServer | null = null;
 
-// Extend socket data interface with our authenticated user session
 export interface AuthenticatedSocket extends Socket {
   data: {
     user?: JWTPayload;
@@ -17,9 +16,6 @@ export interface AuthenticatedSocket extends Socket {
   };
 }
 
-/**
- * Initializes the Socket.IO WebSocket server with CORS and JWT authentication.
- */
 export function initSocketServer(httpServer: HttpServer): SocketIOServer {
   io = new SocketIOServer(httpServer, {
     cors: {
@@ -31,12 +27,10 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
     pingTimeout: 20000,
   });
 
-  // Authentication Handshake Middleware
   io.use(async (socket: AuthenticatedSocket, next) => {
     try {
       let token = socket.handshake.auth?.token;
 
-      // Fallback: extract from cookie header
       if (!token && socket.handshake.headers.cookie) {
         const cookies = socket.handshake.headers.cookie.split(';');
         for (const cookie of cookies) {
@@ -55,7 +49,6 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
       const decoded = verifyToken(token);
       socket.data.user = decoded;
 
-      // If the user belongs to an institutional facility, join their hub room
       if (decoded.role === 'HOSPITAL') {
         const hub = await findHubByUserId(decoded.userId);
         if (hub) {
@@ -78,24 +71,19 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
     }
   });
 
-  // Client Connection & Room Subscriptions
   io.on('connection', (socket: AuthenticatedSocket) => {
     const user = socket.data.user!;
     console.log(`[WEBSOCKET] Client connected: Socket ID ${socket.id} (User: ${user.email}, Role: ${user.role})`);
 
-    // 1. Join user-specific personal room
     socket.join(`user:${user.userId}`);
 
-    // 2. Join role-specific broadcast room
     socket.join(`role:${user.role}`);
 
-    // 3. Join facility room if applicable
     if (socket.data.hubId) {
       socket.join(`hub:${socket.data.hubId}`);
       console.log(`[WEBSOCKET] Socket joined facility room: hub:${socket.data.hubId}`);
     }
 
-    // 4. Join blood group room if citizen donor
     if (socket.data.bloodGroup) {
       socket.join(`blood:${socket.data.bloodGroup}`);
       console.log(`[WEBSOCKET] Citizen joined blood donor room: blood:${socket.data.bloodGroup}`);
@@ -110,9 +98,6 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
   return io;
 }
 
-/**
- * Returns the singleton Socket.IO instance.
- */
 export function getIO(): SocketIOServer {
   if (!io) {
     throw new Error('Socket.IO has not been initialized. Call initSocketServer() first.');
@@ -120,13 +105,6 @@ export function getIO(): SocketIOServer {
   return io;
 }
 
-// ====================================================================
-// REAL-TIME EVENT EMISSION DISPATCHERS
-// ====================================================================
-
-/**
- * Dispatches live notification when an organ match offer is proposed.
- */
 export function emitMatchOfferProposed(payload: {
   matchId: number;
   organName: string;
@@ -138,7 +116,6 @@ export function emitMatchOfferProposed(payload: {
 }): void {
   if (!io) return;
 
-  // 1. Alert attending surgical team room
   io.to(`hub:${payload.attendingHubId}`).emit('MATCH_OFFER_RECEIVED', {
     type: 'ORGAN_MATCH_OFFER',
     priority: 'HIGH_URGENCY',
@@ -149,14 +126,12 @@ export function emitMatchOfferProposed(payload: {
     timestamp: new Date().toISOString(),
   });
 
-  // 2. Alert recipient patient passport room
   io.to(`user:${payload.recipientUserId}`).emit('RECIPIENT_MATCH_ALERT', {
     type: 'MATCH_OFFERED',
     message: `A compatible donor ${payload.organName} has been identified. Your surgical team is reviewing the offer.`,
     timestamp: new Date().toISOString(),
   });
 
-  // 3. Alert platform administrators
   io.to('role:ADMIN').emit('ADMIN_AUDIT_LOG', {
     event: 'ORGAN_MATCH_PROPOSED',
     matchId: payload.matchId,
@@ -165,9 +140,6 @@ export function emitMatchOfferProposed(payload: {
   });
 }
 
-/**
- * Dispatches notification when a match offer is accepted.
- */
 export function emitMatchOfferAccepted(payload: {
   matchId: number;
   organId: number;
@@ -177,7 +149,6 @@ export function emitMatchOfferAccepted(payload: {
 }): void {
   if (!io) return;
 
-  // Alert donor harvesting facility
   io.to(`hub:${payload.donorHubId}`).emit('MATCH_ALLOCATED', {
     type: 'ORGAN_ALLOCATED',
     message: `Offer accepted! ${payload.organName} allocated for transplant. Prepare cold preservation for dispatch.`,
@@ -187,9 +158,6 @@ export function emitMatchOfferAccepted(payload: {
   });
 }
 
-/**
- * Dispatches real-time broadcast when an emergency blood requisition is registered.
- */
 export function emitEmergencyBloodRequest(payload: {
   requestId: number;
   requesterUserId?: string;
@@ -203,7 +171,6 @@ export function emitEmergencyBloodRequest(payload: {
 }): void {
   if (!io) return;
 
-  // Broadcast to all Hospitals in the network (or specific targeted hubs)
   const alertEvent = {
     type: 'EMERGENCY_BLOOD_ALERT',
     priority: payload.urgency,
@@ -231,7 +198,6 @@ export function emitEmergencyBloodRequest(payload: {
     io.to('role:HOSPITAL').emit('BLOOD_REQUEST_ALERT', alertEvent);
   }
 
-  // Broadcast to all matching compatible citizen blood donors in real-time
   const donorGroups = payload.compatibleDonorGroups && payload.compatibleDonorGroups.length > 0
     ? payload.compatibleDonorGroups
     : [payload.bloodGroup];
@@ -245,9 +211,6 @@ export function emitEmergencyBloodRequest(payload: {
   }
 }
 
-/**
- * Dispatches live update to patient, donor, or hospital when blood request status advances.
- */
 export function emitBloodRequestStatusUpdate(payload: {
   requestId: number;
   requesterUserId: string;
@@ -269,22 +232,17 @@ export function emitBloodRequestStatusUpdate(payload: {
     timestamp: new Date().toISOString(),
   };
 
-  // Broadcast globally so all connected clients (citizens, hospitals) update or clear this requisition
   io.emit('BLOOD_ORDER_STATUS_CHANGED', eventData);
 
-  // 1. Notify the requester specifically
   io.to(`user:${payload.requesterUserId}`).emit('BLOOD_ORDER_STATUS_CHANGED', eventData);
 
-  // 2. Notify the committed donor if present
   if (payload.donorUserId) {
     io.to(`user:${payload.donorUserId}`).emit('BLOOD_ORDER_STATUS_CHANGED', eventData);
   }
 
-  // 3. Notify the citizen blood group room
   if (payload.bloodGroup) {
     io.to(`blood:${payload.bloodGroup}`).emit('BLOOD_ORDER_STATUS_CHANGED', eventData);
   }
 
-  // 4. Notify facilities
   io.to('role:HOSPITAL').emit('BLOOD_ORDER_STATUS_CHANGED', eventData);
 }

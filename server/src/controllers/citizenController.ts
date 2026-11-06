@@ -2,17 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import * as citizenService from '../services/citizenService';
 import { UpsertCitizenProfileDTO } from '../types/citizen';
 
-/**
- * Creates or updates the authenticated citizen's profile.
- * POST /api/citizen/profile
- */
 export async function saveMyProfile(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    const userId = req.user!.userId; // Extracted from verified JWT session
+    const userId = req.user!.userId;
     const dto: UpsertCitizenProfileDTO = req.body;
 
     const savedProfile = await citizenService.saveCitizenProfile(userId, dto);
@@ -23,14 +19,10 @@ export async function saveMyProfile(
       data: savedProfile,
     });
   } catch (error) {
-    next(error); // Forward to global error handler
+    next(error);
   }
 }
 
-/**
- * Retrieves the authenticated citizen's profile and completion state.
- * GET /api/citizen/profile
- */
 export async function getMyProfile(
   req: Request,
   res: Response,
@@ -50,10 +42,6 @@ export async function getMyProfile(
   }
 }
 
-/**
- * Uploads a profile picture avatar for the citizen.
- * POST /api/citizen/avatar
- */
 export async function uploadMyAvatar(
   req: Request,
   res: Response,
@@ -92,10 +80,6 @@ export async function uploadMyAvatar(
   }
 }
 
-/**
- * Removes the profile picture avatar.
- * DELETE /api/citizen/avatar
- */
 export async function removeMyAvatar(
   req: Request,
   res: Response,
@@ -114,10 +98,6 @@ export async function removeMyAvatar(
   }
 }
 
-/**
- * Retrieves the authenticated citizen's lifetime donation history and stats.
- * GET /api/citizen/history
- */
 export async function getMyDonationHistory(
   req: Request,
   res: Response,

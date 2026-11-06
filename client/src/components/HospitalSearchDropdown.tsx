@@ -25,13 +25,11 @@ export default function HospitalSearchDropdown({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Identify currently selected hospital
   const selectedHospital = useMemo(() => {
     if (!selectedHospitalId) return null;
     return hospitals.find((h) => String(h.id) === String(selectedHospitalId)) || null;
   }, [hospitals, selectedHospitalId]);
 
-  // Filter hospitals by name or city
   const filteredHospitals = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return hospitals;
@@ -43,7 +41,6 @@ export default function HospitalSearchDropdown({
     );
   }, [hospitals, searchQuery]);
 
-  // Click outside listener to close dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -75,7 +72,6 @@ export default function HospitalSearchDropdown({
         </label>
       )}
 
-      {/* Combobox Trigger & Input Container */}
       <div className="relative">
         <div
           onClick={() => {
@@ -125,7 +121,6 @@ export default function HospitalSearchDropdown({
           </div>
         </div>
 
-        {/* Dropdown Options List */}
         {isOpen && (
           <div className="absolute top-full left-0 right-0 mt-1.5 max-h-60 overflow-y-auto bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl z-50 p-1.5 animate-in fade-in zoom-in-95 duration-100">
             {filteredHospitals.length === 0 ? (
@@ -171,7 +166,6 @@ export default function HospitalSearchDropdown({
         )}
       </div>
 
-      {/* Selected Hospital Address Card */}
       {selectedHospital && (
         <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#0f172a] border border-slate-200/80 dark:border-slate-800 text-xs space-y-1 animate-in fade-in duration-150">
           <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">

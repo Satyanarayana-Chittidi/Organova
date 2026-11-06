@@ -33,18 +33,11 @@ import {
 import { BloodGroup } from '../types/blood';
 import { MedicalHub } from '../types/hub';
 
-// ====================================================================
-// 1. MEDICAL COMPATIBILITY & SCORING ALGORITHM
-// ====================================================================
-
-/**
- * Validates ABO blood compatibility for solid organ transplantation.
- */
 export function isBloodCompatible(donorBlood: BloodGroup, recipientBlood: BloodGroup): boolean {
   const donorType = donorBlood.replace(/[+-]/g, '');
   const recipientType = recipientBlood.replace(/[+-]/g, '');
 
-  if (donorType === 'O') return true; // Universal donor
+  if (donorType === 'O') return true;
   if (donorType === 'A' && (recipientType === 'A' || recipientType === 'AB')) return true;
   if (donorType === 'B' && (recipientType === 'B' || recipientType === 'AB')) return true;
   if (donorType === 'AB' && recipientType === 'AB') return true;
@@ -52,24 +45,17 @@ export function isBloodCompatible(donorBlood: BloodGroup, recipientBlood: BloodG
   return false;
 }
 
-/**
- * Computes multi-factor score for an organ-recipient pair:
- * S = 0.35 * Urgency + 0.25 * WaitTime + 0.20 * Proximity + 0.20 * HLA/ABO
- */
 export function calculateMatchScore(
   organ: any,
   candidate: TransplantRequestEntity
 ): CandidateScoreBreakdown {
-  // 1. Clinical Urgency Score (Weight: 0.35)
   let urgencyRaw = 25;
   if (candidate.urgency_tier === 'TIER_1_EMERGENCY') urgencyRaw = 100;
   else if (candidate.urgency_tier === 'TIER_2_URGENT') urgencyRaw = 60;
 
-  // 2. Wait Time Score (Weight: 0.25)
   const days = candidate.days_waiting || 0;
   const waitTimeRaw = Math.min(100, Math.round(days * 0.5));
 
-  // 3. Geographic Proximity Score (Weight: 0.20)
   let distanceKm = 0;
   if (
     organ.current_hub_latitude &&
@@ -91,11 +77,9 @@ export function calculateMatchScore(
   else if (distanceKm <= 500) proximityRaw = 50;
   else if (distanceKm <= 1000) proximityRaw = 25;
 
-  // 4. ABO / Histocompatibility Score (Weight: 0.20)
   const isExactMatch = organ.blood_group === candidate.blood_group;
   const hlaAboRaw = isExactMatch ? 100 : 70;
 
-  // Weighted total: S in [0, 100]
   const total =
     0.35 * urgencyRaw +
     0.25 * waitTimeRaw +
@@ -121,13 +105,6 @@ export function calculateMatchScore(
   };
 }
 
-// ====================================================================
-// 2. WAITLIST MANAGEMENT
-// ====================================================================
-
-/**
- * Attending Hospital registers a patient onto the transplant waitlist.
- */
 export async function addPatientToWaitlist(
   userId: string,
   dto: CreateTransplantRequestDTO
@@ -147,7 +124,6 @@ export async function addPatientToWaitlist(
 
   let recipientUserId = dto.recipient_user_id;
 
-  // If no recipient_user_id was provided, resolve by email or create a user & profile on behalf of the patient
   if (!recipientUserId) {
     const email = dto.patient_email
       ? dto.patient_email.toLowerCase().trim()
@@ -225,15 +201,6 @@ export async function getRequestDetails(
   return request;
 }
 
-// ====================================================================
-// 3. MATCHING ENGINE & 20-MINUTE OFFER PROTOCOL
-// ====================================================================
-
-/**
- * Evaluates an available organ, scores all compatible waitlist candidates,
- * and generates the ranked candidate leaderboard without prematurely starting the response clock.
- * If an active proposal already exists for this organ, returns it.
- */
 export async function runMatchingForOrgan(
   organId: number
 ): Promise<{
@@ -243,7 +210,6 @@ export async function runMatchingForOrgan(
   leaderboard?: CandidateScoreBreakdown[];
   declinedCandidates?: any[];
 }> {
-  // 1. Inspect organ status & viability
   const organ = await findOrganById(organId);
   if (!organ) {
     const error: any = new Error(`Organ with ID ${organId} not found.`);
@@ -251,7 +217,6 @@ export async function runMatchingForOrgan(
     throw error;
   }
 
-  // 2. Fetch candidates on WAITING_LIST for this organ type
   const candidates = await getActiveWaitlistForOrgan(organ.organ_type_id);
   const declinedIds = await getDeclinedRequestIdsForOrgan(organId);
   const declinedMatches = await getDeclinedMatchesForOrgan(organId);
@@ -259,9 +224,8 @@ export async function runMatchingForOrgan(
   const compatible = eligible.filter((c) => isBloodCompatible(organ.blood_group, c.blood_group));
 
   const scored = compatible.map((candidate) => calculateMatchScore(organ, candidate));
-  scored.sort((a, b) => b.totalScore - a.totalScore); // Highest score first
+  scored.sort((a, b) => b.totalScore - a.totalScore);
 
-  // If already matching, return existing proposal with its active countdown
   if (organ.status === 'MATCHING') {
     const activeMatch = await findActiveMatchForOrgan(organId);
     if (activeMatch) {
@@ -313,10 +277,6 @@ export async function runMatchingForOrgan(
   };
 }
 
-/**
- * Hospital allocates an available organ to a candidate on the leaderboard.
- * This triggers the official 20-minute response deadline and notifies the patient and attending hospital.
- */
 export async function allocateMatchForOrgan(
   organId: number,
   targetRequestId?: number,
@@ -326,7 +286,6 @@ export async function allocateMatchForOrgan(
   message: string;
   match: MatchEntity;
 }> {
-  // 1. Inspect organ status & viability
   const organ = await findOrganById(organId);
   if (!organ) {
     const error: any = new Error(`Organ with ID ${organId} not found.`);
@@ -357,7 +316,6 @@ export async function allocateMatchForOrgan(
     throw error;
   }
 
-  // 2. Fetch candidates & compute scores
   const candidates = await getActiveWaitlistForOrgan(organ.organ_type_id);
   const declinedIds = await getDeclinedRequestIdsForOrgan(organId);
   const eligible = candidates.filter((c) => !declinedIds.includes(c.id));
@@ -383,7 +341,6 @@ export async function allocateMatchForOrgan(
     selectedCandidate = found;
   }
 
-  // Scope Enforcement: If user is HOSPITAL, verify they only allocate to candidates linked to their facility
   if (userRole === 'HOSPITAL' && userId) {
     const hub = await findHubByUserId(userId);
     if (!hub) {
@@ -393,7 +350,6 @@ export async function allocateMatchForOrgan(
     }
 
     if (!targetRequestId) {
-      // Find the highest-scoring candidate enrolled at this hospital
       const myCandidate = scored.find((c) => c.attendingHubId === hub.id);
       if (!myCandidate) {
         const error: any = new Error(
@@ -412,10 +368,8 @@ export async function allocateMatchForOrgan(
     }
   }
 
-  // 3. Official allocation: Propose match offer with 20-minute response deadline
   const match = await createMatchOffer(organ.id, selectedCandidate.requestId, selectedCandidate.totalScore, 20);
 
-  // 4. Dispatch real-time WebSocket notifications to attending hospital and patient
   try {
     emitMatchOfferProposed({
       matchId: match.id,
@@ -436,11 +390,6 @@ export async function allocateMatchForOrgan(
   };
 }
 
-/**
- * Patient (via portal) or Attending Hospital surgical coordinator responds to a match offer (ACCEPT or DECLINE).
- * Either party accepting converts the offer to ACCEPTED and allocates the organ.
- * If DECLINED, the candidate safely returns to WAITING_LIST and the engine re-evaluates the pool.
- */
 export async function respondToMatch(
   userId: string,
   userRole: string,
@@ -458,8 +407,6 @@ export async function respondToMatch(
     throw error;
   }
 
-  // Authorization validation:
-  // If Citizen ('USER'): verify they are the recipient of this match offer
   if (userRole === 'USER') {
     if (match.recipient_user_id && match.recipient_user_id !== userId) {
       const error: any = new Error('Unauthorized. You can only respond to match offers addressed to your profile.');
@@ -468,7 +415,6 @@ export async function respondToMatch(
     }
   }
 
-  // If Hospital ('HOSPITAL'): verify they are the attending facility for this candidate
   if (userRole === 'HOSPITAL') {
     const hub = await findHubByUserId(userId);
     if (!hub) {
@@ -488,7 +434,6 @@ export async function respondToMatch(
   if (decision === 'ACCEPT') {
     const accepted = await acceptMatch(matchId);
 
-    // Dispatch real-time WebSocket notification to donor harvesting hub
     try {
       if (accepted.organ_id) {
         const organ = await findOrganById(accepted.organ_id);
@@ -512,10 +457,8 @@ export async function respondToMatch(
       match: accepted,
     };
   } else {
-    // Decline offer
     const declined = await declineMatch(matchId);
 
-    // Re-evaluate matching pool for failover candidate
     let failoverResult = null;
     try {
       const nextRun = await runMatchingForOrgan(match.organ_id);
@@ -532,10 +475,6 @@ export async function respondToMatch(
   }
 }
 
-/**
- * Scheduled / Cron sweeper: Finds expired match offers (exceeded 20 mins)
- * and automatically triggers failover to the next candidate.
- */
 export async function sweepTimedOutMatches(): Promise<{
   timedOutCount: number;
   failoverCount: number;

@@ -34,28 +34,23 @@ function EmergenciesContent() {
     }
   }, [user, refreshAlerts]);
 
-  // Extract active pass if user is currently committed
   const activePass = alerts.find((a) => a.type === 'ACTIVE_DONOR_PASS');
 
-  // Extract all matching SOS alerts for this citizen (excluding own requisitions)
   const matchingEmergencies = useMemo(() => {
     return alerts.filter(
       (a) => a.type === 'BLOOD_DONOR_SOS' && (!a.meta?.requesterUserId || a.meta?.requesterUserId !== user?.id)
     );
   }, [alerts, user]);
 
-  // Filter and sort emergencies
   const filteredEmergencies = useMemo(() => {
     let result = [...matchingEmergencies];
 
-    // Filter by urgency
     if (selectedUrgency !== 'ALL') {
       result = result.filter(
         (a) => (a.priority || '').toUpperCase() === selectedUrgency.toUpperCase()
       );
     }
 
-    // Filter by search query (hospital name or city)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter((a) => {
@@ -69,7 +64,6 @@ function EmergenciesContent() {
       });
     }
 
-    // Sort by priority (CRITICAL > URGENT > ROUTINE), then newest first
     return result.sort((a, b) => {
       const weight: Record<string, number> = { CRITICAL: 1, URGENT: 2, ROUTINE: 3 };
       const weightA = weight[a.priority || 'ROUTINE'] || 99;
@@ -79,7 +73,6 @@ function EmergenciesContent() {
     });
   }, [matchingEmergencies, selectedUrgency, searchQuery]);
 
-  // Count by urgency for badges
   const criticalCount = matchingEmergencies.filter(
     (a) => a.priority === 'CRITICAL'
   ).length;
@@ -90,7 +83,6 @@ function EmergenciesContent() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <Link
             href="/"
@@ -104,7 +96,6 @@ function EmergenciesContent() {
           </span>
         </div>
 
-        {/* Page Title & Context Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 text-xs font-semibold mb-2">
@@ -120,7 +111,6 @@ function EmergenciesContent() {
           </div>
         </div>
 
-        {/* Active Walk-In Pass Notice if already committed */}
         {activePass && (
           <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
             <div className="flex items-center gap-3">
@@ -143,9 +133,7 @@ function EmergenciesContent() {
           </div>
         )}
 
-        {/* Search & Urgency Filter Toolbar */}
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row gap-4 items-center justify-between">
-          {/* Search Input */}
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -157,7 +145,6 @@ function EmergenciesContent() {
             />
           </div>
 
-          {/* Filter Pills */}
           <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
             <button
               type="button"
@@ -210,7 +197,6 @@ function EmergenciesContent() {
           </div>
         </div>
 
-        {/* Emergencies Grid List */}
         {filteredEmergencies.length === 0 ? (
           <div className="py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-xs">
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
@@ -251,7 +237,6 @@ function EmergenciesContent() {
                 className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-rose-300 dark:hover:border-rose-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div>
-                  {/* Card Header: Specimen & Urgency */}
                   <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-black text-slate-900 dark:text-white">
@@ -277,7 +262,6 @@ function EmergenciesContent() {
                     </span>
                   </div>
 
-                  {/* Hospital Details */}
                   <div className="space-y-1.5">
                     <h4 className="font-bold text-slate-900 dark:text-white text-base">
                       {alert.meta?.destinationHospital}
@@ -315,7 +299,6 @@ function EmergenciesContent() {
                   </div>
                 </div>
 
-                {/* Card Action Link */}
                 <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <span className="text-[11px] font-mono text-slate-400">
                     #BR-{alert.meta?.requestId}

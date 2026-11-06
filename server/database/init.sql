@@ -1,6 +1,3 @@
--- ====================================================================
--- ORGAN DONATION PLATFORM: DATABASE INITIALIZATION SCRIPT
--- ====================================================================
 
 CREATE DATABASE IF NOT EXISTS organ_donation_db
   CHARACTER SET utf8mb4
@@ -8,9 +5,6 @@ CREATE DATABASE IF NOT EXISTS organ_donation_db
 
 USE organ_donation_db;
 
--- --------------------------------------------------------------------
--- 1. USERS (Authentication & Role Gateway)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
     email VARCHAR(191) NOT NULL UNIQUE,
@@ -24,9 +18,6 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 2. CITIZEN PROFILES (Individual Donors & Recipients)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS citizen_profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL UNIQUE,
@@ -45,9 +36,6 @@ CREATE TABLE IF NOT EXISTS citizen_profiles (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 3. MEDICAL HUBS (Accredited Hospitals & Medical Centers)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS medical_hubs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL UNIQUE,
@@ -71,9 +59,6 @@ CREATE TABLE IF NOT EXISTS medical_hubs (
     INDEX idx_hubs_geo (latitude, longitude)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 4. ORGAN TYPES (Static Medical Rules & Shelf-Life Hours)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS organ_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
     code ENUM('HEART', 'KIDNEY', 'LIVER', 'LUNG', 'PANCREAS', 'CORNEA', 'BONE_MARROW', 'BLOOD') NOT NULL UNIQUE,
@@ -83,7 +68,6 @@ CREATE TABLE IF NOT EXISTS organ_types (
     allow_living_donor BOOLEAN NOT NULL DEFAULT FALSE
 ) ENGINE=InnoDB;
 
--- Pre-seed the 8 verified medical donation types
 INSERT INTO organ_types (code, name, category, max_viability_hours, allow_living_donor)
 VALUES
     ('HEART', 'Heart', 'SOLID_ORGAN', 6, FALSE),
@@ -96,9 +80,6 @@ VALUES
     ('BLOOD', 'Blood', 'CELL_FLUID', 1008, TRUE)
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
--- --------------------------------------------------------------------
--- 5. DONOR PLEDGES (Advance Legal Directives by Citizens)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS donor_pledges (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
@@ -111,9 +92,6 @@ CREATE TABLE IF NOT EXISTS donor_pledges (
     UNIQUE KEY uk_user_organ_consent (user_id, organ_type_id, consent_type)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 6. AVAILABLE ORGANS (Harvested Assets with Viability Countdown)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS available_organs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organ_type_id INT NOT NULL,
@@ -133,9 +111,6 @@ CREATE TABLE IF NOT EXISTS available_organs (
     INDEX idx_organs_available (organ_type_id, status, expires_at)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 7. TRANSPLANT REQUESTS (Prioritized Patient Waiting List)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS transplant_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     recipient_user_id VARCHAR(36) NOT NULL,
@@ -153,9 +128,6 @@ CREATE TABLE IF NOT EXISTS transplant_requests (
     INDEX idx_requests_queue (organ_type_id, status, urgency_tier, created_at)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 8. MATCHES (1:1 Allocation Pairs & Audit Trail)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS matches (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organ_id INT NOT NULL,
@@ -170,9 +142,6 @@ CREATE TABLE IF NOT EXISTS matches (
     INDEX idx_matches_deadline (status, response_deadline)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 9. BLOOD INVENTORY (Bulk Commodity Stock Ledger)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS blood_inventory (
     id INT AUTO_INCREMENT PRIMARY KEY,
     hub_id INT NOT NULL,
@@ -184,9 +153,6 @@ CREATE TABLE IF NOT EXISTS blood_inventory (
     UNIQUE KEY uk_hub_blood_component (hub_id, blood_group, component)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 10. BLOOD REQUESTS (High-Throughput Inventory Orders)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS blood_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     requester_user_id VARCHAR(36) NOT NULL,
@@ -213,9 +179,6 @@ CREATE TABLE IF NOT EXISTS blood_requests (
     INDEX idx_blood_req_queue (blood_group, component, status, urgency, created_at)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------------------
--- 11. BLOOD DONATION CAMPS (Community Drives & Hospital Camps)
--- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS blood_donation_camps (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organizer_hub_id INT NOT NULL,

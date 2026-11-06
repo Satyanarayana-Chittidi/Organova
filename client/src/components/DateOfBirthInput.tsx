@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Calendar } from 'lucide-react';
 
 interface DateOfBirthInputProps {
-  value: string; // ISO format: 'YYYY-MM-DD' or ''
+  value: string;
   onChange: (isoValue: string) => void;
   required?: boolean;
 }
@@ -23,7 +23,6 @@ export default function DateOfBirthInput({
   const yearRef = useRef<HTMLInputElement>(null);
   const nativePickerRef = useRef<HTMLInputElement>(null);
 
-  // Sync internal state when external value changes (e.g. loaded from API)
   useEffect(() => {
     if (value && value.includes('-')) {
       const parts = value.split('-');
@@ -41,7 +40,6 @@ export default function DateOfBirthInput({
     }
   }, [value]);
 
-  // Notify parent of valid ISO date or empty string
   const notifyChange = (d: string, m: string, y: string) => {
     if (d && m && y.length === 4) {
       const padD = d.padStart(2, '0');
@@ -62,7 +60,6 @@ export default function DateOfBirthInput({
     setDay(raw);
     notifyChange(raw, month, year);
 
-    // Auto-advance to month if 2 digits or user typed a digit that can't have a 2nd digit (> 3)
     if (raw.length === 2 || (raw.length === 1 && Number(raw) > 3)) {
       monthRef.current?.focus();
       monthRef.current?.select();
@@ -75,7 +72,6 @@ export default function DateOfBirthInput({
     setMonth(raw);
     notifyChange(day, raw, year);
 
-    // Auto-advance to year if 2 digits or user typed a digit that can't have a 2nd digit (> 1)
     if (raw.length === 2 || (raw.length === 1 && Number(raw) > 1)) {
       yearRef.current?.focus();
       yearRef.current?.select();
@@ -116,7 +112,6 @@ export default function DateOfBirthInput({
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').trim();
-    // Support formats: YYYY-MM-DD, DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY
     let d = '', m = '', y = '';
 
     if (pasted.includes('-')) {
@@ -137,7 +132,6 @@ export default function DateOfBirthInput({
       const parts = pasted.split('.');
       [d, m, y] = parts;
     } else if (/^\d{8}$/.test(pasted)) {
-      // 8 consecutive digits DDMMYYYY
       d = pasted.slice(0, 2);
       m = pasted.slice(2, 4);
       y = pasted.slice(4, 8);
@@ -180,7 +174,6 @@ export default function DateOfBirthInput({
   return (
     <div
       onClick={(e) => {
-        // If clicking on background of container, focus the appropriate field
         if (e.target === e.currentTarget) {
           if (!day) dayRef.current?.focus();
           else if (!month) monthRef.current?.focus();
@@ -190,7 +183,6 @@ export default function DateOfBirthInput({
       }}
       className="relative flex items-center w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium focus-within:border-rose-500 focus-within:ring-1 focus-within:ring-rose-500/20 transition-all cursor-text"
     >
-      {/* Hidden native input for calendar popover and form validation */}
       <input
         ref={nativePickerRef}
         type="date"
@@ -201,7 +193,6 @@ export default function DateOfBirthInput({
         aria-hidden="true"
       />
 
-      {/* Hidden input for HTML form validation */}
       <input
         type="text"
         tabIndex={-1}
@@ -212,7 +203,6 @@ export default function DateOfBirthInput({
         aria-hidden="true"
       />
 
-      {/* Segment: Day */}
       <input
         ref={dayRef}
         type="text"
@@ -231,7 +221,6 @@ export default function DateOfBirthInput({
 
       <span className="text-slate-300 dark:text-slate-600 select-none px-1 font-normal">/</span>
 
-      {/* Segment: Month */}
       <input
         ref={monthRef}
         type="text"
@@ -250,7 +239,6 @@ export default function DateOfBirthInput({
 
       <span className="text-slate-300 dark:text-slate-600 select-none px-1 font-normal">/</span>
 
-      {/* Segment: Year */}
       <input
         ref={yearRef}
         type="text"
@@ -267,7 +255,6 @@ export default function DateOfBirthInput({
         aria-label="Year"
       />
 
-      {/* Calendar icon trigger */}
       <button
         type="button"
         tabIndex={-1}

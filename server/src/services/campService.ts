@@ -9,9 +9,6 @@ import {
 } from '../models/campModel';
 import { BloodDonationCamp, CreateCampDTO, UpdateCampDTO } from '../types/camp';
 
-/**
- * Parses time strings like "09:00 AM" or "14:30" into total minutes from midnight.
- */
 function parseTimeToMinutes(timeStr?: string | null): number | null {
   if (!timeStr) return null;
   const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
@@ -24,10 +21,6 @@ function parseTimeToMinutes(timeStr?: string | null): number | null {
   return hours * 60 + minutes;
 }
 
-/**
- * Validates that the camp date and time is not in the past,
- * and that end date/time is after start date/time.
- */
 export function validateCampDateTime(
   campDateStr: string,
   endDateStr?: string | null,
@@ -50,7 +43,6 @@ export function validateCampDateTime(
     throw error;
   }
 
-  // If camp is scheduled for today, validate start_time against current time
   if (cleanCampDate === todayStr && startTimeStr) {
     const startMinutes = parseTimeToMinutes(startTimeStr);
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -63,7 +55,6 @@ export function validateCampDateTime(
     }
   }
 
-  // If end date is provided, ensure end_date >= camp_date
   if (endDateStr) {
     const cleanEndDate = endDateStr.split('T')[0];
     if (cleanEndDate < cleanCampDate) {
@@ -74,7 +65,6 @@ export function validateCampDateTime(
       throw error;
     }
 
-    // If single day camp, validate end_time > start_time
     if (cleanEndDate === cleanCampDate && startTimeStr && endTimeStr) {
       const startMinutes = parseTimeToMinutes(startTimeStr);
       const endMinutes = parseTimeToMinutes(endTimeStr);
@@ -143,10 +133,9 @@ export async function createCampService(
     throw error;
   }
 
-  // Validate that the date and time are strictly not in the past
   validateCampDateTime(dto.camp_date, dto.end_date, dto.start_time, dto.end_time);
 
-  const hubId = hub ? hub.id : 1; // Fallback for admin
+  const hubId = hub ? hub.id : 1;
   return createCamp(hubId, userId, dto);
 }
 
@@ -176,7 +165,6 @@ export async function updateCampService(
     throw error;
   }
 
-  // If date or time fields are being updated, validate them
   const targetStartDate = dto.camp_date || camp.camp_date;
   const targetEndDate = dto.end_date !== undefined ? dto.end_date : camp.end_date;
   const targetStartTime = dto.start_time || camp.start_time;

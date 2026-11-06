@@ -72,13 +72,6 @@ const ENRICHED_MATCH_SELECT = `
   JOIN medical_hubs mh ON mh.id = tr.attending_hub_id
 `;
 
-// ====================================================================
-// 1. WAITLIST DATA ACCESS
-// ====================================================================
-
-/**
- * Creates a new patient waitlist request.
- */
 export async function createTransplantRequest(
   attendingHubId: number,
   dto: CreateTransplantRequestDTO
@@ -103,9 +96,6 @@ export async function createTransplantRequest(
   return created;
 }
 
-/**
- * Finds a single transplant request by its primary key ID.
- */
 export async function findTransplantRequestById(
   id: number
 ): Promise<TransplantRequestEntity | null> {
@@ -114,9 +104,6 @@ export async function findTransplantRequestById(
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Lists transplant requests across the platform with clinical filtering.
- */
 export async function listTransplantRequests(
   filters: TransplantQueryFilters
 ): Promise<TransplantRequestEntity[]> {
@@ -163,9 +150,6 @@ export async function listTransplantRequests(
   return rows;
 }
 
-/**
- * Lists all transplant requests belonging to a specific citizen recipient.
- */
 export async function listRequestsByRecipient(
   userId: string
 ): Promise<TransplantRequestEntity[]> {
@@ -174,9 +158,6 @@ export async function listRequestsByRecipient(
   return rows;
 }
 
-/**
- * Retrieves all eligible candidate requests on WAITING_LIST for a specific organ type.
- */
 export async function getActiveWaitlistForOrgan(
   organTypeId: number
 ): Promise<TransplantRequestEntity[]> {
@@ -185,40 +166,24 @@ export async function getActiveWaitlistForOrgan(
   return rows;
 }
 
-// ====================================================================
-// 2. MATCHING & OFFER OPERATIONS
-// ====================================================================
-
-/**
- * Finds a match record by ID.
- */
 export async function findMatchById(id: number): Promise<MatchEntity | null> {
   const query = `${ENRICHED_MATCH_SELECT} WHERE m.id = ? LIMIT 1`;
   const [rows] = await pool.query<MatchRow[]>(query, [id]);
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Finds an active PROPOSED match for an organ if one is currently pending.
- */
 export async function findActiveMatchForOrgan(organId: number): Promise<MatchEntity | null> {
   const query = `${ENRICHED_MATCH_SELECT} WHERE m.organ_id = ? AND m.status = 'PROPOSED' LIMIT 1`;
   const [rows] = await pool.query<MatchRow[]>(query, [organId]);
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Retrieves all currently active 20-minute match offers across the network.
- */
 export async function getActiveProposedMatches(): Promise<MatchEntity[]> {
   const query = `${ENRICHED_MATCH_SELECT} WHERE m.status = 'PROPOSED' AND m.response_deadline > NOW() ORDER BY m.response_deadline ASC`;
   const [rows] = await pool.query<MatchRow[]>(query);
   return rows;
 }
 
-/**
- * Returns candidate request IDs that have already DECLINED offers for this specific organ.
- */
 export async function getDeclinedRequestIdsForOrgan(organId: number): Promise<number[]> {
   const [rows] = await pool.query<RowDataPacket[]>(
     "SELECT request_id FROM matches WHERE organ_id = ? AND status = 'DECLINED'",
@@ -227,9 +192,6 @@ export async function getDeclinedRequestIdsForOrgan(organId: number): Promise<nu
   return rows.map((r) => r.request_id);
 }
 
-/**
- * Returns enriched declined match offers for an organ to display in clinical audit.
- */
 export async function getDeclinedMatchesForOrgan(organId: number): Promise<any[]> {
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT m.id AS match_id, m.request_id, m.match_score, m.responded_at,
@@ -248,10 +210,6 @@ export async function getDeclinedMatchesForOrgan(organId: number): Promise<any[]
   return rows;
 }
 
-/**
- * ACID TRANSACTION: Proposes a match offer with a 20-minute response deadline.
- * Locks the organ and request, and updates both to MATCHING / MATCH_OFFERED.
- */
 export async function createMatchOffer(
   organId: number,
   requestId: number,
@@ -263,7 +221,6 @@ export async function createMatchOffer(
   try {
     await connection.beginTransaction();
 
-    // 1. Insert proposal record in 'matches'
     const [matchResult] = await connection.query<ResultSetHeader>(
       `INSERT INTO matches (
          organ_id, request_id, match_score, status, offered_at, response_deadline
@@ -271,13 +228,11 @@ export async function createMatchOffer(
       [organId, requestId, matchScore, deadlineMinutes]
     );
 
-    // 2. Advance organ status to MATCHING
     await connection.query<ResultSetHeader>(
       "UPDATE available_organs SET status = 'MATCHING' WHERE id = ?",
       [organId]
     );
 
-    // 3. Update request status to MATCH_OFFERED
     await connection.query<ResultSetHeader>(
       "UPDATE transplant_requests SET status = 'MATCH_OFFERED' WHERE id = ?",
       [requestId]
@@ -295,10 +250,6 @@ export async function createMatchOffer(
   }
 }
 
-/**
- * ACID TRANSACTION: Accepts a match offer by the attending hospital surgical team.
- * Transitions match to ACCEPTED, request to ACCEPTED, and organ to ALLOCATED.
- */
 export async function acceptMatch(matchId: number): Promise<MatchEntity> {
   const connection = await pool.getConnection();
 
@@ -323,26 +274,22 @@ export async function acceptMatch(matchId: number): Promise<MatchEntity> {
       throw error;
     }
 
-    // Verify response deadline has not elapsed
     if (new Date(match.response_deadline).getTime() < Date.now()) {
       const error: any = new Error('The 20-minute response deadline for this offer has elapsed.');
       error.statusCode = 400;
       throw error;
     }
 
-    // 1. Accept match
     await connection.query<ResultSetHeader>(
       "UPDATE matches SET status = 'ACCEPTED', responded_at = NOW() WHERE id = ?",
       [matchId]
     );
 
-    // 2. Accept request
     await connection.query<ResultSetHeader>(
       "UPDATE transplant_requests SET status = 'ACCEPTED' WHERE id = ?",
       [match.request_id]
     );
 
-    // 3. Allocate organ
     await connection.query<ResultSetHeader>(
       "UPDATE available_organs SET status = 'ALLOCATED' WHERE id = ?",
       [match.organ_id]
@@ -360,10 +307,6 @@ export async function acceptMatch(matchId: number): Promise<MatchEntity> {
   }
 }
 
-/**
- * ACID TRANSACTION: Declines a match offer or records a 20-min timeout decline.
- * Returns the candidate to WAITING_LIST and releases the organ so failover can engage.
- */
 export async function declineMatch(matchId: number): Promise<MatchEntity> {
   const connection = await pool.getConnection();
 
@@ -388,19 +331,16 @@ export async function declineMatch(matchId: number): Promise<MatchEntity> {
       throw error;
     }
 
-    // 1. Mark match DECLINED
     await connection.query<ResultSetHeader>(
       "UPDATE matches SET status = 'DECLINED', responded_at = NOW() WHERE id = ?",
       [matchId]
     );
 
-    // 2. Return patient request back to WAITING_LIST
     await connection.query<ResultSetHeader>(
       "UPDATE transplant_requests SET status = 'WAITING_LIST' WHERE id = ?",
       [match.request_id]
     );
 
-    // 3. Revert organ to AVAILABLE temporarily so the next candidate can be evaluated
     await connection.query<ResultSetHeader>(
       "UPDATE available_organs SET status = 'AVAILABLE' WHERE id = ?",
       [match.organ_id]
@@ -418,9 +358,6 @@ export async function declineMatch(matchId: number): Promise<MatchEntity> {
   }
 }
 
-/**
- * Finds all proposed matches that have exceeded their 20-minute response deadline.
- */
 export async function findExpiredProposedMatches(): Promise<MatchEntity[]> {
   const query = `${ENRICHED_MATCH_SELECT} WHERE m.status = 'PROPOSED' AND m.response_deadline <= NOW()`;
   const [rows] = await pool.query<MatchRow[]>(query);

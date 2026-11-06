@@ -29,14 +29,6 @@ function parseIdParam(param: string | string[] | undefined): number {
   return id;
 }
 
-// ====================================================================
-// 1. WAITLIST CONTROLLER HANDLERS
-// ====================================================================
-
-/**
- * POST /api/transplant/requests
- * Attending Hospital registers a verified patient onto the waitlist.
- */
 export async function addPatientHandler(
   req: Request,
   res: Response,
@@ -55,17 +47,12 @@ export async function addPatientHandler(
   }
 }
 
-/**
- * GET /api/transplant/requests
- * Clinical waitlist queue with priority ordering.
- */
 export async function getWaitlistQueueHandler(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    // Automatically sweep expired 20-minute match offers before returning waitlist queue
     await sweepTimedOutMatches();
 
     const rawBloodGroup = req.query.blood_group as string | undefined;
@@ -90,10 +77,6 @@ export async function getWaitlistQueueHandler(
   }
 }
 
-/**
- * GET /api/transplant/requests/mine
- * Recipient passport view: Authenticated citizens inspect their own waitlist requests.
- */
 export async function getMyWaitlistRequestsHandler(
   req: Request,
   res: Response,
@@ -112,10 +95,6 @@ export async function getMyWaitlistRequestsHandler(
   }
 }
 
-/**
- * GET /api/transplant/requests/:id
- * Single waitlist request details.
- */
 export async function getRequestDetailsHandler(
   req: Request,
   res: Response,
@@ -133,22 +112,12 @@ export async function getRequestDetailsHandler(
   }
 }
 
-// ====================================================================
-// 2. MATCHING & OFFER CONTROLLER HANDLERS
-// ====================================================================
-
-/**
- * POST /api/transplant/matches/organ/:organId
- * Evaluates candidate suitability and generates scored leaderboard for an available organ.
- * Does NOT start the 20-minute response window yet.
- */
 export async function runMatchingHandler(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    // Automatically sweep expired 20-minute match offers before evaluating
     await sweepTimedOutMatches();
 
     const organId = parseIdParam(req.params.organId);
@@ -168,18 +137,12 @@ export async function runMatchingHandler(
   }
 }
 
-/**
- * POST /api/transplant/matches/organ/:organId/allocate
- * Hospital allocates an available organ to a candidate on the leaderboard.
- * Officially dispatches the 20-minute offer, updates states, and initiates the response timer.
- */
 export async function allocateOrganHandler(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    // Automatically sweep expired offers
     await sweepTimedOutMatches();
 
     const organId = parseIdParam(req.params.organId);
@@ -199,10 +162,6 @@ export async function allocateOrganHandler(
   }
 }
 
-/**
- * POST /api/transplant/matches/:id/respond
- * Attending hospital responds to a 20-minute match offer (ACCEPT or DECLINE).
- */
 export async function respondToMatchHandler(
   req: Request,
   res: Response,
@@ -236,17 +195,12 @@ export async function respondToMatchHandler(
   }
 }
 
-/**
- * GET /api/transplant/matches/active
- * Retrieves all active 20-minute match offers across the network.
- */
 export async function getActiveMatchesHandler(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    // Automatically sweep expired 20-minute match offers so active list is always accurate
     await sweepTimedOutMatches();
 
     const matches = await getActiveProposedMatches();
@@ -260,10 +214,6 @@ export async function getActiveMatchesHandler(
   }
 }
 
-/**
- * GET /api/transplant/matches/:id
- * Retrieves details for a specific match offer, including remaining deadline seconds.
- */
 export async function getMatchDetailsHandler(
   req: Request,
   res: Response,
@@ -286,10 +236,6 @@ export async function getMatchDetailsHandler(
   }
 }
 
-/**
- * POST /api/transplant/matches/sweep-timeouts
- * Scheduled cron sweep: checks for expired 20-minute offers and cascades failover.
- */
 export async function sweepTimeoutsHandler(
   req: Request,
   res: Response,
@@ -307,10 +253,6 @@ export async function sweepTimeoutsHandler(
   }
 }
 
-/**
- * POST /api/transplant/seed-mocks
- * Seeds never-expiring test organs and comprehensive multi-scenario patient requests for testing.
- */
 export async function seedMocksHandler(
   req: Request,
   res: Response,

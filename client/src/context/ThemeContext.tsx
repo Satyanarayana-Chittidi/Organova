@@ -17,7 +17,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Check initial preference from localStorage or system
     const stored = localStorage.getItem('app-theme') as Theme | null;
     let initialTheme: Theme = 'light';
 

@@ -1,6 +1,3 @@
-// ====================================================================
-// CENTRAL REST API CLIENT & DATA SERVICES
-// ====================================================================
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
@@ -19,8 +16,6 @@ export function getAvatarUrl(url?: string | null): string | null {
   return url.startsWith('/') ? url : `/${url}`;
 }
 
-// Volatile, in-memory token store for Admin Master Control session.
-// Strictly not persisted in localStorage or cookies to prevent session leakage and auto-login on refresh.
 let _adminToken: string | null = null;
 
 export function setAdminToken(token: string | null): void {
@@ -40,7 +35,6 @@ export async function apiRequest<T = any>(
   const defaultHeaders: Record<string, string> =
     options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' };
 
-  // If an active in-memory admin session token is present, send it as Bearer header
   if (_adminToken && (endpoint.startsWith('/admin') || endpoint.startsWith('/auth/me'))) {
     defaultHeaders['Authorization'] = `Bearer ${_adminToken}`;
   }
@@ -51,7 +45,7 @@ export async function apiRequest<T = any>(
       ...defaultHeaders,
       ...(options.headers as Record<string, string>),
     },
-    credentials: 'include', // Ensures HTTP-only authentication cookies are transmitted
+    credentials: 'include',
   });
 
   const data = await response.json().catch(() => ({
@@ -68,10 +62,6 @@ export async function apiRequest<T = any>(
 
   return data;
 }
-
-// --------------------------------------------------------------------
-// 1. AUTHENTICATION SERVICES
-// --------------------------------------------------------------------
 
 export const authApi = {
   register: (body: { email: string; password: string; role?: string }) =>
@@ -90,10 +80,6 @@ export const authApi = {
     apiRequest('/auth/logout', { method: 'POST' }),
 };
 
-// --------------------------------------------------------------------
-// 2. CITIZEN PROFILE SERVICES
-// --------------------------------------------------------------------
-
 export const citizenApi = {
   getProfile: () =>
     apiRequest('/citizen/profile', { method: 'GET' }),
@@ -110,10 +96,6 @@ export const citizenApi = {
   getDonationHistory: () =>
     apiRequest('/citizen/history', { method: 'GET' }),
 };
-
-// --------------------------------------------------------------------
-// 3. DONOR PLEDGE SERVICES
-// --------------------------------------------------------------------
 
 export const donorApi = {
   getOrganTypes: () =>
@@ -134,10 +116,6 @@ export const donorApi = {
   getDonorCard: () =>
     apiRequest('/donor/card', { method: 'GET' }),
 };
-
-// --------------------------------------------------------------------
-// 4. MEDICAL HUB & PUBLIC DIRECTORY SERVICES
-// --------------------------------------------------------------------
 
 export const hubApi = {
   register: (body: any) =>
@@ -182,10 +160,6 @@ export const hubApi = {
   }) =>
     apiRequest('/hubs/citizens/master-register', { method: 'POST', body: JSON.stringify(body) }),
 };
-
-// --------------------------------------------------------------------
-// 5. BLOOD SUPPLY CHAIN SERVICES
-// --------------------------------------------------------------------
 
 export const bloodApi = {
   searchStock: (params: { blood_group?: string; component?: string; city?: string } = {}) => {
@@ -261,10 +235,6 @@ export const bloodApi = {
     apiRequest(`/blood/requests/${requestId}/cancel`, { method: 'POST' }),
 };
 
-// --------------------------------------------------------------------
-// 6. ORGAN HARVEST & VIABILITY SERVICES
-// --------------------------------------------------------------------
-
 export const organApi = {
   getTypes: () =>
     apiRequest('/organs/types', { method: 'GET' }),
@@ -292,10 +262,6 @@ export const organApi = {
   updateStatus: (id: number, body: { status: string; current_hub_id?: number; clinical_notes?: string }) =>
     apiRequest(`/organs/${id}/status`, { method: 'PATCH', body: JSON.stringify(body) }),
 };
-
-// --------------------------------------------------------------------
-// 7. TRANSPLANT WAITLIST & MATCHING SERVICES
-// --------------------------------------------------------------------
 
 export const transplantApi = {
   addPatient: (body: {
@@ -358,10 +324,6 @@ export const transplantApi = {
     apiRequest('/transplant/seed-mocks', { method: 'POST' }),
 };
 
-// --------------------------------------------------------------------
-// 8. ADMIN AUDIT SERVICES
-// --------------------------------------------------------------------
-
 export const adminApi = {
   getPendingHubs: () =>
     apiRequest('/admin/hubs/pending', { method: 'GET' }),
@@ -381,10 +343,6 @@ export const adminApi = {
   getLogs: (limit: number = 50) =>
     apiRequest(`/admin/logs?limit=${limit}`, { method: 'GET' }),
 };
-
-// --------------------------------------------------------------------
-// 9. BLOOD DONATION CAMPS SERVICES
-// --------------------------------------------------------------------
 
 export interface BloodDonationCamp {
   id: number;

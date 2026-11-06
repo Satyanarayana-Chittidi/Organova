@@ -224,7 +224,6 @@ export default function EmergencyBloodRequestPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Left Column: Requisition Form */}
         <div className="lg:col-span-1 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <div className="mb-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-400 border border-transparent dark:border-red-900/50 text-xs font-semibold mb-2">
@@ -331,7 +330,6 @@ export default function EmergencyBloodRequestPage() {
               </select>
             </div>
 
-            {/* Searchable Receiving Hospital Combobox */}
             <HospitalSearchDropdown
               hospitals={availableHospitals}
               selectedHospitalId={selectedHospitalId}
@@ -341,7 +339,6 @@ export default function EmergencyBloodRequestPage() {
               required
             />
 
-            {/* Recipient / Patient Relationship & Identification */}
             <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -406,7 +403,6 @@ export default function EmergencyBloodRequestPage() {
           </form>
         </div>
 
-        {/* Right Column: Active & Historical Requisitions */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
@@ -449,7 +445,6 @@ export default function EmergencyBloodRequestPage() {
                     </div>
                   </div>
 
-                  {/* Patient & Relationship Badge if provided */}
                   {(req.patient_relationship || req.patient_name) && (
                     <div className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                       <User className="w-3.5 h-3.5 text-rose-500 shrink-0" />
@@ -460,7 +455,6 @@ export default function EmergencyBloodRequestPage() {
                     </div>
                   )}
 
-                  {/* Destination Facility Card */}
                   <div className="p-3 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/70 text-xs space-y-1">
                     <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white">
                       <Building2 className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
@@ -486,7 +480,6 @@ export default function EmergencyBloodRequestPage() {
                     )}
                   </div>
 
-                  {/* Targeted Blood Bank (if direct request) */}
                   {req.target_hub_name && (
                     <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs flex items-center justify-between">
                       <span className="text-slate-600 dark:text-slate-300 font-medium">Dispensing Blood Bank: <strong>{req.target_hub_name}</strong></span>
@@ -502,7 +495,6 @@ export default function EmergencyBloodRequestPage() {
                     </div>
                   )}
 
-                  {/* Fulfilling Hub (if claimed from inventory) */}
                   {req.fulfilling_hub_name && (
                     <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/50 text-xs text-blue-900 dark:text-blue-200 flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -521,7 +513,6 @@ export default function EmergencyBloodRequestPage() {
                     </div>
                   )}
 
-                  {/* Walk-In Donor Commitment Card */}
                   {req.status === 'DONOR_COMMITTED' && (
                     <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -563,11 +554,9 @@ export default function EmergencyBloodRequestPage() {
         </div>
       </div>
 
-      {/* Intelligent Inventory Fulfillment Modal (Case A & Case B) */}
       {fulfillmentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200">
-            {/* Close Button */}
             <button
               onClick={() => setFulfillmentModal(null)}
               className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -575,7 +564,6 @@ export default function EmergencyBloodRequestPage() {
               <X className="w-5 h-5" />
             </button>
 
-            {/* Case A: FULL IN-HOUSE */}
             {fulfillmentModal.fulfillmentCase === 'FULL_IN_HOUSE' && (
               <>
                 <div className="flex items-center gap-3">
@@ -602,7 +590,6 @@ export default function EmergencyBloodRequestPage() {
                   </p>
                 </div>
 
-                {/* Details Breakdown */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-2.5 text-xs">
                   <div className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/80">
                     <span className="text-slate-500 dark:text-slate-400">Receiving Hospital:</span>
@@ -642,7 +629,6 @@ export default function EmergencyBloodRequestPage() {
               </>
             )}
 
-            {/* Case B: PARTIAL IN-HOUSE + SOS */}
             {fulfillmentModal.fulfillmentCase === 'PARTIAL_IN_HOUSE' && (
               <>
                 <div className="flex items-center gap-3">
@@ -663,9 +649,7 @@ export default function EmergencyBloodRequestPage() {
                   <strong>{fulfillmentModal.hospitalName}</strong> has partial stock for this emergency. To minimize delay, the system has split this requisition into two parallel fulfillment streams:
                 </p>
 
-                {/* 2-Step Split Cards */}
                 <div className="space-y-3">
-                  {/* Step 1: In-House Order */}
                   <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 uppercase tracking-wide">
@@ -680,7 +664,6 @@ export default function EmergencyBloodRequestPage() {
                     </p>
                   </div>
 
-                  {/* Step 2: External SOS Broadcast */}
                   <div className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200 uppercase tracking-wide flex items-center gap-1">

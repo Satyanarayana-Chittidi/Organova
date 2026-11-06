@@ -11,7 +11,7 @@ export interface BloodDonationCamp {
   city: string;
   state?: string | null;
   pincode?: string | null;
-  camp_date: string; // ISO date string YYYY-MM-DD
+  camp_date: string;
   end_date?: string | null;
   start_time: string;
   end_time: string;
@@ -24,7 +24,6 @@ export interface BloodDonationCamp {
   map_url?: string | null;
   created_at: string | Date;
   updated_at?: string | Date;
-  // Enriched organizer hub details
   organizer_hub_name?: string;
   organizer_hub_type?: string;
   organizer_hub_city?: string;

@@ -53,7 +53,6 @@ function HospitalHistoryContent() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Dedicated Top-Level Ledger Switcher: Organ Harvest, Transplant, Blood
   const getInitialTab = (type: string | undefined): 'HARVESTS' | 'TRANSPLANTS' | 'BLOOD' => {
     if (!type) return 'HARVESTS';
     if (type === 'BLOOD') return 'BLOOD';
@@ -65,13 +64,11 @@ function HospitalHistoryContent() {
     getInitialTab(rawType)
   );
 
-  // Sub-filters for each dedicated ledger
   const [harvestFilter, setHarvestFilter] = useState<'ALL' | 'AVAILABLE' | 'MATCHING' | 'ALLOCATED' | 'TRANSPLANTED' | 'EXPIRED'>('ALL');
   const [transplantFilter, setTransplantFilter] = useState<'ALL' | 'CONFIRMED' | 'PENDING' | 'DECLINED'>('ALL');
   const [bloodFilter, setBloodFilter] = useState<'ALL' | 'INWARD' | 'OUTWARD' | 'REQUISITION'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sync ledgerTab with URL query parameters
   useEffect(() => {
     const current = searchParams.get('type')?.toUpperCase();
     if (current === 'BLOOD') {
@@ -134,7 +131,6 @@ function HospitalHistoryContent() {
   const transplants = data?.transplants || [];
   const bloodTransactions = data?.bloodTransactions || [];
 
-  // Filtered Harvests
   const filteredHarvests = useMemo(() => {
     let result = harvests;
     if (harvestFilter !== 'ALL') {
@@ -153,7 +149,6 @@ function HospitalHistoryContent() {
     return result;
   }, [harvests, harvestFilter, searchQuery]);
 
-  // Filtered Transplants
   const filteredTransplants = useMemo(() => {
     let result = transplants;
     if (transplantFilter === 'CONFIRMED') {
@@ -176,7 +171,6 @@ function HospitalHistoryContent() {
     return result;
   }, [transplants, transplantFilter, searchQuery]);
 
-  // Filtered Blood Transactions
   const filteredBlood = useMemo(() => {
     let result = bloodTransactions;
     if (bloodFilter === 'INWARD') {
@@ -212,7 +206,6 @@ function HospitalHistoryContent() {
     return result;
   }, [bloodTransactions, bloodFilter, searchQuery]);
 
-  // Status counts for Harvests
   const harvestCounts = useMemo(() => {
     const available = harvests.filter((h: any) => h.status === 'AVAILABLE').length;
     const matching = harvests.filter((h: any) => h.status === 'MATCHING').length;
@@ -222,7 +215,6 @@ function HospitalHistoryContent() {
     return { available, matching, allocated, transplanted, expired, total: harvests.length };
   }, [harvests]);
 
-  // Status counts for Transplants
   const transplantCounts = useMemo(() => {
     const confirmed = transplants.filter((t: any) => t.match_status === 'ACCEPTED' || t.match_status === 'COMPLETED').length;
     const pending = transplants.filter((t: any) => t.match_status === 'PENDING_RESPONSE' || t.match_status === 'OFFERED').length;
@@ -230,7 +222,6 @@ function HospitalHistoryContent() {
     return { confirmed, pending, declined, total: transplants.length };
   }, [transplants]);
 
-  // Status counts for Blood
   const bloodCounts = useMemo(() => {
     const inward = bloodTransactions.filter(
       (b: any) => b.patient_relationship === 'VOLUNTARY_DONATION' || (b.donor_user_id && !b.requester_user_id)
@@ -258,7 +249,6 @@ function HospitalHistoryContent() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Navigation Breadcrumb & Actions */}
         <div className="flex items-center justify-between print:hidden">
           <Link
             href="/hospital/profile"
@@ -288,7 +278,6 @@ function HospitalHistoryContent() {
           </div>
         </div>
 
-        {/* Page Hero Header */}
         <div className="pb-2 border-b border-slate-200/80 dark:border-slate-800">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 text-xs font-semibold mb-2">
@@ -304,7 +293,6 @@ function HospitalHistoryContent() {
           </div>
         </div>
 
-        {/* Error Alert */}
         {error && (
           <div className="p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -312,7 +300,6 @@ function HospitalHistoryContent() {
           </div>
         )}
 
-        {/* Top-Level Ledger Switcher Tabs: Harvests, Transplants, Blood */}
         <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4 flex-wrap">
           <button
             type="button"
@@ -381,12 +368,8 @@ function HospitalHistoryContent() {
           </button>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* VIEW 1: ORGAN HARVEST PROCUREMENT LEDGER                      */}
-        {/* ------------------------------------------------------------- */}
         {ledgerTab === 'HARVESTS' && (
           <div className="space-y-6">
-            {/* Metric Chips */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
@@ -434,7 +417,6 @@ function HospitalHistoryContent() {
               </div>
             </div>
 
-            {/* Harvests Filters & Search Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
               <div className="relative w-full sm:w-72">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -447,7 +429,6 @@ function HospitalHistoryContent() {
                 />
               </div>
 
-              {/* Status Filter Buttons */}
               <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
                 <button
                   type="button"
@@ -507,7 +488,6 @@ function HospitalHistoryContent() {
               </div>
             </div>
 
-            {/* Harvests List */}
             {filteredHarvests.length === 0 ? (
               <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-xs bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
                 No organ harvests match the current filters.
@@ -585,12 +565,8 @@ function HospitalHistoryContent() {
           </div>
         )}
 
-        {/* ------------------------------------------------------------- */}
-        {/* VIEW 2: ORGAN TRANSPLANT SURGICAL LEDGER                      */}
-        {/* ------------------------------------------------------------- */}
         {ledgerTab === 'TRANSPLANTS' && (
           <div className="space-y-6">
-            {/* Metric Chips */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
@@ -638,7 +614,6 @@ function HospitalHistoryContent() {
               </div>
             </div>
 
-            {/* Transplants Filters & Search Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
               <div className="relative w-full sm:w-72">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -651,7 +626,6 @@ function HospitalHistoryContent() {
                 />
               </div>
 
-              {/* Status Filter Buttons */}
               <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
                 <button
                   type="button"
@@ -700,7 +674,6 @@ function HospitalHistoryContent() {
               </div>
             </div>
 
-            {/* Transplants List */}
             {filteredTransplants.length === 0 ? (
               <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-xs bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
                 No transplant allocations match the current filters.
@@ -768,12 +741,8 @@ function HospitalHistoryContent() {
           </div>
         )}
 
-        {/* ------------------------------------------------------------- */}
-        {/* VIEW 3: BLOOD TRANSACTIONS LEDGER                             */}
-        {/* ------------------------------------------------------------- */}
         {ledgerTab === 'BLOOD' && (
           <div className="space-y-6">
-            {/* Metric Chips */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
@@ -836,7 +805,6 @@ function HospitalHistoryContent() {
               </div>
             </div>
 
-            {/* Blood Filters & Search Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
               <div className="relative w-full sm:w-72">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -849,7 +817,6 @@ function HospitalHistoryContent() {
                 />
               </div>
 
-              {/* Category Filter Buttons */}
               <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
                 <button
                   type="button"
@@ -898,7 +865,6 @@ function HospitalHistoryContent() {
               </div>
             </div>
 
-            {/* Blood List */}
             {filteredBlood.length === 0 ? (
               <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-xs bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8">
                 No blood transactions match the current filters.

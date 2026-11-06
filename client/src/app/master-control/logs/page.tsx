@@ -20,7 +20,6 @@ import {
   ChevronUp,
 } from 'lucide-react';
 
-// Helper component to render structured log metadata details without raw JSON
 function LogDetailsGrid({ meta }: { meta: any }) {
   const parsedMeta = typeof meta === 'string' ? (() => { try { return JSON.parse(meta); } catch { return {}; } })() : (meta || {});
 
@@ -129,7 +128,6 @@ export default function MasterLogsPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors py-8 px-4 sm:px-6 lg:px-8 space-y-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
             <Link
@@ -171,10 +169,8 @@ export default function MasterLogsPage() {
           </div>
         </div>
 
-        {/* Filter and Search Bar */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-            {/* Search Input */}
             <div className="relative w-full md:w-96">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
@@ -186,7 +182,6 @@ export default function MasterLogsPage() {
               />
             </div>
 
-            {/* Category Filter Pills */}
             <div className="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
               {[
                 { id: 'ALL', label: 'All Operations' },
@@ -212,7 +207,6 @@ export default function MasterLogsPage() {
           </div>
         </div>
 
-        {/* Logs Feed */}
         {loading ? (
           <div className="py-16 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
             <span className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></span>
@@ -298,7 +292,6 @@ export default function MasterLogsPage() {
                     </div>
                   </div>
 
-                  {/* Expandable Structured Details Drawer */}
                   {isExpanded && log.meta && (
                     <div className="mt-2">
                       <LogDetailsGrid meta={log.meta} />

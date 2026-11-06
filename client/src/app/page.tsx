@@ -52,7 +52,6 @@ export default function HomePage() {
   const [donationHistory, setDonationHistory] = useState<any>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
 
-  // Blood Donation Camps state
   const [camps, setCamps] = useState<BloodDonationCamp[]>([]);
   const [campsLoading, setCampsLoading] = useState(false);
   const [selectedCamp, setSelectedCamp] = useState<BloodDonationCamp | null>(null);
@@ -121,7 +120,6 @@ export default function HomePage() {
     }
   }, [user, refreshAlerts, fetchMyRequests, fetchHistory]);
 
-  // Real-time socket updates for requests and donation history
   useEffect(() => {
     if (!socket) return;
     const handleUpdate = () => {
@@ -177,7 +175,6 @@ export default function HomePage() {
     )}`;
   };
 
-  // Handle cancelling a blood requisition directly from the homepage
   const handleCancelRequest = async (id: number) => {
     if (!confirm('Are you sure you want to cancel this emergency requisition?')) return;
     try {
@@ -192,12 +189,10 @@ export default function HomePage() {
     }
   };
 
-  // Active and committed my requests only (cancelled and completed are excluded)
   const activeAndCommittedRequests = myRequests.filter(
     (r) => !['CANCELLED', 'COMPLETED'].includes(r.status)
   );
 
-  // Extract 2 most recent donations
   const recentDonations = React.useMemo(() => {
     if (!donationHistory) return [];
     const blood = (donationHistory.bloodDonations || []).map((b: any) => ({
@@ -226,13 +221,11 @@ export default function HomePage() {
       .slice(0, 2);
   }, [donationHistory]);
 
-  // Extract active committed pass and matching emergencies for registered citizens (exclude own requisitions)
   const activePass = alerts.find((a) => a.type === 'ACTIVE_DONOR_PASS');
   const matchingEmergencies = alerts.filter(
     (a) => a.type === 'BLOOD_DONOR_SOS' && (!a.meta?.requesterUserId || a.meta?.requesterUserId !== user?.id)
   );
 
-  // Sort matching emergencies by urgency priority (CRITICAL > URGENT > ROUTINE), then newest first
   const sortedEmergencies = [...matchingEmergencies].sort((a, b) => {
     const priorityWeight: Record<string, number> = { CRITICAL: 1, URGENT: 2, ROUTINE: 3 };
     const weightA = priorityWeight[a.priority || 'ROUTINE'] || 99;
@@ -241,18 +234,14 @@ export default function HomePage() {
     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
   });
 
-  // Display top four highest emergencies on the homepage
   const topFourEmergencies = sortedEmergencies.slice(0, 4);
 
   return (
     <div className="flex flex-col flex-1 transition-colors duration-200">
-      {/* Friendly Hero Banner */}
       <section className="bg-gradient-to-b from-rose-50/70 via-white to-slate-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 py-12 sm:py-20 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
         <div className="max-w-7xl mx-auto">
           {!user ? (
-            /* Unauthenticated / Guest View: Slogan on Left, 4 Portal Buttons on Right */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-              {/* Left Column: Slogan, Mission & Emergency Blood Action */}
               <div className="lg:col-span-7 space-y-6 text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-transparent dark:border-rose-900/50 text-xs font-semibold">
                   <Heart className="w-3.5 h-3.5 fill-rose-600 dark:fill-rose-400 text-rose-600 dark:text-rose-400" />
@@ -270,7 +259,6 @@ export default function HomePage() {
                   A single organ donor can save up to 8 lives and heal many more. Join verified donors, find urgent blood units in real time, or manage transplant allocations across hospitals.
                 </p>
 
-                {/* Bottom of Left Column: Find Blood in Emergency */}
                 <div className="pt-2 flex flex-wrap items-center gap-3">
                   <Link
                     href="/blood-finder"
@@ -282,7 +270,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right Column: 4 Portal Action Buttons */}
               <div className="lg:col-span-5 w-full">
                 <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-4">
                   <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -297,9 +284,7 @@ export default function HomePage() {
                     </p>
                   </div>
 
-                  {/* 4 Gateway Cards / Buttons */}
                   <div className="space-y-2.5">
-                    {/* 1. User Login */}
                     <Link
                       href="/auth/login?portal=user"
                       className="group p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 border border-slate-200/80 dark:border-slate-700/60 hover:border-rose-300 dark:hover:border-rose-800 transition-all flex items-center justify-between"
@@ -320,7 +305,6 @@ export default function HomePage() {
                       <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-rose-600 dark:group-hover:text-rose-400 group-hover:translate-x-0.5 transition-all shrink-0" />
                     </Link>
 
-                    {/* 2. User Sign Up */}
                     <Link
                       href="/auth/register"
                       className="group p-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-600 text-white shadow-md shadow-rose-600/20 border border-transparent transition-all flex items-center justify-between"
@@ -341,7 +325,6 @@ export default function HomePage() {
                       <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform shrink-0" />
                     </Link>
 
-                    {/* 3. Hospital Login */}
                     <Link
                       href="/auth/login?portal=hospital"
                       className="group p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 hover:bg-blue-50/70 dark:hover:bg-blue-950/40 border border-slate-200/80 dark:border-slate-700/60 hover:border-blue-300 dark:hover:border-blue-800 transition-all flex items-center justify-between"
@@ -362,7 +345,6 @@ export default function HomePage() {
                       <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0" />
                     </Link>
 
-                    {/* 4. Hospital Registration */}
                     <Link
                       href="/hospital/register"
                       className="group p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 border border-slate-200/80 dark:border-slate-700/60 hover:border-emerald-300 dark:hover:border-emerald-800 transition-all flex items-center justify-between"
@@ -387,7 +369,6 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            /* Authenticated Hero Banner for Logged-In User */
             <div className="max-w-4xl mx-auto space-y-6 text-center">
               <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">
                 One Pledge Today.{' '}
@@ -398,7 +379,6 @@ export default function HomePage() {
                 A single organ donor can save up to 8 lives and heal many more. Join thousands of verified donors, find urgent blood units, or track your transplant journey.
               </p>
 
-              {/* Core Action Buttons for Authenticated User */}
               <div className="flex flex-wrap justify-center gap-3 pt-2">
                 {isHospitalStaff ? (
                   <>
@@ -453,12 +433,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Citizens Live Engagement Section between Header & How Can We Help */}
       {user && user.role === 'USER' && (activeAndCommittedRequests.length > 0 || activePass || matchingEmergencies.length > 0 || recentDonations.length > 0) && (
         <section className="py-8 bg-rose-50/50 dark:bg-slate-900/40 border-y border-rose-100 dark:border-slate-800/80 transition-colors">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
-            {/* 1. Status of My Requests (Active & Committed Only, Cancelled Disappears) */}
             {activeAndCommittedRequests.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
@@ -490,7 +468,6 @@ export default function HomePage() {
                       className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
                     >
                       <div>
-                        {/* Header: Specimen & Urgency */}
                         <div className="flex items-center justify-between gap-2 mb-3">
                           <span className="px-2.5 py-1 rounded-full bg-rose-50 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 font-bold text-xs border border-rose-100 dark:border-rose-900/50">
                             {req.blood_group} • {req.component?.replace(/_/g, ' ') || 'Whole Blood'}
@@ -511,7 +488,6 @@ export default function HomePage() {
                           </div>
                         </div>
 
-                        {/* Destination Hospital */}
                         <h4 className="font-bold text-slate-900 dark:text-white text-sm">
                           {req.destination_hub_name}
                         </h4>
@@ -533,7 +509,6 @@ export default function HomePage() {
                           </div>
                         )}
 
-                        {/* Live Status Box */}
                         <div className="mt-3.5">
                           {req.status === 'REQUESTED' && (
                             <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-xs">
@@ -590,7 +565,6 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Card Footer: Timestamp & Cancel / Manage Action */}
                       <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                         <span className="text-[11px] text-slate-400 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
@@ -621,12 +595,10 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* Divider between My Requests and Emergencies / Pass */}
             {activeAndCommittedRequests.length > 0 && (matchingEmergencies.length > 0 || activePass) && (
               <hr className="border-rose-200/70 dark:border-slate-800" />
             )}
 
-            {/* 2. Matching Urgent Blood Requests & Committed Pass */}
             {(matchingEmergencies.length > 0 || activePass) && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
@@ -654,12 +626,10 @@ export default function HomePage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Committed Pass Card rendered directly in the grid */}
                   {activePass && (
                     <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-teal-50/50 dark:from-emerald-950/40 dark:via-slate-900 dark:to-teal-950/30 border-2 border-emerald-500/80 dark:border-emerald-500/70 shadow-sm flex flex-col justify-between relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
                       <div>
-                        {/* Top Header Badge */}
                         <div className="flex items-center justify-between mb-3">
                           <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 font-bold text-xs border border-emerald-200 dark:border-emerald-800">
                             {activePass.meta?.bloodGroup} • {activePass.meta?.component?.replace(/_/g, ' ') || 'Whole Blood'}
@@ -697,7 +667,6 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Footer Actions */}
                       <div className="mt-4 pt-3 border-t border-emerald-200/60 dark:border-emerald-900/60 flex items-center justify-between gap-2 flex-wrap">
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -723,7 +692,6 @@ export default function HomePage() {
                     </div>
                   )}
 
-                  {/* Open Matching Emergencies */}
                   {(activePass ? sortedEmergencies.slice(0, 3) : topFourEmergencies).map((alert: any) => (
                     <div
                       key={alert.id}
@@ -768,7 +736,6 @@ export default function HomePage() {
                   ))}
                 </div>
 
-                {/* Show All Emergencies button only if there are matching emergencies */}
                 {matchingEmergencies.length > 0 && (
                   <div className="pt-2 flex justify-center">
                     <Link
@@ -783,12 +750,10 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* Divider between Emergencies and Recent Donations */}
             {(activeAndCommittedRequests.length > 0 || activePass || matchingEmergencies.length > 0) && recentDonations.length > 0 && (
               <hr className="border-rose-200/70 dark:border-slate-800" />
             )}
 
-            {/* 3. 2 Most Recent Donations with "Show Full History" Button (Only shown if at least 1 entry exists) */}
             {recentDonations.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
@@ -891,7 +856,6 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Blood Donation Camps & Community Drives Section */}
       <section className="py-12 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -908,7 +872,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Action buttons: Explore All Camps & hub management */}
             <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
               <Link
                 href="/camps"
@@ -950,7 +913,6 @@ export default function HomePage() {
                   className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-rose-300 dark:hover:border-rose-800/80 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden cursor-pointer"
                 >
                   <div className="p-5">
-                    {/* Header tags: Status & Target */}
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
@@ -980,23 +942,19 @@ export default function HomePage() {
                       )}
                     </div>
 
-                    {/* Camp Title */}
                     <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors line-clamp-1">
                       {camp.camp_name}
                     </h3>
 
-                    {/* Associated Hub */}
                     <p className="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1 flex items-center gap-1 line-clamp-1">
                       <Building2 className="w-3.5 h-3.5 shrink-0" />
                       {camp.organizer_hub_name || 'Associated Medical Hub'}
                     </p>
 
-                    {/* Description snippet */}
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
                       {camp.description || 'Voluntary blood donation camp organized for community life-support and emergency stock replenishment.'}
                     </p>
 
-                    {/* Venue & Time metadata */}
                     <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-rose-500 shrink-0" />
@@ -1016,7 +974,6 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Card Action footer */}
                   <div className="px-5 py-3 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                     <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                       View Details & Timings <ArrowRight className="w-3 h-3" />
@@ -1042,11 +999,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CAMP DETAILS MODAL */}
       {selectedCamp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto">
           <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8 animate-in fade-in zoom-in-95">
-            {/* Header */}
             <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
@@ -1081,9 +1036,7 @@ export default function HomePage() {
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 space-y-4 text-sm">
-              {/* Description */}
               <div>
                 <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
                   About This Blood Donation Drive
@@ -1093,7 +1046,6 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Associated Hub */}
               <div className="p-3.5 rounded-xl bg-rose-50/50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40">
                 <div className="flex items-center gap-1.5 text-xs text-rose-700 dark:text-rose-400 font-bold mb-1">
                   <Building2 className="w-3.5 h-3.5" />
@@ -1108,7 +1060,6 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Timings & Dates */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-1">
@@ -1131,7 +1082,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Venue & Location Address */}
               <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                   <MapPin className="w-3.5 h-3.5 text-amber-500" />
@@ -1145,7 +1095,6 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Contact phone & Target units */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-1">
@@ -1171,7 +1120,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Action Buttons: Navigate Button */}
               <div className="pt-2 flex items-center justify-between gap-3">
                 <a
                   href={getCampNavigateUrl(selectedCamp)}
@@ -1197,7 +1145,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Direct Pathways (Where do you want to go?) - Authenticated Users Only */}
       {user && (
         <section className="py-12 bg-white dark:bg-slate-950 transition-colors duration-200">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1215,7 +1162,6 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {isHospitalStaff ? (
                 <>
-                  {/* Hospital Card 1: Blood Stock Inventory */}
                   <Link
                     href="/hospital/inventory"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-red-300 dark:hover:border-red-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1234,7 +1180,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Hospital Card 2: Organ Requests & Waitlist */}
                   <Link
                     href="/hospital/requests"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1253,7 +1198,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Hospital Card 3: Organ Harvest Registry */}
                   <Link
                     href="/hospital/harvest"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-rose-300 dark:hover:border-rose-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1272,7 +1216,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Hospital Card 3: Clinical Match Engine */}
                   <Link
                     href="/hospital/matches"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1291,7 +1234,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Hospital Card 4: Blood Donation Camps */}
                   <Link
                     href="/camps"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-purple-300 dark:hover:border-purple-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1310,7 +1252,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Hospital Card 5: Regional Blood Search */}
                   <Link
                     href="/blood-finder"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-red-300 dark:hover:border-red-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1329,7 +1270,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Hospital Card 6: Partner Centers Directory */}
                   <Link
                     href="/directory"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 dark:hover:border-blue-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1350,7 +1290,6 @@ export default function HomePage() {
                 </>
               ) : (
                 <>
-                  {/* Card 1: Pledge Organs */}
                   <Link
                     href="/donor/pledge"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 dark:hover:border-amber-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1369,7 +1308,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Card 2: Digital Donor Card */}
                   <Link
                     href="/donor/card"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 dark:hover:border-amber-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1388,7 +1326,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Card 3: Find Blood */}
                   <Link
                     href="/blood-finder"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-red-300 dark:hover:border-red-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1407,7 +1344,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Card 4: Donation History Ledger */}
                   <Link
                     href="/citizen/history"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-teal-300 dark:hover:border-teal-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1426,7 +1362,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Card 5: Patient Waitlist */}
                   <Link
                     href="/transplant/waitlist-status"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1445,7 +1380,6 @@ export default function HomePage() {
                     </div>
                   </Link>
 
-                  {/* Card 6: Hospitals */}
                   <Link
                     href="/directory"
                     className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 dark:hover:border-blue-500/60 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -1470,7 +1404,6 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Simple Information / FAQ - Authenticated Users Only */}
       {user && (
         <section className="py-16 bg-slate-50/80 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800/80 transition-colors duration-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">

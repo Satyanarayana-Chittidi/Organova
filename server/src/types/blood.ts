@@ -1,6 +1,3 @@
-// ====================================================================
-// BLOOD SUPPLY CHAIN & EMERGENCY REQUISITION TYPES
-// ====================================================================
 
 export type BloodGroup =
   | 'A+'
@@ -32,10 +29,6 @@ export type BloodRequestStatus =
   | 'CANCELLED'
   | 'EXPIRED';
 
-// --------------------------------------------------------------------
-// 1. DATABASE ENTITIES
-// --------------------------------------------------------------------
-
 export interface BloodInventoryItem {
   id: number;
   hub_id: number;
@@ -43,7 +36,6 @@ export interface BloodInventoryItem {
   component: BloodComponent;
   units_available: number;
   last_updated: Date;
-  // Enriched hub details for search queries
   hub_name?: string;
   hub_type?: string;
   contact_phone?: string;
@@ -70,7 +62,6 @@ export interface BloodRequest {
   hospital_bed_no?: string | null;
   created_at: Date;
   fulfilled_at: Date | null;
-  // Enriched details
   requester_email?: string;
   destination_hub_name?: string;
   destination_hub_address?: string;
@@ -84,10 +75,6 @@ export interface BloodRequest {
   donor_phone?: string;
 }
 
-// --------------------------------------------------------------------
-// 2. DATA TRANSFER OBJECTS (DTOs)
-// --------------------------------------------------------------------
-
 export interface SetInventoryDTO {
   blood_group: BloodGroup;
   component: BloodComponent;
@@ -97,7 +84,7 @@ export interface SetInventoryDTO {
 export interface AdjustInventoryDTO {
   blood_group: BloodGroup;
   component: BloodComponent;
-  delta_units: number; // positive to add stock, negative to consume
+  delta_units: number;
   linked_user_id?: string | null;
   linked_user_role?: 'DONOR' | 'RECIPIENT' | null;
   patient_name?: string | null;

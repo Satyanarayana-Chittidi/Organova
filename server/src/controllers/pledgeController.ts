@@ -2,10 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import * as pledgeService from '../services/pledgeService';
 import { CreatePledgesDTO } from '../types/pledge';
 
-/**
- * Returns the catalog of approved organs and living donation rules.
- * GET /api/donor/organ-types
- */
 export async function getOrganCatalog(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const catalog = await pledgeService.getOrganTypesCatalog();
@@ -18,10 +14,6 @@ export async function getOrganCatalog(req: Request, res: Response, next: NextFun
   }
 }
 
-/**
- * Submits or reactivates organ donation pledges.
- * POST /api/donor/pledges
- */
 export async function createPledges(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user!.userId;
@@ -39,10 +31,6 @@ export async function createPledges(req: Request, res: Response, next: NextFunct
   }
 }
 
-/**
- * Fetches the authenticated user's active pledges and donor status.
- * GET /api/donor/pledges
- */
 export async function getMyPledges(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user!.userId;
@@ -57,10 +45,6 @@ export async function getMyPledges(req: Request, res: Response, next: NextFuncti
   }
 }
 
-/**
- * Revokes a specific organ pledge.
- * PATCH /api/donor/pledges/:id/revoke
- */
 export async function revokePledge(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user!.userId;
@@ -83,10 +67,6 @@ export async function revokePledge(req: Request, res: Response, next: NextFuncti
   }
 }
 
-/**
- * Revokes all active organ donation pledges for the citizen.
- * PATCH /api/donor/pledges/revoke-all
- */
 export async function revokeAllMyPledges(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user!.userId;
@@ -101,10 +81,6 @@ export async function revokeAllMyPledges(req: Request, res: Response, next: Next
   }
 }
 
-/**
- * Generates the official Digital Donor Card data.
- * GET /api/donor/card
- */
 export async function getMyDonorCard(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user!.userId;

@@ -61,7 +61,6 @@ export default function DigitalDonorCardPage() {
     );
   }
 
-  // Detect whether the citizen simply has no active pledges yet vs. an incomplete citizen profile
   const isNoPledges =
     errorCode === 'NO_PLEDGES' ||
     (error && /no active pledges|pledge at least one organ|no pledges/i.test(error));
@@ -165,12 +164,9 @@ export default function DigitalDonorCardPage() {
         </button>
       </div>
 
-      {/* Digital Donor Card */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-700/60 relative overflow-hidden print:border-black print:text-black print:bg-white print:shadow-none">
-        {/* Background Watermark */}
         <div className="absolute -right-16 -bottom-16 w-80 h-80 rounded-full bg-rose-600/10 blur-3xl pointer-events-none"></div>
 
-        {/* Card Header */}
         <div className="flex items-start justify-between border-b border-slate-700/80 pb-6 mb-6">
           <div className="flex items-center gap-3.5">
             <div className="w-14 h-14 rounded-2xl bg-white border border-slate-700 p-0 shadow-md flex items-center justify-center overflow-hidden shrink-0">
@@ -197,9 +193,7 @@ export default function DigitalDonorCardPage() {
           </div>
         </div>
 
-        {/* Donor Identity Demographics & Photo */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-6 pb-6 border-b border-slate-700/80">
-          {/* Official Donor Photo */}
           {(card.avatar_url || card.avatarUrl) ? (
             <img
               src={getAvatarUrl(card.avatar_url || card.avatarUrl)!}
@@ -237,7 +231,6 @@ export default function DigitalDonorCardPage() {
           </div>
         </div>
 
-        {/* Pledged Organs Breakdown */}
         <div className="space-y-4 mb-6 pb-6 border-b border-slate-700/80">
           {livingPledges.length > 0 && (
             <div>
@@ -286,7 +279,6 @@ export default function DigitalDonorCardPage() {
           )}
         </div>
 
-        {/* Emergency Contact & Consent Statement */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-400">
           <div>
             <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-1">

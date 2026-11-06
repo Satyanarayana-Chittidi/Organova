@@ -14,7 +14,6 @@ export async function seedOrganMocksService(): Promise<SeedMocksResult> {
   try {
     await connection.beginTransaction();
 
-    // 1. Fetch available active medical hubs
     const [hubs] = await connection.query<RowDataPacket[]>(
       `SELECT id, name, city, latitude, longitude 
        FROM medical_hubs 
@@ -25,7 +24,6 @@ export async function seedOrganMocksService(): Promise<SeedMocksResult> {
       throw new Error('No active medical hubs found in database. Please register/verify at least one hospital first.');
     }
 
-    // Helper to find hub by city keyword or fallback
     const findHubByCity = (cityKeyword: string) => {
       const match = hubs.find((h) => h.city.toLowerCase().includes(cityKeyword.toLowerCase()));
       return match ? match.id : hubs[0].id;
@@ -36,32 +34,26 @@ export async function seedOrganMocksService(): Promise<SeedMocksResult> {
     const mumHubId = findHubByCity('Mumbai');
     const punHubId = findHubByCity('Pune');
 
-    // 2. Fetch organ type IDs
     const [types] = await connection.query<RowDataPacket[]>('SELECT id, code FROM organ_types');
     const typeMap: Record<string, number> = {};
     for (const t of types) {
       typeMap[t.code] = t.id;
     }
 
-    // 3. Remove previously seeded mock records to keep tests clean & idempotent
-    // Clean up matches tied to mock organs
     await connection.query(
       `DELETE m FROM matches m
        JOIN available_organs ao ON ao.id = m.organ_id
        WHERE ao.clinical_notes LIKE '%[TEST - NEVER EXPIRES]%' OR ao.clinical_notes LIKE '%[Demo Graft]%'`
     );
 
-    // Clean up mock organs
     await connection.query(
       "DELETE FROM available_organs WHERE clinical_notes LIKE '%[TEST - NEVER EXPIRES]%' OR clinical_notes LIKE '%[Demo Graft]%'"
     );
 
-    // Clean up mock requests
     await connection.query(
       "DELETE FROM transplant_requests WHERE medical_summary LIKE '%[MOCK TEST]%'"
     );
 
-    // 4. Seed Viable Procurement Organs (Continuous Perfusion, Year 2099 Expiration)
     const mockOrgans = [
       {
         organ_type_id: typeMap['KIDNEY'],
@@ -150,7 +142,6 @@ export async function seedOrganMocksService(): Promise<SeedMocksResult> {
       organsCount++;
     }
 
-    // 5. Seed Patients & Transplant Requisitions covering ALL clinical cases
     const mockPatients = [
       {
         email: 'aarav.sharma@patient.organdonation.in',
@@ -397,7 +388,6 @@ export async function seedOrganMocksService(): Promise<SeedMocksResult> {
       const organTypeId = typeMap[p.organ_code];
       if (!organTypeId) continue;
 
-      // Ensure user account exists
       let userId: string;
       const [existingUser] = await connection.query<RowDataPacket[]>(
         'SELECT id FROM users WHERE email = ? LIMIT 1',
@@ -415,7 +405,6 @@ export async function seedOrganMocksService(): Promise<SeedMocksResult> {
         );
       }
 
-      // Upsert citizen profile
       await connection.query(
         `INSERT INTO citizen_profiles (
            user_id, full_name, date_of_birth, gender, blood_group,
@@ -428,7 +417,6 @@ export async function seedOrganMocksService(): Promise<SeedMocksResult> {
         [userId, p.name, p.dob, p.gender, p.blood_group]
       );
 
-      // Insert transplant request with backdated created_at
       await connection.query(
         `INSERT INTO transplant_requests (
            recipient_user_id, attending_hub_id, organ_type_id, blood_group,

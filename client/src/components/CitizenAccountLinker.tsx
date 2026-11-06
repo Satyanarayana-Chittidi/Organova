@@ -63,13 +63,11 @@ export default function CitizenAccountLinker({
 }: CitizenAccountLinkerProps) {
   const [mode, setMode] = useState<'SEARCH' | 'CREATE'>('SEARCH');
 
-  // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  // Register state
   const [newFullName, setNewFullName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newDob, setNewDob] = useState('1990-01-01');
@@ -79,7 +77,6 @@ export default function CitizenAccountLinker({
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
-  // Temporary password display / copy state
   const [copied, setCopied] = useState(false);
   const [createdCredential, setCreatedCredential] = useState<{
     email: string;
@@ -88,7 +85,6 @@ export default function CitizenAccountLinker({
 
   const previewPassword = calculateTempPassword(newFullName, newDob);
 
-  // Search citizens on debounced input
   useEffect(() => {
     if (mode !== 'SEARCH') return;
     const timer = setTimeout(async () => {
@@ -109,7 +105,6 @@ export default function CitizenAccountLinker({
     return () => clearTimeout(timer);
   }, [searchQuery, mode]);
 
-  // Handle registration submission
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreateError(null);
@@ -182,7 +177,6 @@ export default function CitizenAccountLinker({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // If a citizen is already selected & linked
   if (selectedUser) {
     return (
       <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-3">
@@ -227,7 +221,6 @@ export default function CitizenAccountLinker({
           </div>
         </div>
 
-        {/* Temporary password alert banner if just created */}
         {(selectedUser.temp_password || createdCredential) && (
           <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
@@ -255,7 +248,6 @@ export default function CitizenAccountLinker({
 
   return (
     <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 space-y-3">
-      {/* Header */}
       <div>
         <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
           <User className="w-3.5 h-3.5 text-rose-500" />
@@ -268,7 +260,6 @@ export default function CitizenAccountLinker({
         )}
       </div>
 
-      {/* Mode Switcher Tabs */}
       <div className="grid grid-cols-2 p-1 rounded-xl bg-slate-200/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold">
         <button
           type="button"
@@ -303,7 +294,6 @@ export default function CitizenAccountLinker({
         </button>
       </div>
 
-      {/* TAB 1: Search Existing Citizen */}
       {mode === 'SEARCH' && (
         <div className="space-y-3">
           <div className="relative">
@@ -324,7 +314,6 @@ export default function CitizenAccountLinker({
             </div>
           )}
 
-          {/* Results list - cleanly rendered without nested scrollbars */}
           <div className="space-y-1.5">
             {searching ? (
               <div className="py-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
@@ -383,7 +372,6 @@ export default function CitizenAccountLinker({
         </div>
       )}
 
-      {/* TAB 2: Create New Account */}
       {mode === 'CREATE' && (
         <form onSubmit={handleRegister} className="space-y-3">
           {createError && (
@@ -393,7 +381,6 @@ export default function CitizenAccountLinker({
             </div>
           )}
 
-          {/* Full Name */}
           <div>
             <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
               Full Name *
@@ -408,7 +395,6 @@ export default function CitizenAccountLinker({
             />
           </div>
 
-          {/* Email with helper */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
@@ -432,7 +418,6 @@ export default function CitizenAccountLinker({
             />
           </div>
 
-          {/* DOB & Gender */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -463,7 +448,6 @@ export default function CitizenAccountLinker({
             </div>
           </div>
 
-          {/* Blood Group & Phone */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -496,12 +480,10 @@ export default function CitizenAccountLinker({
             </div>
           </div>
 
-          {/* Clean password info note without big purple card */}
           <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1">
             Note: Initial password will be the first 4 letters of first name + birth year (e.g. <span className="font-mono font-bold text-slate-700 dark:text-slate-300">rame1990</span>).
           </p>
 
-          {/* Action button */}
           <button
             type="submit"
             disabled={creating}

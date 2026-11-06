@@ -68,7 +68,7 @@ function TransplantRecordContent() {
   const recordId = parseInt(rawId || '', 10);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const recordType = searchParams?.get('type') || 'request'; // 'request' or 'donation'
+  const recordType = searchParams?.get('type') || 'request';
   const fromHistory = searchParams?.get('from') === 'history';
   const fromProfile = searchParams?.get('from') === 'profile';
 
@@ -140,7 +140,6 @@ function TransplantRecordContent() {
     }
   }, [user, authLoading, recordId, recordType]);
 
-  // Countdown timer for active match proposal (20-minute window)
   useEffect(() => {
     if (!record?.active_response_deadline) {
       setTimeLeft(null);
@@ -169,7 +168,6 @@ function TransplantRecordContent() {
     return () => clearInterval(interval);
   }, [record?.active_response_deadline]);
 
-  // Handle Offer Response (Accept / Decline)
   const handleOfferResponse = async (decision: 'ACCEPT' | 'DECLINE') => {
     if (!record?.active_match_id) return;
     const confirmText =
@@ -323,7 +321,6 @@ function TransplantRecordContent() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Top Navigation & Print Bar */}
         <div className="flex items-center justify-between print:hidden">
           <Link
             href={fromHistory ? '/citizen/history?type=organ' : fromProfile ? '/citizen/profile' : '/transplant/waitlist-status'}
@@ -353,7 +350,6 @@ function TransplantRecordContent() {
           </div>
         </div>
 
-        {/* Action Message Feedback */}
         {actionMsg && (
           <div
             className={`p-4 rounded-2xl border text-xs font-semibold flex items-center gap-2 ${
@@ -371,7 +367,6 @@ function TransplantRecordContent() {
           </div>
         )}
 
-        {/* Hero Card */}
         <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-start sm:items-center gap-4">
@@ -402,7 +397,6 @@ function TransplantRecordContent() {
               </div>
             </div>
 
-            {/* Status Pill */}
             <div className="flex flex-col sm:items-end gap-1.5 shrink-0">
               <span
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border ${statusInfo.color}`}
@@ -416,7 +410,6 @@ function TransplantRecordContent() {
             </div>
           </div>
 
-          {/* Active 20-minute Match Proposal Callout (when MATCH_OFFERED) */}
           {isMatchOffered && (
             <div className="mt-6 p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-300 dark:border-amber-700/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
@@ -460,7 +453,6 @@ function TransplantRecordContent() {
             </div>
           )}
 
-          {/* Quick Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-xs">
             <div>
               <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold block mb-1">
@@ -501,9 +493,7 @@ function TransplantRecordContent() {
           </div>
         </div>
 
-        {/* Clinical Dossier Breakdown */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Card 1: Patient / Candidate Information */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-slate-500" />
@@ -551,7 +541,6 @@ function TransplantRecordContent() {
             </div>
           </div>
 
-          {/* Card 2: Hospital & Clinical Facility Information */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-blue-500" />
@@ -597,7 +586,6 @@ function TransplantRecordContent() {
           </div>
         </div>
 
-        {/* Clinical Summary Notes Card */}
         {record.medical_summary && (
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">

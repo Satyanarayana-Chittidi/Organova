@@ -9,14 +9,12 @@ async function runTest() {
   console.log('🧬 MODULE 7: TRANSPLANT WAITLIST & MATCHING ENGINE TEST SUITE');
   console.log('===============================================================\n');
 
-  // Pre-cleanup of test data
   await pool.query("DELETE FROM matches WHERE match_score > 0");
   await pool.query("DELETE FROM transplant_requests WHERE medical_summary LIKE '%Test Match Patient%'");
   await pool.query("DELETE FROM available_organs WHERE clinical_notes LIKE '%Test Donor Liver%'");
   await pool.query("DELETE FROM medical_hubs WHERE license_number IN ('MUM-KEM-01', 'PUNE-RUBY-01', 'DELHI-AIIMS-01')");
   await pool.query("DELETE FROM users WHERE email IN ('kem.mumbai@hospital.org', 'ruby.pune@hospital.org', 'p1@citizen.org', 'p2@citizen.org', 'p3@citizen.org')");
 
-  // Step 1: Admin token setup
   const adminLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -28,7 +26,6 @@ async function runTest() {
   const adminLoginData: any = await adminLoginRes.json();
   const adminToken = adminLoginData.data.token;
 
-  // Helper to register and activate a hospital
   async function setupHospital(name: string, email: string, license: string, city: string, lat: number, lng: number) {
     const regRes = await fetch(`${BASE_URL}/hubs/register`, {
       method: 'POST',
@@ -51,14 +48,12 @@ async function runTest() {
     const regData: any = await regRes.json();
     const hubId = regData.data.id;
 
-    // Approve
     await fetch(`${BASE_URL}/admin/hubs/${hubId}/verify`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
       body: JSON.stringify({ status: 'ACTIVE' }),
     });
 
-    // Login
     const loginRes = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -68,15 +63,11 @@ async function runTest() {
     return { hubId, token: loginData.data.token };
   }
 
-  // Setup Hospitals:
-  // 1. Mumbai KEM Hospital (Donor Hub)
   const donorHosp = await setupHospital('KEM Hospital Mumbai', 'kem.mumbai@hospital.org', 'MUM-KEM-01', 'Mumbai', 18.9986, 72.8428);
-  // 2. Pune Ruby Hall (Recipient Hub 1, ~120 km away)
   const puneHosp = await setupHospital('Ruby Hall Clinic Pune', 'ruby.pune@hospital.org', 'PUNE-RUBY-01', 'Pune', 18.5328, 73.8726);
 
   console.log('▶ [Step 1] Initialized hospitals (Mumbai donor hub & Pune transplant center)...\n');
 
-  // Step 2: Helper to create verified citizen users
   async function createCitizen(email: string, fullName: string) {
     const userId = crypto.randomUUID();
     const pwHash = await hashPassword('CitizenPass#2026');
@@ -106,13 +97,10 @@ async function runTest() {
 
   console.log('▶ [Step 2] Registered 3 citizen recipients with profiles...\n');
 
-  // Get Liver organ type ID
   const [liverRows]: any = await pool.query("SELECT id FROM organ_types WHERE code = 'LIVER' LIMIT 1");
   const liverTypeId = liverRows[0].id;
 
-  // Step 3: Register 3 patients on waitlist
   console.log('▶ [Step 3] Enrolling candidates on national waitlist...');
-  // Patient 1: Pune (Tier 1 Emergency, ~120 km)
   const req1Res = await fetch(`${BASE_URL}/transplant/requests`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${puneHosp.token}` },
@@ -128,7 +116,6 @@ async function runTest() {
   const req1Id = req1Data.data.id;
   console.log(`  ✓ Candidate 1 enrolled: ID ${req1Id} (Rajesh - Pune, TIER_1_EMERGENCY)`);
 
-  // Patient 2: Pune (Tier 1 Emergency, but lower wait days or different priority)
   const req2Res = await fetch(`${BASE_URL}/transplant/requests`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${puneHosp.token}` },
@@ -144,7 +131,6 @@ async function runTest() {
   const req2Id = req2Data.data.id;
   console.log(`  ✓ Candidate 2 enrolled: ID ${req2Id} (Anita - Pune, TIER_2_URGENT)`);
 
-  // Patient 3: Pune (Tier 3 Routine)
   const req3Res = await fetch(`${BASE_URL}/transplant/requests`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${puneHosp.token}` },
@@ -160,7 +146,6 @@ async function runTest() {
   const req3Id = req3Data.data.id;
   console.log(`  ✓ Candidate 3 enrolled: ID ${req3Id} (Vikram - Pune, TIER_3_ROUTINE)\n`);
 
-  // Step 4: Harvest a Liver at Mumbai hospital
   console.log('▶ [Step 4] Harvesting donor Liver at KEM Hospital Mumbai...');
   const harvestRes = await fetch(`${BASE_URL}/organs/harvest`, {
     method: 'POST',
@@ -176,7 +161,6 @@ async function runTest() {
   const organId = harvestData.data.id;
   console.log(`  ✓ Liver harvested successfully (Organ ID: ${organId}, Status: AVAILABLE)\n`);
 
-  // Step 5: Run Multi-Factor Matching Algorithm
   console.log(`▶ [Step 5] Executing Multi-Factor Matching Algorithm for Organ ID ${organId}...`);
   const matchRunRes = await fetch(`${BASE_URL}/transplant/matches/organ/${organId}`, {
     method: 'POST',
@@ -195,7 +179,6 @@ async function runTest() {
   }
   console.log(`  ✓ 20-minute response deadline started: ${match1.response_deadline}\n`);
 
-  // Step 6: Recipient Passport Visibility
   console.log('▶ [Step 6] Recipient checks their live waitlist passport...');
   const passportRes = await fetch(`${BASE_URL}/transplant/requests/mine`, {
     headers: { Authorization: `Bearer ${patient1.token}` },
@@ -204,7 +187,6 @@ async function runTest() {
   const myReq = passportData.data.find((r: any) => r.id === req1Id);
   console.log(`  ✓ Patient live status verified: '${myReq.status}' (MATCH_OFFERED)\n`);
 
-  // Step 7: Test Decline & Automated Failover
   console.log('▶ [Step 7] Simulating surgical decline for Candidate 1 (unexpected fever)...');
   const declineRes = await fetch(`${BASE_URL}/transplant/matches/${match1.id}/respond`, {
     method: 'POST',
@@ -217,7 +199,6 @@ async function runTest() {
   }
   console.log(`  ✓ Offer ID ${match1.id} transitioned to: 'DECLINED'`);
 
-  // Verify automated failover was triggered
   const failoverOffer = declineData.data.failoverOffer;
   if (!failoverOffer) {
     throw new Error('FAILED: Automated failover did not generate an offer for Candidate 2!');
@@ -226,7 +207,6 @@ async function runTest() {
   console.log(`  ✓ New Offer ID: ${failoverOffer.id} routed to Candidate 2 (Request ID: ${failoverOffer.request_id})`);
   console.log(`  ✓ Score for Candidate 2: ${failoverOffer.match_score}\n`);
 
-  // Step 8: Candidate 2 Surgeon Accepts the Offer
   console.log(`▶ [Step 8] Pune Hospital surgical team ACCEPTS the offer for Candidate 2...`);
   const acceptRes = await fetch(`${BASE_URL}/transplant/matches/${failoverOffer.id}/respond`, {
     method: 'POST',
@@ -239,7 +219,6 @@ async function runTest() {
   }
   console.log(`  ✓ Match Offer ID ${failoverOffer.id} accepted! Status: '${acceptData.data.match.status}'`);
 
-  // Step 9: Verify Organ is now ALLOCATED
   console.log('▶ [Step 9] Verifying organ allocation in database...');
   const [organCheck]: any = await pool.query('SELECT status FROM available_organs WHERE id = ?', [organId]);
   console.log(`  ✓ Organ ID ${organId} final status: '${organCheck[0].status}' (Expected: ALLOCATED)\n`);

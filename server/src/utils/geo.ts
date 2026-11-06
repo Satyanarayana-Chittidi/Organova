@@ -1,14 +1,10 @@
-/**
- * Calculates the great-circle distance in kilometers between two points
- * on the Earth's surface using the Haversine Formula.
- */
 export function calculateHaversineDistanceKm(
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
 ): number {
-  const R = 6371; // Earth radius in kilometers
+  const R = 6371;
 
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
@@ -23,7 +19,7 @@ export function calculateHaversineDistanceKm(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c;
 
-  return Math.round(distance * 10) / 10; // Round to 1 decimal place
+  return Math.round(distance * 10) / 10;
 }
 
 function toRadians(degrees: number): number {

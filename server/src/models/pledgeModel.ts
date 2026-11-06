@@ -10,9 +10,6 @@ import {
 interface OrganTypeRow extends OrganType, RowDataPacket {}
 interface DonorPledgeRow extends DonorPledge, RowDataPacket {}
 
-/**
- * Retrieves the complete clinical organ reference catalog.
- */
 export async function getAllOrganTypes(): Promise<OrganType[]> {
   const [rows] = await pool.query<OrganTypeRow[]>(
     'SELECT * FROM organ_types ORDER BY id ASC'
@@ -20,9 +17,6 @@ export async function getAllOrganTypes(): Promise<OrganType[]> {
   return rows;
 }
 
-/**
- * Finds a specific organ type by its clinical code (e.g. 'HEART', 'KIDNEY').
- */
 export async function findOrganTypeByCode(code: OrganTypeCode): Promise<OrganType | null> {
   const [rows] = await pool.query<OrganTypeRow[]>(
     'SELECT * FROM organ_types WHERE code = ? LIMIT 1',
@@ -31,9 +25,6 @@ export async function findOrganTypeByCode(code: OrganTypeCode): Promise<OrganTyp
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Retrieves all currently ACTIVE pledges for a citizen with joined organ metadata.
- */
 export async function getActivePledgesByUserId(userId: string): Promise<DonorPledge[]> {
   const query = `
     SELECT 
@@ -48,12 +39,6 @@ export async function getActivePledgesByUserId(userId: string): Promise<DonorPle
   return rows;
 }
 
-/**
- * Upserts a pledge:
- * - If not pledged before: Inserts new ACTIVE row.
- * - If previously REVOKED: Reactivates to ACTIVE with fresh pledge_date = NOW().
- * - If already ACTIVE: Updates consent_type if modified.
- */
 export async function upsertPledge(
   userId: string,
   organTypeId: number,
@@ -70,9 +55,6 @@ export async function upsertPledge(
   await pool.query<ResultSetHeader>(query, [userId, organTypeId, consentType]);
 }
 
-/**
- * Revokes an existing pledge, changing status to 'REVOKED'.
- */
 export async function revokePledge(userId: string, pledgeId: number): Promise<boolean> {
   const [result] = await pool.query<ResultSetHeader>(
     "UPDATE donor_pledges SET status = 'REVOKED' WHERE id = ? AND user_id = ?",
@@ -81,10 +63,6 @@ export async function revokePledge(userId: string, pledgeId: number): Promise<bo
   return result.affectedRows > 0;
 }
 
-/**
- * Revokes any currently ACTIVE pledges for this user that are NOT in the provided organTypeId list.
- * This guarantees that deselecting an organ in the UI revokes it in the database upon saving.
- */
 export async function revokePledgesNotInList(
   userId: string,
   keepOrganTypeIds: number[]
@@ -101,9 +79,6 @@ export async function revokePledgesNotInList(
   return result.affectedRows;
 }
 
-/**
- * Revokes ALL active pledges for a user, changing their status to 'REVOKED'.
- */
 export async function revokeAllPledgesByUserId(userId: string): Promise<number> {
   const [result] = await pool.query<ResultSetHeader>(
     "UPDATE donor_pledges SET status = 'REVOKED' WHERE user_id = ? AND status = 'ACTIVE'",

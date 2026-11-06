@@ -8,14 +8,12 @@ async function runTest() {
   console.log('🏥 MODULE 4: INSTITUTIONAL ONBOARDING & VERIFICATION TEST SUITE');
   console.log('===============================================================\n');
 
-  // Pre-cleanup of test facility
   const testLicense = 'AIIMS-ND-2026';
   const testEmail = 'aiims.delhi@gov.in';
 
   await pool.query('DELETE FROM medical_hubs WHERE license_number = ?', [testLicense]);
   await pool.query('DELETE FROM users WHERE email = ?', [testEmail]);
 
-  // Step 1: Register institutional hub
   console.log('▶ [Step 1] Registering facility (AIIMS New Delhi, HOSPITAL)...');
   const regRes = await fetch(`${BASE_URL}/hubs/register`, {
     method: 'POST',
@@ -44,7 +42,6 @@ async function runTest() {
   console.log(`  ✓ Hospital registered successfully! ID: ${hubId}`);
   console.log(`  ✓ Initial Verification Status: '${regData.data.verification_status}' (Correct: PENDING_APPROVAL)\n`);
 
-  // Step 2: Query public directory before approval
   console.log('▶ [Step 2] Querying public directory as unauthenticated citizen...');
   const dirBeforeRes = await fetch(`${BASE_URL}/hubs/directory?city=New Delhi`);
   const dirBeforeData: any = await dirBeforeRes.json();
@@ -55,7 +52,6 @@ async function runTest() {
   }
   console.log('  ✓ Verified: Pending facility is hidden from public directory.\n');
 
-  // Step 3: Admin Login
   console.log('▶ [Step 3] Logging in as Government Administrator...');
   const adminLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
@@ -72,7 +68,6 @@ async function runTest() {
   const adminToken = adminLoginData.data.token;
   console.log(`  ✓ Admin authenticated successfully! (Role: ${adminLoginData.data.user.role})\n`);
 
-  // Step 4: Admin views pending applications
   console.log('▶ [Step 4] Admin audits pending applications list...');
   const pendingRes = await fetch(`${BASE_URL}/admin/hubs/pending`, {
     headers: { Authorization: `Bearer ${adminToken}` },
@@ -86,7 +81,6 @@ async function runTest() {
   console.log(`  ✓ Linked User Email: ${pendingItem.email}`);
   console.log(`  ✓ License: ${pendingItem.license_number}\n`);
 
-  // Step 5: Admin Approves the facility
   console.log(`▶ [Step 5] Admin approves facility ID ${hubId} to ACTIVE...`);
   const approveRes = await fetch(`${BASE_URL}/admin/hubs/${hubId}/verify`, {
     method: 'PATCH',
@@ -102,7 +96,6 @@ async function runTest() {
   }
   console.log(`  ✓ Facility status updated to: '${approveData.data.verification_status}'\n`);
 
-  // Step 6: Public directory check after approval
   console.log('▶ [Step 6] Public directory search after approval...');
   const dirAfterRes = await fetch(`${BASE_URL}/hubs/directory?city=New Delhi`);
   const dirAfterData: any = await dirAfterRes.json();
@@ -114,7 +107,6 @@ async function runTest() {
   console.log(`  ✓ Name: ${foundAfter.name}`);
   console.log(`  ✓ Coordinates: (${foundAfter.latitude}, ${foundAfter.longitude})\n`);
 
-  // Step 7: Facility login and self-profile check
   console.log('▶ [Step 7] Hospital logs in and fetches institutional profile...');
   const hospLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
@@ -139,7 +131,6 @@ async function runTest() {
   }
   console.log(`  ✓ Hospital profile verified: ID ${meData.data.id}, Status: ${meData.data.verification_status}\n`);
 
-  // Step 8: Suspension & Public Exclusion Test
   console.log('▶ [Step 8] Testing administrative suspension (e.g. license audit)...');
   const suspendRes = await fetch(`${BASE_URL}/admin/hubs/${hubId}/verify`, {
     method: 'PATCH',
@@ -160,7 +151,6 @@ async function runTest() {
   }
   console.log('  ✓ Verified: Suspended facility is automatically delisted from public directory.\n');
 
-  // Step 9: Reinstating to ACTIVE
   console.log('▶ [Step 9] Reinstating facility to ACTIVE status...');
   await fetch(`${BASE_URL}/admin/hubs/${hubId}/verify`, {
     method: 'PATCH',

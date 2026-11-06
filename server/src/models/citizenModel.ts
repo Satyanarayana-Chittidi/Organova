@@ -14,12 +14,8 @@ import {
   CitizenOrganRequest,
 } from '../types/citizen';
 
-// Interface extending CitizenProfile with mysql2's RowDataPacket
 interface CitizenProfileRow extends CitizenProfile, RowDataPacket {}
 
-/**
- * Finds a citizen profile by its linked user_id foreign key.
- */
 export async function findCitizenProfileByUserId(userId: string): Promise<CitizenProfile | null> {
   const [rows] = await pool.query<CitizenProfileRow[]>(
     'SELECT * FROM citizen_profiles WHERE user_id = ? LIMIT 1',
@@ -28,10 +24,6 @@ export async function findCitizenProfileByUserId(userId: string): Promise<Citize
   return rows.length > 0 ? rows[0] : null;
 }
 
-/**
- * Inserts a new citizen profile, or updates the existing profile if one already exists.
- * Employs MySQL's atomic 'ON DUPLICATE KEY UPDATE' to prevent race conditions.
- */
 export async function upsertCitizenProfile(
   userId: string,
   dto: UpsertCitizenProfileDTO
@@ -88,9 +80,6 @@ export async function upsertCitizenProfile(
   return profile;
 }
 
-/**
- * Updates avatar URL for a citizen across citizen_profiles and users tables.
- */
 export async function updateCitizenAvatar(
   userId: string,
   avatarUrl: string | null
@@ -105,12 +94,7 @@ export async function updateCitizenAvatar(
   );
 }
 
-/**
- * Retrieves the comprehensive donation and harvest history for a citizen donor.
- * Combines blood donation orders (committed & completed) and harvested organs.
- */
 export async function getCitizenDonationHistory(userId: string): Promise<CitizenDonationHistory> {
-  // 1. Blood donation transactions where user is the donor
   const bloodQuery = `
     SELECT 
       br.id,
@@ -138,7 +122,6 @@ export async function getCitizenDonationHistory(userId: string): Promise<Citizen
   `;
   const [bloodRows] = await pool.query<(CitizenBloodDonation & RowDataPacket)[]>(bloodQuery, [userId]);
 
-  // 2. Blood requests created/received by this user
   const bloodRequestsQuery = `
     SELECT 
       br.id,
@@ -168,7 +151,6 @@ export async function getCitizenDonationHistory(userId: string): Promise<Citizen
   `;
   const [bloodRequestRows] = await pool.query<(CitizenBloodRequest & RowDataPacket)[]>(bloodRequestsQuery, [userId]);
 
-  // 3. Harvested organ transactions where user is the logged donor
   const organQuery = `
     SELECT 
       ao.id,
@@ -206,7 +188,6 @@ export async function getCitizenDonationHistory(userId: string): Promise<Citizen
   `;
   const [organRows] = await pool.query<(CitizenOrganDonation & RowDataPacket)[]>(organQuery, [userId]);
 
-  // 4. Organ transplant waitlist/received requests where user is the recipient
   const organRequestsQuery = `
     SELECT 
       tr.id,
@@ -233,14 +214,12 @@ export async function getCitizenDonationHistory(userId: string): Promise<Citizen
   `;
   const [organRequestRows] = await pool.query<(CitizenOrganRequest & RowDataPacket)[]>(organRequestsQuery, [userId]);
 
-  // 5. Count registered pledges
   const [pledgeRows] = await pool.query<RowDataPacket[]>(
     'SELECT COUNT(*) as count FROM donor_pledges WHERE user_id = ?',
     [userId]
   );
   const activePledges = Number(pledgeRows[0]?.count || 0);
 
-  // 6. Calculate summary stats
   const totalBloodDonations = bloodRows.length;
   const completedBloodRows = bloodRows.filter((b) => b.status === 'COMPLETED');
   const completedBloodDonations = completedBloodRows.length;
@@ -256,7 +235,6 @@ export async function getCitizenDonationHistory(userId: string): Promise<Citizen
   ).length;
   const totalOrgansRequested = organRequestRows.length;
 
-  // Standard clinical advocacy metrics: 1 unit of blood can save up to 3 lives, each organ up to 1 life
   const estimatedLivesSaved = totalBloodUnitsDonated * 3 + totalOrgansDonated;
 
   return {
@@ -278,10 +256,6 @@ export async function getCitizenDonationHistory(userId: string): Promise<Citizen
   };
 }
 
-// ====================================================================
-// 4. HOSPITAL MASTER CONTROL CITIZEN OPERATIONS
-// ====================================================================
-
 export interface RegisteredCitizenSearchResult {
   id: string;
   email: string;
@@ -294,9 +268,6 @@ export interface RegisteredCitizenSearchResult {
   state: string;
 }
 
-/**
- * Searches registered citizen accounts by Name, Email, or Phone.
- */
 export async function searchRegisteredCitizens(
   query: string
 ): Promise<RegisteredCitizenSearchResult[]> {
@@ -331,10 +302,6 @@ export async function searchRegisteredCitizens(
   return rows as RegisteredCitizenSearchResult[];
 }
 
-/**
- * Generates temporary password: first 4 letters of first name (lowercase) + birth year.
- * E.g., "Ramesh Patel", "1985-04-12" -> "rame1985".
- */
 export function generateTemporaryPassword(fullName: string, dateOfBirth: string): string {
   const cleanName = (fullName || '').trim();
   const firstName = cleanName.split(/\s+/)[0]?.replace(/[^a-zA-Z]/g, '').toLowerCase() || 'user';
@@ -367,17 +334,12 @@ export interface MasterRegisterCitizenDTO {
   pincode?: string;
 }
 
-/**
- * Hospital Master Control: Registers a citizen account with pre-verified status (no OTP).
- * Used when enrolling transplant candidates or logging harvested organs.
- */
 export async function masterRegisterCitizen(
   facilityHub: MedicalHub,
   dto: MasterRegisterCitizenDTO
 ): Promise<{ user: any; tempPassword: string }> {
   const normalizedEmail = dto.email.toLowerCase().trim();
 
-  // 1. Check if user already exists
   const existing = await findUserByEmail(normalizedEmail);
   if (existing) {
     const profile = await findCitizenProfileByUserId(existing.id);
@@ -397,7 +359,6 @@ export async function masterRegisterCitizen(
     throw error;
   }
 
-  // 2. Generate temporary password
   const tempPassword = generateTemporaryPassword(dto.full_name, dto.date_of_birth);
   const passwordHash = await hashPassword(tempPassword);
   const newUserId = crypto.randomUUID();
@@ -406,14 +367,12 @@ export async function masterRegisterCitizen(
   try {
     await connection.beginTransaction();
 
-    // 3. Create user record with verified status (No OTP required for Master Control)
     await connection.query(
       `INSERT INTO users (id, email, password_hash, role, auth_provider, is_active, is_verified)
        VALUES (?, ?, ?, 'USER', 'LOCAL', TRUE, TRUE)`,
       [newUserId, normalizedEmail, passwordHash]
     );
 
-    // 4. Create citizen profile record
     await connection.query(
       `INSERT INTO citizen_profiles (
          user_id, full_name, date_of_birth, gender, blood_group,

@@ -1,6 +1,3 @@
-// ====================================================================
-// TRANSPLANT WAITLIST & MULTI-FACTOR MATCHING TYPES
-// ====================================================================
 
 import { BloodGroup } from './blood';
 import { OrganCode } from './organ';
@@ -25,10 +22,6 @@ export type MatchStatus =
   | 'DECLINED'
   | 'COMPLETED';
 
-// --------------------------------------------------------------------
-// 1. DATABASE ENTITIES
-// --------------------------------------------------------------------
-
 export interface TransplantRequestEntity {
   id: number;
   recipient_user_id: string;
@@ -41,7 +34,6 @@ export interface TransplantRequestEntity {
   verified_at: Date | null;
   created_at: Date;
 
-  // Enriched fields from joins
   recipient_email?: string;
   recipient_name?: string;
   attending_hub_name?: string;
@@ -67,7 +59,6 @@ export interface MatchEntity {
   response_deadline: Date;
   responded_at: Date | null;
 
-  // Enriched fields from joins
   organ_code?: OrganCode;
   organ_name?: string;
   organ_blood_group?: BloodGroup;
@@ -82,10 +73,6 @@ export interface MatchEntity {
   is_expired?: boolean;
 }
 
-// --------------------------------------------------------------------
-// 2. MATCHING ENGINE DATA STRUCTURES
-// --------------------------------------------------------------------
-
 export interface CandidateScoreBreakdown {
   requestId: number;
   recipientUserId: string;
@@ -97,16 +84,12 @@ export interface CandidateScoreBreakdown {
   urgencyTier: UrgencyTier;
   distanceKm: number;
   daysWaiting: number;
-  urgencyScore: number;     // Weight: 0.35
-  waitTimeScore: number;    // Weight: 0.25
-  proximityScore: number;   // Weight: 0.20
-  hlaAboScore: number;      // Weight: 0.20
-  totalScore: number;       // S = sum of weighted scores
+  urgencyScore: number;
+  waitTimeScore: number;
+  proximityScore: number;
+  hlaAboScore: number;
+  totalScore: number;
 }
-
-// --------------------------------------------------------------------
-// 3. DATA TRANSFER OBJECTS (DTOs)
-// --------------------------------------------------------------------
 
 export interface CreateTransplantRequestDTO {
   recipient_user_id?: string;

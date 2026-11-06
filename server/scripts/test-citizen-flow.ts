@@ -16,9 +16,6 @@ async function runCitizenFlowTests() {
   let citizenUserId = '';
 
   try {
-    // -------------------------------------------------------------
-    // Step 1: Register Citizen Account
-    // -------------------------------------------------------------
     console.log(`▶ [Step 1] Registering citizen account: ${testEmail}...`);
     const regRes = await fetch(`${BASE_URL}/auth/register`, {
       method: 'POST',
@@ -40,9 +37,6 @@ async function runCitizenFlowTests() {
     console.log(`  ✓ Registration initiated! User ID: ${citizenUserId}`);
     console.log(`  ✓ OTP Code Generated for local test: ${otpCode}`);
 
-    // -------------------------------------------------------------
-    // Step 2: Verify 6-Digit OTP Code
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 2] Verifying 6-digit OTP code...');
     const verifyRes = await fetch(`${BASE_URL}/auth/verify-otp`, {
       method: 'POST',
@@ -62,9 +56,6 @@ async function runCitizenFlowTests() {
     console.log(`  ✓ OTP successfully verified! User status: VERIFIED`);
     console.log(`  ✓ JWT Token issued: ${authToken.substring(0, 20)}...`);
 
-    // -------------------------------------------------------------
-    // Step 3: Login with Email & Password
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 3] Logging in with email & password credentials...');
     const loginRes = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
@@ -81,9 +72,6 @@ async function runCitizenFlowTests() {
     }
     console.log(`  ✓ Login successful! Authenticated as: ${loginData.data.user.email} (Role: ${loginData.data.user.role})`);
 
-    // -------------------------------------------------------------
-    // Step 4: Verify Protected Session (/api/auth/me)
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 4] Checking active session via /api/auth/me...');
     const meRes = await fetch(`${BASE_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -94,9 +82,6 @@ async function runCitizenFlowTests() {
     }
     console.log(`  ✓ Valid session confirmed! User ID matches: ${meData.data.id === citizenUserId}`);
 
-    // -------------------------------------------------------------
-    // Step 5: Save Medical Demographics & Emergency Contacts (PUT /api/citizen/profile)
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 5] Saving demographic & medical health profile...');
     const profilePayload = {
       full_name: 'Satyanarayana Chittidi',
@@ -127,9 +112,6 @@ async function runCitizenFlowTests() {
     }
     console.log(`  ✓ Profile saved successfully! (${saveProfileData.message})`);
 
-    // -------------------------------------------------------------
-    // Step 6: Fetch Saved Profile & Verify Fields
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 6] Retrieving saved profile via GET /api/citizen/profile...');
     const getProfileRes = await fetch(`${BASE_URL}/citizen/profile`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -148,9 +130,6 @@ async function runCitizenFlowTests() {
     }
     console.log(`  ✓ Profile verified: Name='${savedProfile.full_name}', Blood Group='${savedProfile.blood_group}', City='${savedProfile.city}'`);
 
-    // -------------------------------------------------------------
-    // Step 6b: Upload Citizen Profile Picture (POST /api/citizen/avatar)
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 6b] Uploading citizen profile picture avatar...');
     const dummyImageBuffer = Buffer.from(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
@@ -173,16 +152,12 @@ async function runCitizenFlowTests() {
     }
     console.log(`  ✓ Avatar uploaded successfully: ${avatarData.data.avatar_url}`);
 
-    // Verify avatar is served statically
     const staticCheckRes = await fetch(`http://localhost:5000${avatarData.data.avatar_url}`);
     if (!staticCheckRes.ok) {
       throw new Error(`Static avatar serving failed with status ${staticCheckRes.status}`);
     }
     console.log(`  ✓ Static image delivery verified: HTTP ${staticCheckRes.status} OK`);
 
-    // -------------------------------------------------------------
-    // Step 7: Inspect Approved Organ Catalog
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 7] Fetching approved organ catalog (/api/donor/organ-types)...');
     const catalogRes = await fetch(`${BASE_URL}/donor/organ-types`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -200,9 +175,6 @@ async function runCitizenFlowTests() {
     console.log(`  ✓ Kidney living donation allowed: ${kidney.allow_living_donor}`);
     console.log(`  ✓ Heart living donation allowed: ${heart.allow_living_donor} (Deceased only)`);
 
-    // -------------------------------------------------------------
-    // Step 8: Submit Organ Donation Pledges (Living + Deceased)
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 8] Pledging organs (Kidney: LIVING, Heart: DECEASED)...');
     const pledgeRes = await fetch(`${BASE_URL}/donor/pledges`, {
       method: 'POST',
@@ -224,9 +196,6 @@ async function runCitizenFlowTests() {
     }
     console.log(`  ✓ Pledges legally recorded! (${pledgeData.message})`);
 
-    // -------------------------------------------------------------
-    // Step 9: Verify Pledges Registry
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 9] Fetching citizen pledges from registry (/api/donor/pledges)...');
     const myPledgesRes = await fetch(`${BASE_URL}/donor/pledges`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -243,9 +212,6 @@ async function runCitizenFlowTests() {
       console.log(`     • ${p.organ_name} (${p.organ_code}) — Consent: ${p.consent_type}`);
     });
 
-    // -------------------------------------------------------------
-    // Step 10: Generate Digital Donor Card (/api/donor/card)
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 10] Generating official Digital Donor Card...');
     const cardRes = await fetch(`${BASE_URL}/donor/card`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -263,9 +229,6 @@ async function runCitizenFlowTests() {
     console.log(`  ✓ Emergency Contact: ${card.emergency_contact_name || card.emergencyContact?.name} (${card.emergency_contact_phone || card.emergencyContact?.phone})`);
     console.log(`  ✓ Pledged Organs on Card: ${card.pledges?.length}`);
 
-    // -------------------------------------------------------------
-    // Step 11: Emergency Blood Requisition
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 11] Posting emergency blood requisition (2 units of Packed RBC, O+)...');
     const bloodRes = await fetch(`${BASE_URL}/blood/requests`, {
       method: 'POST',
@@ -290,9 +253,6 @@ async function runCitizenFlowTests() {
     console.log(`  ✓ Emergency blood requisition created! Order ID: ${orderId}`);
     console.log(`  ✓ Initial Order Status: ${bloodData.data?.status}`);
 
-    // -------------------------------------------------------------
-    // Step 12: Citizen Passport Tracking (/api/blood/requests/mine)
-    // -------------------------------------------------------------
     console.log('\n▶ [Step 12] Inspecting requisition in citizen orders passport...');
     const myOrdersRes = await fetch(`${BASE_URL}/blood/requests/mine`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -314,7 +274,6 @@ async function runCitizenFlowTests() {
     console.log('===============================================================\n');
 
   } finally {
-    // Clean up test user
     if (citizenUserId) {
       await pool.query('DELETE FROM users WHERE id = ?', [citizenUserId]);
     }

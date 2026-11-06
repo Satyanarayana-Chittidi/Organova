@@ -38,7 +38,6 @@ export default function BloodFinderPage() {
   const [searched, setSearched] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Direct Blood Request Modal State
   const [requestTarget, setRequestTarget] = useState<any | null>(null);
   const [unitsRequested, setUnitsRequested] = useState<number>(1);
   const [urgency, setUrgency] = useState<'CRITICAL' | 'URGENT' | 'ROUTINE'>('CRITICAL');
@@ -61,7 +60,6 @@ export default function BloodFinderPage() {
     return map[comp] || comp.replace(/_/g, ' ');
   };
 
-  // Load distinct cities and facilities from registered network hubs on mount
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
@@ -86,7 +84,6 @@ export default function BloodFinderPage() {
     fetchFacilities();
   }, []);
 
-  // Automatically search inventory whenever bloodGroup, component, city, or refreshTrigger changes
   useEffect(() => {
     let isCancelled = false;
 
@@ -116,7 +113,6 @@ export default function BloodFinderPage() {
     };
   }, [bloodGroup, component, city, refreshTrigger]);
 
-  // Close city suggestions dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (cityWrapperRef.current && !cityWrapperRef.current.contains(e.target as Node)) {
@@ -152,7 +148,6 @@ export default function BloodFinderPage() {
 
   const hasActiveFilters = Boolean(bloodGroup || component || city.trim());
 
-  // Direct Request Modal Handlers
   const handleOpenRequestModal = (item: any) => {
     if (!user) {
       router.push('/auth/login?redirect=/blood-finder');
@@ -217,7 +212,6 @@ export default function BloodFinderPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200">
-      {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-10">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-400 border border-transparent dark:border-red-900/50 text-xs font-semibold mb-3">
           <FindBloodIcon className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
@@ -231,7 +225,6 @@ export default function BloodFinderPage() {
         </p>
       </div>
 
-      {/* Filter Bar with Automatic Updates (No Search Button Needed) */}
       <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end transition-colors">
         <div className="lg:col-span-3">
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -273,7 +266,6 @@ export default function BloodFinderPage() {
           </select>
         </div>
 
-        {/* City Autocomplete Input with Registered Hospitals Dropdown */}
         <div className="lg:col-span-3 relative" ref={cityWrapperRef}>
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
             City / Region
@@ -299,7 +291,6 @@ export default function BloodFinderPage() {
             )}
           </div>
 
-          {/* City Suggestions Dropdown */}
           {isCityDropdownOpen && (
             <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden max-h-56 overflow-y-auto animate-in fade-in duration-150">
               <div className="p-2 border-b border-slate-100 dark:border-slate-700/60 text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
@@ -346,7 +337,6 @@ export default function BloodFinderPage() {
           )}
         </div>
 
-        {/* Clear Button that stays on the right */}
         <div className="lg:col-span-2 flex items-center justify-end">
           <button
             type="button"
@@ -365,7 +355,6 @@ export default function BloodFinderPage() {
         </div>
       </div>
 
-      {/* Results Section */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
@@ -487,9 +476,6 @@ export default function BloodFinderPage() {
         </div>
       </div>
 
-      {/* ==================================================================== */}
-      {/* DIRECT BLOOD REQUISITION MODAL */}
-      {/* ==================================================================== */}
       {requestTarget && (
         <div
           role="dialog"
@@ -517,7 +503,6 @@ export default function BloodFinderPage() {
               </p>
             </div>
 
-            {/* Target Stock Preview Card */}
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between">
               <div>
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">Requested Stock Item</span>
@@ -597,7 +582,6 @@ export default function BloodFinderPage() {
                   </div>
                 </div>
 
-                {/* Searchable Receiving Hospital Combobox */}
                 <HospitalSearchDropdown
                   hospitals={availableHospitals}
                   selectedHospitalId={selectedHospitalId}

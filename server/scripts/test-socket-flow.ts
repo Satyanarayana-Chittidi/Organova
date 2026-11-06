@@ -11,14 +11,12 @@ async function runTest() {
   console.log('⚡ MODULE 8: REAL-TIME WEBSOCKET & ALERT ENGINE TEST SUITE');
   console.log('===============================================================\n');
 
-  // Pre-cleanup
   await pool.query("DELETE FROM matches WHERE match_score > 0");
   await pool.query("DELETE FROM transplant_requests WHERE medical_summary LIKE '%Socket Test%'");
   await pool.query("DELETE FROM available_organs WHERE clinical_notes LIKE '%Socket Test%'");
   await pool.query("DELETE FROM medical_hubs WHERE license_number = 'SOCKET-HOSP-01'");
   await pool.query("DELETE FROM users WHERE email IN ('socket.hosp@hospital.org', 'socket.patient@citizen.org')");
 
-  // Step 1: Admin login
   const adminLoginRes = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -27,7 +25,6 @@ async function runTest() {
   const adminLoginData: any = await adminLoginRes.json();
   const adminToken = adminLoginData.data.token;
 
-  // Step 2: Register & activate a test hospital
   const hospRegRes = await fetch(`${BASE_URL}/hubs/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -49,7 +46,6 @@ async function runTest() {
   const hospRegData: any = await hospRegRes.json();
   const hubId = hospRegData.data.id;
 
-  // Admin approves hospital
   await fetch(`${BASE_URL}/admin/hubs/${hubId}/verify`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
@@ -64,7 +60,6 @@ async function runTest() {
   const hospLoginData: any = await hospLoginRes.json();
   const hospToken = hospLoginData.data.token;
 
-  // Step 3: Register a citizen recipient patient
   const patientUserId = crypto.randomUUID();
   const pwHash = await hashPassword('CitizenPass#2026');
   await pool.query(
@@ -88,7 +83,6 @@ async function runTest() {
 
   console.log('▶ [Step 1] Initialized hospital and citizen recipient credentials...\n');
 
-  // Step 4: Establish authenticated WebSocket connections
   console.log('▶ [Step 2] Establishing authenticated WebSocket handshakes...');
   
   const hospSocket: Socket = ioClient(SERVER_URL, {
@@ -119,7 +113,6 @@ async function runTest() {
   ]);
   console.log('');
 
-  // Step 5: Test Emergency Blood Request Live Broadcast
   console.log('▶ [Step 3] Testing real-time emergency blood broadcast...');
   
   const bloodAlertPromise = new Promise<any>((resolve) => {
@@ -128,7 +121,6 @@ async function runTest() {
     });
   });
 
-  // Post blood request via HTTP API
   const bloodReqRes = await fetch(`${BASE_URL}/blood/requests`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${patientToken}` },
@@ -148,10 +140,8 @@ async function runTest() {
   console.log(`  ✓ Alert Priority: '${receivedBloodAlert.priority}'`);
   console.log(`  ✓ Message: "${receivedBloodAlert.message}"\n`);
 
-  // Step 6: Test Blood Request Claim Status Update to Patient
   console.log('▶ [Step 4] Testing blood order status update pushed to patient socket...');
   
-  // Stock hospital with blood so it can claim
   await fetch(`${BASE_URL}/blood/inventory`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${hospToken}` },
@@ -164,7 +154,6 @@ async function runTest() {
     });
   });
 
-  // Hospital claims the request
   await fetch(`${BASE_URL}/blood/requests/${bloodRequestId}/claim`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${hospToken}` },
@@ -174,14 +163,11 @@ async function runTest() {
   console.log(`  ✓ Live status update received by Patient socket!`);
   console.log(`  ✓ Status: '${receivedStatusAlert.status}', Fulfilling Hub: '${receivedStatusAlert.fulfillingHubName}'\n`);
 
-  // Step 7: Test Organ Match 20-Minute Offer Live Broadcast
   console.log('▶ [Step 5] Testing real-time organ match proposal alerts...');
 
-  // Get Kidney organ type
   const [kidneyRow]: any = await pool.query("SELECT id FROM organ_types WHERE code = 'KIDNEY' LIMIT 1");
   const kidneyTypeId = kidneyRow[0].id;
 
-  // Enroll patient on waitlist
   const waitlistRes = await fetch(`${BASE_URL}/transplant/requests`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${hospToken}` },
@@ -196,7 +182,6 @@ async function runTest() {
   const waitlistData: any = await waitlistRes.json();
   const waitlistId = waitlistData.data.id;
 
-  // Harvest kidney
   const harvestRes = await fetch(`${BASE_URL}/organs/harvest`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${hospToken}` },
@@ -210,7 +195,6 @@ async function runTest() {
   const harvestData: any = await harvestRes.json();
   const organId = harvestData.data.id;
 
-  // Set up listeners on both hospital and patient sockets
   const hospMatchPromise = new Promise<any>((resolve) => {
     hospSocket.on('MATCH_OFFER_RECEIVED', (data) => resolve(data));
   });
@@ -219,7 +203,6 @@ async function runTest() {
     patientSocket.on('RECIPIENT_MATCH_ALERT', (data) => resolve(data));
   });
 
-  // Run matching engine
   await fetch(`${BASE_URL}/transplant/matches/organ/${organId}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${hospToken}` },
@@ -238,7 +221,6 @@ async function runTest() {
   console.log(`  ✓ Patient Socket received match alert:`);
   console.log(`    - Message: "${patientMatchAlert.message}"\n`);
 
-  // Disconnect sockets cleanly
   hospSocket.disconnect();
   patientSocket.disconnect();
 

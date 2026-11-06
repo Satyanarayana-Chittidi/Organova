@@ -109,7 +109,6 @@ export default function HospitalRegisterPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Facility Category Confirmation */}
             <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/50 flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
                 <Hospital className="w-5 h-5" />
@@ -124,7 +123,6 @@ export default function HospitalRegisterPage() {
               </div>
             </div>
 
-            {/* Facility Details & Accreditation */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Official Facility Name</label>
@@ -163,7 +161,6 @@ export default function HospitalRegisterPage() {
               </div>
             </div>
 
-            {/* Step 3: Login Credentials */}
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
               <h3 className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
                 Institutional Coordinator Login Credentials
@@ -210,7 +207,6 @@ export default function HospitalRegisterPage() {
               </div>
             </div>
 
-            {/* Step 4: Geographic Coordinates & Physical Address */}
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
               <h3 className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
                 Physical Location & Haversine Distance Coordinates

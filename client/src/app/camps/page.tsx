@@ -49,18 +49,15 @@ export default function DonationCampsPage() {
   const [selectedCamp, setSelectedCamp] = useState<BloodDonationCamp | null>(null);
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
 
-  // Global Camps Page notifications (Success & Server Errors only; NEVER form validation errors)
   const [globalSuccess, setGlobalSuccess] = useState<string | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  // Schedule New Camp modal state
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [submittingSchedule, setSubmittingSchedule] = useState(false);
   const [scheduleModalError, setScheduleModalError] = useState<string | null>(null);
   const [scheduleInvalidFields, setScheduleInvalidFields] = useState<string[]>([]);
   const [isGeolocating, setIsGeolocating] = useState(false);
 
-  // Edit Camp modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCamp, setEditingCamp] = useState<BloodDonationCamp | null>(null);
   const [submittingEdit, setSubmittingEdit] = useState(false);
@@ -109,7 +106,6 @@ export default function DonationCampsPage() {
     longitude: undefined,
   });
 
-  // Public Filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'UPCOMING'>('ALL');
@@ -147,7 +143,6 @@ export default function DonationCampsPage() {
     fetchAllCampsData();
   }, [isHospitalStaff]);
 
-  // Lock background body scroll when any modal is open
   useEffect(() => {
     const isAnyModalOpen = isScheduleModalOpen || isEditModalOpen || Boolean(selectedCamp);
     if (isAnyModalOpen) {
@@ -172,7 +167,6 @@ export default function DonationCampsPage() {
     fetchAllCampsData();
   };
 
-  // Helper to parse time strings like "09:00 AM" into minutes from midnight
   const parseTimeToMinutes = (timeStr?: string | null): number | null => {
     if (!timeStr) return null;
     const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
@@ -185,7 +179,6 @@ export default function DonationCampsPage() {
     return hours * 60 + minutes;
   };
 
-  // Helper to convert 12-hour format "09:00 AM" to 24-hour "09:00" for standard HTML5 time inputs
   const to24Hour = (time12?: string | null): string => {
     if (!time12) return '09:00';
     const match = time12.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
@@ -198,7 +191,6 @@ export default function DonationCampsPage() {
     return `${String(hours).padStart(2, '0')}:${minutes}`;
   };
 
-  // Helper to convert 24-hour "HH:mm" from HTML5 time input to 12-hour "hh:mm AM/PM"
   const to12Hour = (time24?: string | null): string => {
     if (!time24) return '09:00 AM';
     const match = time24.trim().match(/^(\d{1,2}):(\d{2})$/);
@@ -210,7 +202,6 @@ export default function DonationCampsPage() {
     return `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
   };
 
-  // Check if a date string is fully entered (YYYY-MM-DD) and not a partial keystroke
   const isCompleteDate = (d?: string | null): boolean => {
     if (!d) return false;
     const clean = d.split('T')[0].trim();
@@ -219,7 +210,6 @@ export default function DonationCampsPage() {
     return year >= 2000 && year <= 2100;
   };
 
-  // Date and Time validation function
   const validateDates = (
     startDate: string,
     endDate?: string | null,
@@ -230,7 +220,6 @@ export default function DonationCampsPage() {
 
     const cleanStart = startDate.split('T')[0];
 
-    // Only validate past date once start date is fully typed (YYYY-MM-DD)
     if (isCompleteDate(startDate)) {
       const now = new Date();
       const curYear = now.getFullYear();
@@ -250,7 +239,6 @@ export default function DonationCampsPage() {
         }
       }
 
-      // Check end date only after the user has completely entered the date field (not while partially typing)
       if (endDate && isCompleteDate(endDate)) {
         const cleanEnd = endDate.split('T')[0];
         if (cleanEnd < cleanStart) {
@@ -270,7 +258,6 @@ export default function DonationCampsPage() {
     return null;
   };
 
-  // Geolocation: Fetch organizer's current GPS location
   const handleGetDeviceLocation = (target: 'create' | 'edit') => {
     if (!navigator.geolocation) {
       alert('Geolocation is not supported by your browser.');
@@ -317,7 +304,6 @@ export default function DonationCampsPage() {
   const handleCreateInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    // After a warning, if the field has been filled/typed by the user, clear the red border and warning immediately
     if (scheduleInvalidFields.includes(name)) {
       setScheduleInvalidFields((prev) => prev.filter((f) => f !== name));
       setScheduleModalError(null);
@@ -329,7 +315,6 @@ export default function DonationCampsPage() {
         [name]: name === 'target_units' ? (value ? parseInt(value, 10) : undefined) : value,
       };
 
-      // As soon as the start date is entered, it should be copied to end date (single day camp default)
       if (name === 'camp_date') {
         updated.end_date = value;
       }
@@ -345,7 +330,6 @@ export default function DonationCampsPage() {
           setScheduleModalError(dateErr);
           setScheduleInvalidFields((prev) => (prev.includes(name) ? prev : [...prev, name]));
         } else {
-          // As soon as the condition is satisfied, the warning disappears immediately
           setScheduleModalError(null);
           setScheduleInvalidFields((prev) => prev.filter((f) => f !== 'camp_date' && f !== 'end_date' && f !== 'start_time' && f !== 'end_time'));
         }
@@ -358,7 +342,6 @@ export default function DonationCampsPage() {
   const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    // After a warning, if the field has been filled/typed by the user, clear the red border and warning immediately
     if (editInvalidFields.includes(name)) {
       setEditInvalidFields((prev) => prev.filter((f) => f !== name));
       setEditModalError(null);
@@ -370,7 +353,6 @@ export default function DonationCampsPage() {
         [name]: name === 'target_units' ? (value ? parseInt(value, 10) : undefined) : value,
       };
 
-      // As soon as the start date is entered, it should be copied to end date (single day camp default)
       if (name === 'camp_date') {
         updated.end_date = value;
       }
@@ -386,7 +368,6 @@ export default function DonationCampsPage() {
           setEditModalError(dateErr);
           setEditInvalidFields((prev) => (prev.includes(name) ? prev : [...prev, name]));
         } else {
-          // As soon as the condition is satisfied, the warning disappears immediately
           setEditModalError(null);
           setEditInvalidFields((prev) => prev.filter((f) => f !== 'camp_date' && f !== 'end_date' && f !== 'start_time' && f !== 'end_time'));
         }
@@ -417,7 +398,6 @@ export default function DonationCampsPage() {
   const handleCreateCamp = async (status: 'DRAFT' | 'UPCOMING') => {
     setScheduleModalError(null);
 
-    // Identify unfilled mandatory fields and highlight in red
     const emptyFields: string[] = [];
     if (!formData.camp_name?.trim()) emptyFields.push('camp_name');
     if (!formData.venue_name?.trim()) emptyFields.push('venue_name');
@@ -432,7 +412,6 @@ export default function DonationCampsPage() {
       return;
     }
 
-    // Validate future dates & timestamps
     const dateErr = validateDates(formData.camp_date, formData.end_date, formData.start_time, formData.end_time);
     if (dateErr) {
       setScheduleInvalidFields((prev) => (prev.includes('camp_date') ? prev : [...prev, 'camp_date']));
@@ -519,7 +498,6 @@ export default function DonationCampsPage() {
 
     setEditModalError(null);
 
-    // Identify unfilled mandatory fields and highlight in red
     const emptyFields: string[] = [];
     if (!editFormData.camp_name?.trim()) emptyFields.push('camp_name');
     if (!editFormData.venue_name?.trim()) emptyFields.push('venue_name');
@@ -534,7 +512,6 @@ export default function DonationCampsPage() {
       return;
     }
 
-    // Validate future dates & timestamps
     const dateErr = validateDates(
       editFormData.camp_date || '',
       editFormData.end_date,
@@ -593,7 +570,6 @@ export default function DonationCampsPage() {
     }
   };
 
-  // Revert to Draft action: unpublishes camp from public platform back to draft for editing
   const handleRevokeToDraft = async (camp: BloodDonationCamp) => {
     const confirmed = confirm(
       `Revert "${camp.camp_name}" to Draft?\n\nThis will unpublish the camp from public citizen view so you can edit details before broadcasting again.`
@@ -602,7 +578,6 @@ export default function DonationCampsPage() {
     await handleStatusChange(camp.id, 'DRAFT');
   };
 
-  // Helper to determine the precise turn-by-turn navigation URL for a camp
   const getCampNavigateUrl = (camp: BloodDonationCamp) => {
     if (camp.map_url && camp.map_url.trim()) {
       return camp.map_url.trim();
@@ -615,7 +590,6 @@ export default function DonationCampsPage() {
     )}`;
   };
 
-  // Extract unique cities for the city filter dropdown and pills
   const availableCities = useMemo(() => {
     const set = new Set<string>();
     camps.forEach((c) => {
@@ -624,7 +598,6 @@ export default function DonationCampsPage() {
     return Array.from(set).sort();
   }, [camps]);
 
-  // Filtered public community camps
   const filteredCamps = useMemo(() => {
     let todayCompare = '';
     let startOfWeek: Date | null = null;
@@ -644,17 +617,14 @@ export default function DonationCampsPage() {
     }
 
     return camps.filter((camp) => {
-      // 1. City Filter
       if (selectedCity !== 'ALL' && camp.city?.toLowerCase() !== selectedCity.toLowerCase()) {
         return false;
       }
 
-      // 2. Status Filter
       if (statusFilter !== 'ALL' && camp.status !== statusFilter) {
         return false;
       }
 
-      // 3. Time Filter
       if (timeFilter !== 'ALL' && currentDate) {
         const campDateStr = camp.camp_date.split('T')[0];
         const campDate = new Date(camp.camp_date);
@@ -670,7 +640,6 @@ export default function DonationCampsPage() {
         }
       }
 
-      // 4. Text Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchesName = camp.camp_name?.toLowerCase().includes(q);
@@ -766,7 +735,6 @@ export default function DonationCampsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
-      {/* 1. PAGE HEADER & INTRO */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 text-xs font-bold uppercase tracking-wider mb-2">
@@ -783,7 +751,6 @@ export default function DonationCampsPage() {
           </p>
         </div>
 
-        {/* Top Action Bar */}
         <div className="flex items-center gap-3 shrink-0 flex-wrap">
           <button
             type="button"
@@ -812,7 +779,6 @@ export default function DonationCampsPage() {
         </div>
       </div>
 
-      {/* Global Alerts on Camps Page (Success & Server Errors Only; never form validation) */}
       {globalSuccess && (
         <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 text-emerald-800 dark:text-emerald-300 text-xs font-semibold animate-in fade-in">
           <div className="flex items-center gap-2">
@@ -837,7 +803,6 @@ export default function DonationCampsPage() {
         </div>
       )}
 
-      {/* 2. TOP SECTION FOR HOSPITALS: Camps organized by current hospital (ONLY shown if at least 1 exists) */}
       {isHospitalStaff && myHubCamps.length > 0 && (
         <section className="p-6 sm:p-7 rounded-3xl bg-rose-50/60 dark:bg-slate-900/70 border border-rose-200/80 dark:border-rose-950/80 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-rose-200/60 dark:border-slate-800">
@@ -908,7 +873,6 @@ export default function DonationCampsPage() {
                 </div>
 
                 <div className="px-3.5 sm:px-4 py-2.5 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1.5">
-                  {/* Left: View Details */}
                   <div className="shrink-0">
                     <button
                       type="button"
@@ -919,9 +883,7 @@ export default function DonationCampsPage() {
                     </button>
                   </div>
 
-                  {/* Center: Broadcast / Revert to Draft & Edit buttons (Always side by side) */}
                   <div className="flex items-center justify-center gap-1.5 shrink-0 flex-nowrap">
-                    {/* Broadcast button for Draft drives */}
                     {camp.status === 'DRAFT' && (
                       <button
                         type="button"
@@ -934,7 +896,6 @@ export default function DonationCampsPage() {
                       </button>
                     )}
 
-                    {/* Revert to Draft button for live Upcoming or Active drives */}
                     {['UPCOMING', 'ACTIVE'].includes(camp.status) && (
                       <button
                         type="button"
@@ -947,7 +908,6 @@ export default function DonationCampsPage() {
                       </button>
                     )}
 
-                    {/* Edit button for Draft and Upcoming drives */}
                     {['DRAFT', 'UPCOMING'].includes(camp.status) && (
                       <button
                         type="button"
@@ -961,7 +921,6 @@ export default function DonationCampsPage() {
                     )}
                   </div>
 
-                  {/* Right: Cancel button */}
                   <div className="shrink-0 flex items-center justify-end">
                     {['DRAFT', 'UPCOMING', 'ACTIVE'].includes(camp.status) && (
                       <button
@@ -985,7 +944,6 @@ export default function DonationCampsPage() {
         </section>
       )}
 
-      {/* 3. UNDER THAT: ALL EXISTING CAMPS (Available to both users and hospitals with location filter) */}
       <section className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -1005,10 +963,8 @@ export default function DonationCampsPage() {
           </div>
         </div>
 
-        {/* Filter Controls Bar */}
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-3">
           <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-            {/* Search Input */}
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -1029,7 +985,6 @@ export default function DonationCampsPage() {
               )}
             </div>
 
-            {/* City Dropdown & Reset */}
             <div className="flex items-center gap-2 shrink-0">
               <div className="relative">
                 <select
@@ -1058,7 +1013,6 @@ export default function DonationCampsPage() {
             </div>
           </div>
 
-          {/* Quick Filter Tabs: Status & Timeframe */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
               <Filter className="w-3 h-3" /> Status:
@@ -1101,7 +1055,6 @@ export default function DonationCampsPage() {
             ))}
           </div>
 
-          {/* City Quick Pills */}
           {availableCities.length > 0 && (
             <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-none pb-1">
               <span className="text-[11px] font-semibold text-slate-400 shrink-0">Popular Cities:</span>
@@ -1134,7 +1087,6 @@ export default function DonationCampsPage() {
           )}
         </div>
 
-        {/* Camp Cards Grid */}
         {loading ? (
           <div className="py-16 text-center text-slate-400 space-y-3">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-rose-500 opacity-60" />
@@ -1173,7 +1125,6 @@ export default function DonationCampsPage() {
                 className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group"
               >
                 <div className="p-5 sm:p-6 space-y-4">
-                  {/* Top Header: Badge & Target Volume */}
                   <div className="flex items-center justify-between gap-2">
                     {getStatusBadge(camp.status)}
                     {camp.target_units && (
@@ -1184,7 +1135,6 @@ export default function DonationCampsPage() {
                     )}
                   </div>
 
-                  {/* Camp Name & Description */}
                   <div>
                     <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors line-clamp-1">
                       {camp.camp_name}
@@ -1194,7 +1144,6 @@ export default function DonationCampsPage() {
                     </p>
                   </div>
 
-                  {/* Associated Hub */}
                   <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
                       <Building2 className="w-3.5 h-3.5" />
@@ -1209,7 +1158,6 @@ export default function DonationCampsPage() {
                     </div>
                   </div>
 
-                  {/* Date, Timings & Venue Details */}
                   <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-rose-500 shrink-0" />
@@ -1232,7 +1180,6 @@ export default function DonationCampsPage() {
                   </div>
                 </div>
 
-                {/* Card Footer: View Details & Turn-by-Turn Navigation */}
                 <div className="px-5 sm:px-6 py-3.5 bg-slate-50/70 dark:bg-slate-950/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
                   <button
                     type="button"
@@ -1262,11 +1209,9 @@ export default function DonationCampsPage() {
         )}
       </section>
 
-      {/* 4. SCHEDULE NEW CAMP MODAL (For Hospitals) */}
       {isScheduleModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-slate-950/70 backdrop-blur-xs flex justify-center items-start p-3 sm:p-6 py-6 sm:py-10 animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh] my-auto sm:my-0 animate-in zoom-in-95">
-            {/* Modal Header */}
             <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shadow-xs">
@@ -1294,7 +1239,6 @@ export default function DonationCampsPage() {
               </button>
             </div>
 
-            {/* Scrollable Form Body */}
             <form
               id="schedule-camp-form"
               onSubmit={(e) => {
@@ -1423,7 +1367,6 @@ export default function DonationCampsPage() {
                 </div>
               </div>
 
-              {/* Camp Date Range Section with strict Future Date Validation */}
               <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
@@ -1522,7 +1465,6 @@ export default function DonationCampsPage() {
                 </div>
               </div>
 
-              {/* Map Navigation & Location Link Section */}
               <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-slate-800/60 border border-blue-100 dark:border-slate-700 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
@@ -1598,7 +1540,6 @@ export default function DonationCampsPage() {
                 )}
               </div>
 
-              {/* Contact Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
@@ -1634,9 +1575,7 @@ export default function DonationCampsPage() {
               </div>
             </form>
 
-            {/* Pinned Modal Footer (Always Visible at bottom with Bottom Error Notice) */}
             <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 flex flex-col gap-3 shrink-0">
-              {/* Validation & Mandatory Fields Error Notice - Exactly ONE Alert */}
               {scheduleModalError && (
                 <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-semibold text-xs flex items-center gap-2 animate-in fade-in">
                   <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
@@ -1692,11 +1631,9 @@ export default function DonationCampsPage() {
         </div>
       )}
 
-      {/* 5. EDIT CAMP MODAL (For Hospitals) */}
       {isEditModalOpen && editingCamp && (
         <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-slate-950/70 backdrop-blur-xs flex justify-center items-start p-3 sm:p-6 py-6 sm:py-10 animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh] my-auto sm:my-0 animate-in zoom-in-95">
-            {/* Modal Header */}
             <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
@@ -1725,7 +1662,6 @@ export default function DonationCampsPage() {
               </button>
             </div>
 
-            {/* Scrollable Form Body */}
             <form id="edit-camp-form" onSubmit={handleUpdateCamp} className="p-5 sm:p-6 overflow-y-auto overscroll-contain flex-1 space-y-4 text-xs">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
@@ -1840,7 +1776,6 @@ export default function DonationCampsPage() {
                 </div>
               </div>
 
-              {/* Date & Timings */}
               <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
@@ -1939,7 +1874,6 @@ export default function DonationCampsPage() {
                 </div>
               </div>
 
-              {/* Map Navigation Link & Coordinates */}
               <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-slate-800/60 border border-blue-100 dark:border-slate-700 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
@@ -2009,7 +1943,6 @@ export default function DonationCampsPage() {
                 )}
               </div>
 
-              {/* Contact Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
@@ -2043,9 +1976,7 @@ export default function DonationCampsPage() {
               </div>
             </form>
 
-            {/* Pinned Edit Modal Footer (Always Visible at bottom with Bottom Error Notice) */}
             <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 flex flex-col gap-3 shrink-0">
-              {/* Form Local Error Notification - Exactly ONE Alert */}
               {editModalError && (
                 <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-semibold text-xs flex items-center gap-2 animate-in fade-in">
                   <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
@@ -2090,7 +2021,6 @@ export default function DonationCampsPage() {
         </div>
       )}
 
-      {/* 6. CAMP DETAILS PREVIEW MODAL */}
       {selectedCamp && (
         <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-slate-950/70 backdrop-blur-xs flex justify-center items-start p-3 sm:p-6 py-6 sm:py-10 animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh] my-auto sm:my-0 animate-in zoom-in-95">
@@ -2205,7 +2135,6 @@ export default function DonationCampsPage() {
               </div>
             </div>
 
-            {/* Pinned Details Modal Footer */}
             <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 flex items-center justify-between gap-3 shrink-0">
               <a
                 href={getCampNavigateUrl(selectedCamp)}

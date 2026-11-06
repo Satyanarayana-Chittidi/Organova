@@ -105,7 +105,6 @@ export default function RecipientWaitlistStatusPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full transition-colors duration-200">
       <div className="space-y-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-transparent dark:border-emerald-900/50 text-xs font-semibold mb-2">
@@ -131,7 +130,6 @@ export default function RecipientWaitlistStatusPage() {
           </div>
         </div>
 
-        {/* Action feedback message */}
         {actionMsg && (
           <div
             className={`p-4 rounded-2xl border text-xs font-semibold flex items-center gap-2 ${
@@ -149,7 +147,6 @@ export default function RecipientWaitlistStatusPage() {
           </div>
         )}
 
-        {/* Informational Guidance Box */}
         <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900/50 text-xs text-blue-900 dark:text-blue-200 leading-relaxed flex items-start gap-3">
           <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <div>
@@ -196,7 +193,6 @@ export default function RecipientWaitlistStatusPage() {
                       : 'border-slate-200 dark:border-slate-800'
                   }`}
                 >
-                  {/* Match Offer Active Callout Banner with Accept / Decline Controls */}
                   {isMatchOffered && (
                     <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 mb-6 shadow-lg shadow-amber-500/20">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -216,7 +212,6 @@ export default function RecipientWaitlistStatusPage() {
                           </p>
                         </div>
 
-                        {/* Interactive Accept / Decline Actions for Patient */}
                         {req.active_match_id && (
                           <div className="flex items-center gap-2 shrink-0">
                             <button
@@ -240,7 +235,6 @@ export default function RecipientWaitlistStatusPage() {
                     </div>
                   )}
 
-                  {/* Confirmed Acceptance Banner */}
                   {isAccepted && (
                     <div className="p-4 rounded-2xl bg-emerald-500 text-white font-semibold text-xs mb-6 shadow-md shadow-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
@@ -292,7 +286,6 @@ export default function RecipientWaitlistStatusPage() {
                     </div>
                   </div>
 
-                  {/* Demographic & Hospital Info */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-b border-slate-100 dark:border-slate-800 text-xs">
                     <div>
                       <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
@@ -332,7 +325,6 @@ export default function RecipientWaitlistStatusPage() {
                     </div>
                   </div>
 
-                  {/* Medical Summary Description */}
                   <div className="pt-4 text-xs">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
                       Clinical Summary from Hospital:
