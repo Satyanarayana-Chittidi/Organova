@@ -6,23 +6,54 @@ import path from 'path';
 dotenv.config();
 
 // Create a connection pool to reuse database connections efficiently
-// Supports both individual environment variables and cloud connection strings (Railway / Render)
+// Supports individual environment variables and cloud connection strings (TiDB / Render / Railway)
 const dbUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
-const pool = dbUrl
-  ? mysql.createPool(dbUrl)
-  : mysql.createPool({
-      host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
-      port: Number(process.env.MYSQLPORT || process.env.DB_PORT) || 3306,
-      user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
-      password: process.env.MYSQLPASSWORD ?? process.env.DB_PASSWORD ?? '',
-      database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db',
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-      enableKeepAlive: true,
-      keepAliveInitialDelay: 0,
-    });
+function createDatabasePool() {
+  if (dbUrl) {
+    try {
+      const isTidb = dbUrl.includes('tidbcloud.com');
+      // If TiDB Cloud is detected and SSL isn't explicitly defined in query params, enforce TLSv1.2
+      if (isTidb && !dbUrl.includes('ssl=')) {
+        const parsed = new URL(dbUrl);
+        return mysql.createPool({
+          host: parsed.hostname,
+          port: Number(parsed.port) || 4000,
+          user: decodeURIComponent(parsed.username),
+          password: decodeURIComponent(parsed.password),
+          database: parsed.pathname.replace(/^\//, '') || 'organ_donation_db',
+          ssl: {
+            minVersion: 'TLSv1.2',
+            rejectUnauthorized: true,
+          },
+          waitForConnections: true,
+          connectionLimit: 10,
+          queueLimit: 0,
+          enableKeepAlive: true,
+          keepAliveInitialDelay: 0,
+        });
+      }
+    } catch (e) {
+      // Fall through to standard pool creation
+    }
+    return mysql.createPool(dbUrl);
+  }
+
+  return mysql.createPool({
+    host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
+    port: Number(process.env.MYSQLPORT || process.env.DB_PORT) || 3306,
+    user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
+    password: process.env.MYSQLPASSWORD ?? process.env.DB_PASSWORD ?? '',
+    database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+  });
+}
+
+const pool = createDatabasePool();
 
 // Helper function to verify database connectivity on server startup
 export async function testDatabaseConnection(): Promise<void> {
