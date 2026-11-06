@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
@@ -118,11 +120,31 @@ export async function autoMigrateDatabase(): Promise<{ status: string; tables: n
   try {
     const connection = await pool.getConnection();
     try {
-      const [rows]: any = await connection.query(
+      let [rows]: any = await connection.query(
         "SELECT COUNT(*) as cnt FROM information_schema.tables WHERE table_schema = DATABASE()"
       );
-      const tableCount = rows[0]?.cnt || 0;
-      console.log(`[AUTO-MIGRATE] Database schema verified: ${tableCount} active tables.`);
+      let tableCount = rows[0]?.cnt || 0;
+
+      if (tableCount === 0) {
+        const initPath = path.resolve(__dirname, '../../database/init.sql');
+        if (fs.existsSync(initPath)) {
+          const sql = fs.readFileSync(initPath, 'utf8');
+          const statements = sql
+            .split(';')
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0 && !s.toLowerCase().startsWith('use ') && !s.toLowerCase().startsWith('create database'));
+          for (const stmt of statements) {
+            await connection.query(stmt);
+          }
+          const [afterRows]: any = await connection.query(
+            "SELECT COUNT(*) as cnt FROM information_schema.tables WHERE table_schema = DATABASE()"
+          );
+          tableCount = afterRows[0]?.cnt || 0;
+          console.log(`[AUTO-MIGRATE] Initialized fresh database schema: ${tableCount} tables created.`);
+        }
+      } else {
+        console.log(`[AUTO-MIGRATE] Database schema verified: ${tableCount} active tables.`);
+      }
 
       const adminHash = '$2b$10$1pqXqzsdydZ7xAGVl2wYweY5ObOLKc69s7kCNL4KTPmqcoBCUVZA2';
       await connection.query(

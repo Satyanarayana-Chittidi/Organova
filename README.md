@@ -91,43 +91,29 @@ git clone https://github.com/Satyanarayana-Chittidi/Organova.git
 cd Organova
 ```
 
-### 2. Database Configuration
+### 2. Backend Setup
 
-Start your local MySQL service and import the schema:
+Ensure your local MySQL service is running. If your local MySQL root user has a password, create a `server/.env` file:
 
-```bash
-mysql -u root -p < server/database/init.sql
+```env
+DB_PASSWORD=your_mysql_password
 ```
 
-### 3. Backend Setup
+*(If your local MySQL root has no password, no configuration is needed. The server automatically creates the database, loads the schema, and provisions the admin keys on startup.)*
 
 ```bash
 cd server
 npm install
-npm run build
-npm start
-```
-
-For development mode with hot reload:
-
-```bash
 npm run dev
 ```
 
-### 4. Frontend Setup
+### 3. Frontend Setup
 
 In a separate terminal:
 
 ```bash
 cd client
 npm install
-npm run build
-npm start
-```
-
-For development mode:
-
-```bash
 npm run dev
 ```
 
