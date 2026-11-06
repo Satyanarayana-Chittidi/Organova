@@ -48,6 +48,22 @@ async function startServer(): Promise<void> {
       console.error('[SWEEPER] Error during timeout sweep:', err);
     }
   }, 15000);
+
+  // 4. Automated 12-minute keep-alive heartbeat for Render Free Tier (auto-detects RENDER_EXTERNAL_URL)
+  const keepAliveUrl = process.env.RENDER_EXTERNAL_URL || process.env.KEEP_ALIVE_URL;
+  if (keepAliveUrl) {
+    const PING_INTERVAL = 12 * 60 * 1000; // 12 minutes (Render spins down after 15 min of inactivity)
+    console.log(`[KEEP-ALIVE] Initialized self-ping heartbeat for ${keepAliveUrl} (every 12 mins).`);
+    setInterval(async () => {
+      try {
+        const pingTarget = `${keepAliveUrl.replace(/\/$/, '')}/api/health`;
+        const res = await fetch(pingTarget);
+        console.log(`[KEEP-ALIVE] Heartbeat ping sent to ${pingTarget} (Status: ${res.status})`);
+      } catch (pingErr: any) {
+        console.warn('[KEEP-ALIVE] Heartbeat notice:', pingErr.message);
+      }
+    }, PING_INTERVAL);
+  }
 }
 
 // Handle termination signals for clean, graceful server shutdowns
