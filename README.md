@@ -1,213 +1,102 @@
 # Organova
 
-> **National Digital Healthcare Platform for Real-Time Organ Viability Tracking, 20-Minute Algorithmic Matching, and Emergency Blood Logistics.**
+<p align="center">
+  <strong>National Digital Healthcare Platform for Real-Time Organ Viability Tracking, Algorithmic Matching, and Emergency Blood Logistics</strong>
+</p>
 
-[![Next.js](https://img.shields.io/badge/Frontend-Next.js%2016-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript%205-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Backend-Node.js%20%2F%20Express-green?style=flat-square&logo=node.js)](https://nodejs.org/)
-[![MySQL](https://img.shields.io/badge/Database-MySQL%208.0-orange?style=flat-square&logo=mysql)](https://www.mysql.com/)
-[![Socket.IO](https://img.shields.io/badge/Realtime-Socket.IO-010101?style=flat-square&logo=socket.io)](https://socket.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS%204-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+<p align="center">
+  <a href="https://organova.vercel.app"><strong>Live Application</strong></a> &bull;
+  <a href="https://organova.onrender.com/api/health"><strong>API Service</strong></a> &bull;
+  <a href="https://github.com/Satyanarayana-Chittidi/Organova"><strong>GitHub Repository</strong></a>
+</p>
 
----
-
-## 📌 Executive Summary
-
-Every year, thousands of life-saving organs are lost due to cold ischemia expiration and fragmented inter-hospital communication. In parallel, critical trauma centers struggle with real-time blood stock visibility during emergencies.
-
-**Organova** is a high-availability digital health infrastructure engineered to bridge the critical gap between organ retrieval and surgical implantation. It combines:
-1. **Dynamic Cold Ischemia Countdown Timers** based on organ-specific viability degradation curves.
-2. **Deterministic 20-Minute Algorithmic Match Engine** balancing clinical urgency, waitlist tenure, transit proximity, and HLA/ABO immunocompatibility.
-3. **Emergency Blood Supply Matrix & SOS Broadcasts** enabling instant inter-hospital requisition, stock transfers, and citizen walk-in donor mobilization.
-4. **Master Control Governance Gateway** ensuring hospital accreditation, clinical auditability, and tamper-resistant medical ledgers.
-
----
-
-## 🏗️ System Architecture
-
-Organova is structured as a distributed, decoupled full-stack platform:
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        Organova Client (Next.js 16)                    │
-│   Citizen Portal   │   Hospital Clinical Suite   │   Master Control    │
-│  (Donor Pledges,   │  (Harvest viabilities,      │  (Facility audit,   │
-│   Blood Requests)  │   Leaderboard matching)     │   Node telemetry)   │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ HTTP / REST & WebSockets (WSS)
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                   Organova Core API (Express / Node.js)                 │
-│  ┌───────────────────────┬──────────────────────┬───────────────────┐  │
-│  │ Match Engine Worker   │ Cold Ischemia Watch  │ Socket.IO Server  │  │
-│  │ (Multi-factor scoring)│ (Auto-decay sweeper) │ (Real-time SOS)   │  │
-│  └───────────────────────┴──────────────────────┴───────────────────┘  │
-└───────────────────┬───────────────────────────────┬────────────────────┘
-                    │                               │
-                    ▼                               ▼
-       ┌────────────────────────┐      ┌─────────────────────────┐
-       │   MySQL 8.0 Database   │      │   Redis In-Memory Cache │
-       │  (Clinical records &   │      │  (Transient session &   │
-       │   audited transactions)│      │   geo-proximity caches) │
-       └────────────────────────┘      └─────────────────────────┘
-```
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript_5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socket.io&logoColor=white" alt="Socket.IO" />
+  <img src="https://img.shields.io/badge/MySQL_8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+</p>
 
 ---
 
-## 🚀 Key Modules & Capabilities
+## Live Deployments
 
-### 1. National Organ Harvest & Cold Ischemia Ledger
-- Real-time viability tracking with dynamic progress bars and countdown timers per harvested asset.
-- Strict clinical enforcement of cold ischemia preservation limits:
-  - **Heart & Lungs:** 4 – 6 Hours
-  - **Liver:** 12 Hours
-  - **Kidneys:** 24 – 36 Hours
-  - **Cornea (Tissue):** Up to 14 Days
-  - **Bone Marrow:** 72 Hours
-
-### 2. Algorithmic Matching Engine (Multi-Tier Scoring)
-When an organ is harvested, the engine prioritizes waiting recipients using a weighted composite formula:
-$$\text{Score} = (W_{\text{urgency}} \times 0.35) + (W_{\text{tenure}} \times 0.25) + (W_{\text{distance}} \times 0.20) + (W_{\text{hla\_abo}} \times 0.20)$$
-- **20-Minute Match Offers:** Hospitals receive a strict 20-minute review window to accept an allocation. If unaccepted, an automated background sweeper declines the offer and elevates the next candidate in the queue.
-- **ABO/HLA Immunocompatibility:** Strict validation preventing incompatible cross-matches.
-
-### 3. Emergency Blood Supply Matrix & Citizen SOS Broadcasts
-- Live stock availability across authorized hospitals broken down by ABO/Rh groups and components (`Whole Blood`, `Packed RBC`, `Platelets`, `Plasma`).
-- Real-time emergency blood requests triggering instant WebSocket notifications to nearby accredited medical hubs.
-- Walk-in donor passes featuring QR verification and clinical eligibility pre-checks.
-
-### 4. Citizen Registry & Digital Donor Card
-- Advance legal directives for organ donation with deceased vs living donation consent selections.
-- Instant generation of verified digital organ donor identity credentials.
-- Real-time waitlist status and transplant passport tracking.
-
-### 5. Master Control Governance Gateway
-- Centralized administrative console for hospital facility verification and license accreditation.
-- Comprehensive system audit logs tracking logins, entity updates, allocations, and emergency dispatches.
-- Donation camp coordination engine with geolocation mapping.
+- Web Application: https://organova.vercel.app
+- Backend API Service: https://organova.onrender.com
+- GitHub Source Repository: https://github.com/Satyanarayana-Chittidi/Organova
 
 ---
 
-## 🛠️ Technology Stack
+## Platform Overview
 
-| Domain | Technology | Description |
-| :--- | :--- | :--- |
-| **Frontend Framework** | [Next.js 16 (App Router)](https://nextjs.org/) | Server-side rendering, React 19, partial prerendering, and optimized client bundles. |
-| **Styling** | [Tailwind CSS 4](https://tailwindcss.com/) | Atomic responsive design with dark mode and zero-overflow layout guards. |
-| **Icons & UI** | [Lucide React](https://lucide.dev/) | Consistent iconography across clinical and citizen interfaces. |
-| **Backend API** | [Node.js](https://nodejs.org/) & [Express 4](https://expressjs.com/) | Modular TypeScript REST services and asynchronous task orchestration. |
-| **Real-time Engine** | [Socket.IO](https://socket.io/) | Full-duplex WebSocket channels for instant clinical alerts and stock updates. |
-| **Database** | [MySQL 8.0](https://www.mysql.com/) | Relational store with foreign-key constraints, enum enforcements, and audit trails. |
-| **Cache & Queue** | [Redis (ioredis)](https://redis.io/) | Memory cache for fast lookups with automated offline database fallback. |
-| **Authentication** | JWT (`jsonwebtoken`) & `bcryptjs` | HTTP-only session cookies and role-based access control (`USER`, `HOSPITAL`, `ADMIN`). |
+Organova is a digital healthcare platform engineered to streamline organ donation pledges, track organ viability in real time, run automated compatibility matching, and coordinate emergency blood logistics across accredited hospitals and citizens.
 
----
+In organ transplantation, timing is critical. Organs undergo cold ischemia degradation the moment they are retrieved, leaving medical teams only narrow hourly windows to match, allocate, transport, and surgically implant them into waiting recipients. Organova automates this lifecycle by replacing fragmented telephone chains and manual records with an integrated digital registry, automated algorithmic allocation, and real-time clinical alerts.
 
-## 📁 Repository Structure
+### What the Platform Offers
 
-```
-Organova/
-├── client/                      # Next.js 16 Web Application
-│   ├── public/                  # Static assets & organ anatomy visuals
-│   │   ├── images/              # Organ badges, logos & illustrations
-│   │   └── favicon.ico          # Application favicon
-│   ├── src/
-│   │   ├── app/                 # Next.js App Router (Citizen, Hospital, Admin)
-│   │   │   ├── blood-finder/    # Public blood inventory search
-│   │   │   ├── camps/           # Blood donation drives & camps
-│   │   │   ├── citizen/         # Profile & donation history
-│   │   │   ├── donor/           # Organ pledge form & digital donor card
-│   │   │   ├── hospital/        # Harvest, matching engine, inventory, waitlist
-│   │   │   ├── master-control/  # System administration, audit logs, facilities
-│   │   │   └── transplant/      # Transplant passport & recipient records
-│   │   ├── components/          # Reusable UI components, navbars, and dialogs
-│   │   ├── context/             # ThemeContext, AuthContext, SocketContext
-│   │   └── lib/                 # REST API client & centralized endpoints
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── server/                      # Node.js + Express TypeScript API
-│   ├── database/
-│   │   └── init.sql             # Complete database schema, tables & indexes
-│   ├── scripts/
-│   │   ├── seed-admin.ts        # Root administrator account initializer
-│   │   ├── seedOrganMocks.ts    # Seed script for realistic clinical demo assets
-│   │   └── test-*.ts            # Automated test suites for all major flows
-│   ├── src/
-│   │   ├── config/              # Database pool, Redis client & Socket setup
-│   │   ├── controllers/         # REST API route handlers
-│   │   ├── middlewares/         # JWT verification, roles & upload parsers
-│   │   ├── models/              # Relational SQL query helpers & queries
-│   │   ├── routes/              # Centralized route definitions
-│   │   ├── services/            # Matching engine, ischemia tracker & business logic
-│   │   ├── sockets/             # Real-time event dispatchers & room listeners
-│   │   ├── types/               # TypeScript data interfaces & DTOs
-│   │   └── utils/               # Encryption, distance calculators & token helpers
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── start-mysql.bat              # Windows helper to launch MySQL service
-├── .gitignore                   # Multi-tier git exclusion rules
-└── README.md                    # Platform documentation
-```
+- Citizen Organ Pledges and Digital Donor ID: Citizens can register legal organ donation pledges across all major organs and tissues (kidneys, liver, heart, lungs, cornea, pancreas, bone marrow) and receive an instantly verifiable digital donor card with QR credentials.
+- Real-Time Cold Ischemia Tracking: When an organ is harvested at a donor hospital, the system logs its clinical parameters and initiates a live countdown timer reflecting strict medical viability preservation limits.
+- Algorithmic Compatibility Matching: An automated matching engine calculates compatibility scores for waitlisted recipients by evaluating clinical urgency, waitlist tenure, transit proximity, and ABO/HLA blood compatibility.
+- 20-Minute Match Acceptance Windows: When an organ match is proposed, the attending hospital receives a strict 20-minute decision window to review candidate compatibility and accept the allocation. If unaccepted, background sweepers automatically transition the offer to the next eligible candidate in the queue.
+- Emergency Blood Requisitions and SOS Alerts: Trauma centers and citizens can broadcast urgent blood requisitions. Nearby compatible donors receive instant notifications and digital walk-in donor passes.
+- Hospital Inventory Management: Accredited facilities maintain live stock counts across specific blood components (Whole Blood, Packed RBC, Platelets, Plasma) with automated inter-hospital transfer coordination.
+- Master Control Governance: Centralized administrative gateway for verifying medical facilities, managing donation camps, and auditing system transaction logs.
 
 ---
 
-## ⚡ Getting Started
+## How Frontend, Backend, and Database Work Together
+
+Organova operates as a decoupled three-tier system:
+
+### 1. Frontend (Next.js 16, React 19, Tailwind CSS 4)
+- User Experience: Provides dedicated, responsive interfaces for Citizens, Hospital Coordinators, and System Administrators.
+- Real-Time Notifications: Establishes a persistent WebSocket connection via Socket.IO to receive instant alerts (emergency blood requisitions, match proposals, and donor responses) without requiring manual page reloads.
+- Client State and Theme: Manages authentication sessions, role-based routing, and persistent dark/light mode toggling.
+- API Client: Communicates with backend REST endpoints using structured, typed API helpers with automatic token management and error boundaries.
+
+### 2. Backend (Node.js, Express, TypeScript, Socket.IO)
+- REST API Services: Serves endpoints for user authentication, donor registration, waitlist management, hospital administration, and blood inventory.
+- Real-Time Socket Gateway: Manages WebSocket rooms, dispatching emergency SOS broadcasts to nearby registered donors and clinical match alerts to hospital coordinators.
+- Matching Engine Service: Evaluates donor organ attributes against recipient clinical parameters to compute weighted multi-tier match rankings.
+- Background Sweepers: Monitors active match proposals and automatically sweeps expired 20-minute offers, notifying attending hospitals in real time when allocations shift.
+- Automated Schema Migrations: Verifies database schema integrity and automatically provisions administrative credentials on startup.
+
+### 3. Database (MySQL 8.0 / Cloud TiDB)
+- Relational Schema: Stores user accounts, hospital accreditations, recipient waitlists, organ harvest records, match proposals, blood requests, and audit logs.
+- Data Integrity: Enforces foreign keys, status enumerations, and indexed queries to ensure rapid lookups during high-frequency matching operations.
+- Audit Trail: Persists immutable records of clinical transactions, including organ retrievals, allocation decisions, hospital acceptances, and emergency dispatches.
+
+---
+
+## Local Setup and Installation
 
 ### Prerequisites
-- **Node.js**: `v20.x` or higher
-- **MySQL**: `8.0+`
-- **Redis** *(Optional)*: Server gracefully falls back to database queries if Redis is offline.
 
----
+- Node.js (version 20 or higher)
+- MySQL (version 8.0 or higher)
+- Git
 
-### Step 1: Database Setup
+### 1. Clone the Repository
 
-1. Start your local MySQL service.
-2. Execute the initialization script located at `server/database/init.sql`:
-   ```bash
-   mysql -u root -p < server/database/init.sql
-   ```
-   *This creates the database `organ_donation_db` with all required tables, foreign keys, triggers, and organ type reference tables.*
-
----
-
-### Step 2: Configure Environment Variables
-
-#### Backend (`server/.env`):
-Copy `server/.env.example` to `server/.env` and update credentials:
-```env
-PORT=5000
-NODE_ENV=development
-
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-DB_NAME=organ_donation_db
-
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
-REDIS_EXPIRE_TIME=3600
-
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRES_IN=7d
-
-CLIENT_URL=http://localhost:3000
+```bash
+git clone https://github.com/Satyanarayana-Chittidi/Organova.git
+cd Organova
 ```
 
-#### Frontend (`client/.env.local`):
-Copy `client/.env.example` to `client/.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
+### 2. Database Configuration
+
+Start your local MySQL service and import the schema:
+
+```bash
+mysql -u root -p < server/database/init.sql
 ```
 
----
-
-### Step 3: Install & Start Backend
+### 3. Backend Setup
 
 ```bash
 cd server
@@ -215,69 +104,45 @@ npm install
 npm run build
 npm start
 ```
-*For development mode with hot reload:*
+
+For development mode with hot reload:
+
 ```bash
 npm run dev
 ```
 
-#### Seed Admin & Test Datasets:
-```bash
-# Seed the Master Control Administrator
-npx ts-node scripts/seed-admin.ts
-
-# Seed realistic mock organs, matches, and clinical requests
-npx ts-node scripts/seedOrganMocks.ts
-```
-
----
-
-### Step 4: Install & Start Frontend
+### 4. Frontend Setup
 
 In a separate terminal:
+
 ```bash
 cd client
 npm install
 npm run build
 npm start
 ```
-*For development mode:*
+
+For development mode:
+
 ```bash
 npm run dev
 ```
 
-Visit **`http://localhost:3000`** in your browser.
+Open `http://localhost:3000` in your browser.
 
 ---
 
-## 🔑 Default Credentials (Seed Data)
+## Default Access Credentials
 
-| Role | Portal / Destination | Email | Password |
+| Role | Portal URL | Email | Password |
 | :--- | :--- | :--- | :--- |
-| **System Admin** | `/master-control` | `admin@organdonation.gov.in` | `AdminSecurePass@2026` |
-| **Hospital Coordinator** | `/hospital/login` | *Registered facility email* | *Specified during registration* |
-| **Citizen / Patient** | `/auth/login` | *Registered user email* | *Specified during registration* |
+| System Administrator | `/master-control` | admin@mastercontrol.local | AdminSecurePass@2026 |
+| Alternative Admin | `/master-control` | admin@organdonation.gov.in | AdminSecurePass@2026 |
+| Hospital Coordinator | `/hospital/login` | Registered Facility Email | Specified at Registration |
+| Citizen / Donor | `/auth/login` | Registered User Email | Specified at Registration |
 
 ---
 
-## 🧪 Verification & Test Suites
+## License
 
-The backend includes test scripts to validate core clinical flows:
-
-```bash
-cd server
-npm run test:auth       # User authentication and JWT lifecycle
-npm run test:hubs       # Hospital registration and verification
-npm run test:citizen    # Pledge submission and citizen profile
-npm run test:blood      # Emergency blood requisition workflow
-npm run test:organs     # Organ harvest entry and cold ischemia timers
-npm run test:matching   # 20-minute match algorithm execution
-npm run test:socket     # WebSocket event propagation
-```
-
----
-
-## 📄 License & Attribution
-
-Distributed under the **MIT License**. See `LICENSE` for more information.
-
-Designed and developed by [Satyanarayana Chittidi](https://github.com/Satyanarayana-Chittidi).
+Distributed under the MIT License. Designed and developed by [Satyanarayana Chittidi](https://github.com/Satyanarayana-Chittidi).
