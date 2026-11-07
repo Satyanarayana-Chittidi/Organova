@@ -66,8 +66,7 @@ Organova operates as a decoupled three-tier system:
 - REST API Services: Serves endpoints for user authentication, donor registration, waitlist management, hospital administration, and blood inventory.
 - Real-Time Socket Gateway: Manages WebSocket rooms, dispatching emergency SOS broadcasts to nearby registered donors and clinical match alerts to hospital coordinators.
 - Matching Engine Service: Evaluates donor organ attributes against recipient clinical parameters to compute weighted multi-tier match rankings.
-- Background Sweepers: Monitors active match proposals and automatically sweeps expired 20-minute offers, notifying attending hospitals in real time when allocations shift.
-- Automated Schema Migrations: Verifies database schema integrity and automatically provisions administrative credentials on startup.
+- Background Sweepers: Monitors active match proposals and sweeps expired 20-minute offers, notifying attending hospitals when allocations shift.
 
 ### 3. Database (MySQL 8.0 / Cloud TiDB)
 - Relational Schema: Stores user accounts, hospital profiles, recipient waitlists, organ harvest records, match proposals, blood requests, and audit logs.
@@ -91,15 +90,23 @@ git clone https://github.com/Satyanarayana-Chittidi/Organova.git
 cd Organova
 ```
 
-### 2. Backend Setup
+### 2. Database Setup
 
-Ensure your local MySQL service is running. If your local MySQL root user has a password, create a `server/.env` file:
+Start your local MySQL service and import the schema:
+
+```bash
+mysql -u root -p < server/database/init.sql
+```
+
+### 3. Backend Setup
+
+Configure `server/.env` if your local MySQL root user has a password:
 
 ```env
 DB_PASSWORD=your_mysql_password
 ```
 
-*(If your local MySQL root has no password, no configuration is needed. The server automatically creates the database, loads the schema, and provisions the admin keys on startup.)*
+Install dependencies and start the development server:
 
 ```bash
 cd server
@@ -107,7 +114,7 @@ npm install
 npm run dev
 ```
 
-### 3. Frontend Setup
+### 4. Frontend Setup
 
 In a separate terminal:
 

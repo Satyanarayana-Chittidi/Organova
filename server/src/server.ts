@@ -1,6 +1,6 @@
 import http from 'http';
 import app from './app';
-import { testDatabaseConnection, autoMigrateDatabase } from './config/database';
+import { testDatabaseConnection } from './config/database';
 import { testRedisConnection } from './config/redis';
 import { testSmtpConnection } from './services/emailService';
 import { initSocketServer } from './config/socket';
@@ -21,9 +21,9 @@ async function startServer(): Promise<void> {
   console.log('====================================================');
 
   await testDatabaseConnection();
-  await autoMigrateDatabase();
-  await testRedisConnection();
-  await testSmtpConnection();
+
+  testRedisConnection().catch(() => {});
+  testSmtpConnection().catch(() => {});
 
   server.listen(PORT, () => {
     console.log(`[SERVER] Running in ${process.env.NODE_ENV || 'development'} mode`);
@@ -41,7 +41,7 @@ async function startServer(): Promise<void> {
     } catch (err) {
       console.error('[SWEEPER] Error during timeout sweep:', err);
     }
-  }, 15000);
+  }, 60000);
 }
 
 process.on('SIGINT', () => {

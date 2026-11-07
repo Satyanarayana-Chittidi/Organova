@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
@@ -65,109 +63,15 @@ pool.on('connection', (connection: any) => {
   });
 });
 
-async function ensureDatabaseExists(): Promise<void> {
-  const targetDb = process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db';
-  if (dbUrl) {
-    try {
-      const parsed = new URL(dbUrl);
-      const dbName = parsed.pathname.replace(/^\//, '') || targetDb;
-      const connConfig: any = {
-        host: parsed.hostname,
-        port: Number(parsed.port) || 4000,
-        user: decodeURIComponent(parsed.username),
-        password: decodeURIComponent(parsed.password),
-      };
-      if (dbUrl.includes('tidbcloud.com') || !dbUrl.includes('ssl=')) {
-        connConfig.ssl = { minVersion: 'TLSv1.2', rejectUnauthorized: true };
-      }
-      const connection = await mysql.createConnection(connConfig);
-      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
-      console.log(`[DATABASE] ✓ Ensured database '${dbName}' exists on MySQL / TiDB`);
-      await connection.end();
-    } catch (err: any) {
-      console.warn('[DATABASE] Notice during database creation check:', err.message);
-    }
-  } else {
-    try {
-      const connection = await mysql.createConnection({
-        host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
-        port: Number(process.env.MYSQLPORT || process.env.DB_PORT) || 3306,
-        user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
-        password: process.env.MYSQLPASSWORD ?? process.env.DB_PASSWORD ?? '',
-      });
-      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${targetDb}\``);
-      await connection.end();
-    } catch (err: any) {
-      console.warn('[DATABASE] Notice during local database creation check:', err.message);
-    }
-  }
-}
-
 export async function testDatabaseConnection(): Promise<void> {
-  await ensureDatabaseExists();
   try {
     const connection = await pool.getConnection();
-    const targetDb = dbUrl ? 'cloud connection URL' : (process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db');
+    await connection.query('SELECT 1');
+    const targetDb = dbUrl ? 'Cloud Database' : (process.env.MYSQLDATABASE || process.env.DB_NAME || 'organ_donation_db');
     console.log(`[DATABASE] Connected successfully to MySQL (${targetDb})`);
     connection.release();
   } catch (error) {
     console.error('[DATABASE] Error connecting to MySQL:', error);
-  }
-}
-
-export async function autoMigrateDatabase(): Promise<{ status: string; tables: number }> {
-  await ensureDatabaseExists();
-  try {
-    const connection = await pool.getConnection();
-    try {
-      let [rows]: any = await connection.query(
-        "SELECT COUNT(*) as cnt FROM information_schema.tables WHERE table_schema = DATABASE()"
-      );
-      let tableCount = rows[0]?.cnt || 0;
-
-      if (tableCount === 0) {
-        const initPath = path.resolve(__dirname, '../../database/init.sql');
-        if (fs.existsSync(initPath)) {
-          const sql = fs.readFileSync(initPath, 'utf8');
-          const statements = sql
-            .split(';')
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0 && !s.toLowerCase().startsWith('use ') && !s.toLowerCase().startsWith('create database'));
-          for (const stmt of statements) {
-            await connection.query(stmt);
-          }
-          const [afterRows]: any = await connection.query(
-            "SELECT COUNT(*) as cnt FROM information_schema.tables WHERE table_schema = DATABASE()"
-          );
-          tableCount = afterRows[0]?.cnt || 0;
-          console.log(`[AUTO-MIGRATE] Initialized fresh database schema: ${tableCount} tables created.`);
-        }
-      } else {
-        console.log(`[AUTO-MIGRATE] Database schema verified: ${tableCount} active tables.`);
-      }
-
-      const adminHash = '$2b$10$1pqXqzsdydZ7xAGVl2wYweY5ObOLKc69s7kCNL4KTPmqcoBCUVZA2';
-      await connection.query(
-        `INSERT INTO users (id, email, password_hash, role, is_active, is_verified)
-         VALUES 
-           ('99fef86d-d4b8-4803-b174-b6292e231ab3', 'admin@mastercontrol.local', ?, 'ADMIN', 1, 1),
-           (UUID(), 'admin@organdonation.gov.in', ?, 'ADMIN', 1, 1)
-         ON DUPLICATE KEY UPDATE 
-           password_hash = VALUES(password_hash),
-           role = 'ADMIN',
-           is_active = 1,
-           is_verified = 1`,
-        [adminHash, adminHash]
-      );
-      console.log('[AUTO-MIGRATE] Verified administrative access keys.');
-
-      return { status: 'active', tables: tableCount };
-    } finally {
-      connection.release();
-    }
-  } catch (err: any) {
-    console.warn('[AUTO-MIGRATE] Database check notice:', err.message);
-    return { status: 'error', tables: 0 };
   }
 }
 

@@ -206,3 +206,11 @@ CREATE TABLE IF NOT EXISTS blood_donation_camps (
     FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_camp_status_date (status, camp_date)
 ) ENGINE=InnoDB;
+
+INSERT INTO users (id, email, password_hash, role, is_active, is_verified)
+VALUES ('99fef86d-d4b8-4803-b174-b6292e231ab3', 'admin@mastercontrol.local', '$2b$10$1pqXqzsdydZ7xAGVl2wYweY5ObOLKc69s7kCNL4KTPmqcoBCUVZA2', 'ADMIN', 1, 1)
+ON DUPLICATE KEY UPDATE 
+  password_hash = VALUES(password_hash),
+  role = 'ADMIN',
+  is_active = 1,
+  is_verified = 1;
