@@ -2,7 +2,6 @@ import http from 'http';
 import app from './app';
 import { testDatabaseConnection } from './config/database';
 import { testRedisConnection } from './config/redis';
-import { testSmtpConnection } from './services/emailService';
 import { initSocketServer } from './config/socket';
 import { sweepTimedOutMatches } from './services/matchingService';
 import dotenv from 'dotenv';
@@ -23,7 +22,6 @@ async function startServer(): Promise<void> {
   await testDatabaseConnection();
 
   testRedisConnection().catch(() => {});
-  testSmtpConnection().catch(() => {});
 
   server.listen(PORT, () => {
     console.log(`[SERVER] Running in ${process.env.NODE_ENV || 'development'} mode`);
