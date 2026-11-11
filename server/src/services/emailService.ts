@@ -46,6 +46,10 @@ async function sendViaBrevo(
 }
 
 export async function sendOtpEmail(toEmail: string, otp: string): Promise<SendOtpResult> {
+  const logoUrl =
+    process.env.APP_LOGO_URL ||
+    'https://raw.githubusercontent.com/Satyanarayana-Chittidi/Organova/main/client/public/images/logo.png';
+
   const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -61,6 +65,13 @@ export async function sendOtpEmail(toEmail: string, otp: string): Promise<SendOt
         <table role="presentation" width="100%" style="max-width: 540px; background-color: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);">
           <tr>
             <td style="padding: 36px 40px 24px 40px; text-align: center; border-bottom: 1px solid #f1f5f9; background: #ffffff;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto 16px auto;">
+                <tr>
+                  <td align="center" style="width: 56px; height: 56px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; padding: 4px; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.08);">
+                    <img src="${logoUrl}" alt="Organova Logo" width="48" height="48" style="display: block; width: 48px; height: 48px; border: 0; outline: none; text-decoration: none; margin: 0 auto;" />
+                  </td>
+                </tr>
+              </table>
               <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #0f172a;">
                 ORGA<span style="color: #e11d48;">NOVA</span>
               </h1>
