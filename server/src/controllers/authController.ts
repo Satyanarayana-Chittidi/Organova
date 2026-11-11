@@ -20,10 +20,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
     res.status(201).json({
       success: true,
       message: result.message,
-      data: {
-        ...result.user,
-        devOtp: (result as any).devOtp,
-      },
+      data: result.user,
     });
   } catch (error) {
     next(error);

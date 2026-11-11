@@ -9,7 +9,6 @@ import {
   respondToMatch,
   sweepTimedOutMatches,
 } from '../services/matchingService';
-import { seedOrganMocksService } from '../services/seedMockService';
 import { findMatchById, getActiveProposedMatches } from '../models/transplantModel';
 import {
   TransplantQueryFilters,
@@ -246,23 +245,6 @@ export async function sweepTimeoutsHandler(
     res.status(200).json({
       success: true,
       message: `Match offer timeout sweep completed. Timed out: ${result.timedOutCount}, Failovers dispatched: ${result.failoverCount}.`,
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function seedMocksHandler(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const result = await seedOrganMocksService();
-    res.status(200).json({
-      success: true,
-      message: result.message,
       data: result,
     });
   } catch (error) {

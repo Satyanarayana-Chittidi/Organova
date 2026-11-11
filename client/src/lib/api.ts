@@ -319,9 +319,6 @@ export const transplantApi = {
 
   sweepTimeouts: () =>
     apiRequest('/transplant/matches/sweep-timeouts', { method: 'POST' }),
-
-  seedMocks: () =>
-    apiRequest('/transplant/seed-mocks', { method: 'POST' }),
 };
 
 export const adminApi = {

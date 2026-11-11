@@ -28,7 +28,7 @@ interface PendingRegistration {
   expiresAt: number;
 }
 
-const devPendingRegistrations = new Map<string, PendingRegistration>();
+const pendingRegistrationsStore = new Map<string, PendingRegistration>();
 
 function toAuthResponse(user: User): AuthUserResponse {
   return {
@@ -44,7 +44,6 @@ function toAuthResponse(user: User): AuthUserResponse {
 export async function registerUser(dto: RegisterDTO): Promise<{
   message: string;
   user: AuthUserResponse;
-  devOtp?: string;
 }> {
   const normalizedEmail = dto.email.toLowerCase().trim();
 
@@ -74,7 +73,7 @@ export async function registerUser(dto: RegisterDTO): Promise<{
   } catch (redisError) {
     console.warn('[REDIS] Cache offline. Using memory fallback store for pending registration.');
   }
-  devPendingRegistrations.set(normalizedEmail, pendingData);
+  pendingRegistrationsStore.set(normalizedEmail, pendingData);
 
   let emailDelivered = false;
   try {
@@ -87,7 +86,7 @@ export async function registerUser(dto: RegisterDTO): Promise<{
   return {
     message: emailDelivered
       ? 'Registration initiated. Please verify the 6-digit OTP sent to your email.'
-      : 'Registration initiated. Verification code sent (or use demo code shown below).',
+      : 'Registration initiated. Verification code sent.',
     user: {
       id: userId,
       email: normalizedEmail,
@@ -96,7 +95,6 @@ export async function registerUser(dto: RegisterDTO): Promise<{
       is_verified: false,
       avatar_url: null,
     },
-    devOtp: (!emailDelivered || process.env.NODE_ENV !== 'production') ? otp : undefined,
   };
 }
 
@@ -116,7 +114,7 @@ export async function verifyOtp(dto: VerifyOtpDTO): Promise<{
   }
 
   if (!pendingData) {
-    const memoryRecord = devPendingRegistrations.get(normalizedEmail);
+    const memoryRecord = pendingRegistrationsStore.get(normalizedEmail);
     if (memoryRecord && memoryRecord.expiresAt > Date.now()) {
       pendingData = memoryRecord;
     }
@@ -150,7 +148,7 @@ export async function verifyOtp(dto: VerifyOtpDTO): Promise<{
 
   console.log(`[AUTH] ✓ 6-digit OTP successfully verified for ${normalizedEmail}. User saved to database as verified.`);
 
-  devPendingRegistrations.delete(normalizedEmail);
+  pendingRegistrationsStore.delete(normalizedEmail);
   try {
     await redis.del(`pending_reg:${normalizedEmail}`);
   } catch (err) {}

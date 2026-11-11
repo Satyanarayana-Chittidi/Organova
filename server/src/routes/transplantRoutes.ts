@@ -10,7 +10,6 @@ import {
   getActiveMatchesHandler,
   getMatchDetailsHandler,
   sweepTimeoutsHandler,
-  seedMocksHandler,
 } from '../controllers/transplantController';
 import { authenticate, authorizeRoles } from '../middlewares/authMiddleware';
 
@@ -69,13 +68,6 @@ router.post(
   authenticate,
   authorizeRoles('ADMIN'),
   sweepTimeoutsHandler
-);
-
-router.post(
-  '/seed-mocks',
-  authenticate,
-  authorizeRoles('HOSPITAL', 'ADMIN'),
-  seedMocksHandler
 );
 
 export default router;
